@@ -1,0 +1,122 @@
+version: '3.8'
+
+services:
+  # Redis for shared state and caching
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+
+  # Router 1 - Bank A
+  router-bank-a:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3001:3000"
+      - "50051:50051"
+    environment:
+      - NODE_ENV=development
+      - ROUTER_ID=bank-a
+      - ROUTER_NAME=Bank A Router
+      - HTTP_PORT=3000
+      - GRPC_PORT=50051
+      - REDIS_URL=redis://redis:6379
+      - PEER_ROUTERS=http://router-bank-b:3000,http://router-bank-c:3000
+    depends_on:
+      - redis
+    volumes:
+      - ./config:/app/config
+      - ./logs:/app/logs
+
+  # Router 2 - Bank B
+  router-bank-b:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3002:3000"
+      - "50052:50051"
+    environment:
+      - NODE_ENV=development
+      - ROUTER_ID=bank-b
+      - ROUTER_NAME=Bank B Router
+      - HTTP_PORT=3000
+      - GRPC_PORT=50051
+      - REDIS_URL=redis://redis:6379
+      - PEER_ROUTERS=http://router-bank-a:3000,http://router-bank-c:3000
+    depends_on:
+      - redis
+    volumes:
+      - ./config:/app/config
+      - ./logs:/app/logs
+
+  # Router 3 - Bank C
+  router-bank-c:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3003:3000"
+      - "50053:50051"
+    environment:
+      - NODE_ENV=development
+      - ROUTER_ID=bank-c
+      - ROUTER_NAME=Bank C Router
+      - HTTP_PORT=3000
+      - GRPC_PORT=50051
+      - REDIS_URL=redis://redis:6379
+      - PEER_ROUTERS=http://router-bank-a:3000,http://router-bank-b:3000
+    depends_on:
+      - redis
+    volumes:
+      - ./config:/app/config
+      - ./logs:/app/logs
+
+  # Mock Ledger Service
+  mock-ledger:
+    build:
+      context: .
+      dockerfile: Dockerfile.ledger
+    ports:
+      - "4000:4000"
+    environment:
+      - NODE_ENV=development
+      - LEDGER_PORT=4000
+      - REDIS_URL=redis://redis:6379
+    depends_on:
+      - redis
+
+  # Monitoring and Metrics
+  prometheus:
+    image: prom/prometheus:latest
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./monitoring/grafana:/etc/grafana/provisioning
+
+volumes:
+  redis_data:
+  grafana_data:
+
+networks:
+  default:
+    name: finp2p-network
