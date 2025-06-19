@@ -1,0 +1,27 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+rule_files:
+  # - "first_rules.yml"
+  # - "second_rules.yml"
+
+scrape_configs:
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  - job_name: 'finp2p-routers'
+    static_configs:
+      - targets: 
+        - 'router-bank-a:3000'
+        - 'router-bank-b:3000'
+        - 'router-bank-c:3000'
+    metrics_path: '/metrics'
+    scrape_interval: 10s
+
+  - job_name: 'mock-ledger'
+    static_configs:
+      - targets: ['mock-ledger:4000']
+    metrics_path: '/metrics'
+    scrape_interval: 10s

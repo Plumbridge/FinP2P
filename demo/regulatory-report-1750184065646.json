@@ -1,0 +1,275 @@
+{
+  "reportId": "REG-REPORT-1750184065646",
+  "generatedAt": "2025-06-17T18:14:25.646Z",
+  "reportingPeriod": {
+    "start": "2025-06-16T18:14:25.646Z",
+    "end": "2025-06-17T18:14:25.646Z"
+  },
+  "routerA": {
+    "routerId": "router-a",
+    "totalConfirmations": 5,
+    "userTransactions": {
+      "user-001@router-a.com": [
+        {
+          "confirmationId": "conf-1750184059260-stevkf8bq",
+          "transferId": "transfer-1750184059258",
+          "asset": "GOLD-001",
+          "amount": "1000000",
+          "toAccount": "user-002@router-b.com",
+          "status": "confirmed",
+          "timestamp": "2025-06-17T18:14:19.260Z",
+          "signature": "dHJhbnNmZXItMTc1MDE4NDA1OTI1OC1yb3V0ZXItYS0xMDAwMDAwLTE3NTAxODQwNTkyNjA="
+        },
+        {
+          "confirmationId": "conf-1750184060279-a2fp4hksx",
+          "transferId": "transfer-1750184060279-1",
+          "asset": "SILVER-001",
+          "amount": "5000000",
+          "toAccount": "user-003@router-b.com",
+          "status": "confirmed",
+          "timestamp": "2025-06-17T18:14:20.279Z",
+          "signature": "dHJhbnNmZXItMTc1MDE4NDA2MDI3OS0xLXJvdXRlci1hLTUwMDAwMDAtMTc1MDE4NDA2MDI3OQ=="
+        },
+        {
+          "confirmationId": "conf-1750184060497-14gejsf6a",
+          "transferId": "transfer-1750184060279-3",
+          "asset": "PLATINUM-001",
+          "amount": "500000",
+          "toAccount": "user-005@router-b.com",
+          "status": "confirmed",
+          "timestamp": "2025-06-17T18:14:20.497Z",
+          "signature": "dHJhbnNmZXItMTc1MDE4NDA2MDI3OS0zLXJvdXRlci1hLTUwMDAwMC0xNzUwMTg0MDYwNDk3"
+        }
+      ],
+      "user-002@router-a.com": [
+        {
+          "confirmationId": "conf-1750184060389-qbzqp4d56",
+          "transferId": "transfer-1750184060279-2",
+          "asset": "GOLD-001",
+          "amount": "2000000",
+          "toAccount": "user-004@router-b.com",
+          "status": "confirmed",
+          "timestamp": "2025-06-17T18:14:20.389Z",
+          "signature": "dHJhbnNmZXItMTc1MDE4NDA2MDI3OS0yLXJvdXRlci1hLTIwMDAwMDAtMTc1MDE4NDA2MDM4OQ=="
+        }
+      ],
+      "user-006@router-a.com": [
+        {
+          "confirmationId": "conf-1750184064632-uiivbzys9",
+          "transferId": "transfer-fail-1750184064632",
+          "asset": "DIAMOND-001",
+          "amount": "100000",
+          "toAccount": "user-007@router-b.com",
+          "status": "failed",
+          "timestamp": "2025-06-17T18:14:24.632Z",
+          "signature": "dHJhbnNmZXItZmFpbC0xNzUwMTg0MDY0NjMyLXJvdXRlci1hLTEwMDAwMC0xNzUwMTg0MDY0NjMy"
+        }
+      ]
+    },
+    "confirmations": [
+      {
+        "id": "conf-1750184059260-stevkf8bq",
+        "transferId": "transfer-1750184059258",
+        "routerId": "router-a",
+        "status": "confirmed",
+        "timestamp": "2025-06-17T18:14:19.260Z",
+        "signature": "dHJhbnNmZXItMTc1MDE4NDA1OTI1OC1yb3V0ZXItYS0xMDAwMDAwLTE3NTAxODQwNTkyNjA=",
+        "metadata": {
+          "fromAccount": "user-001@router-a.com",
+          "toAccount": "user-002@router-b.com",
+          "asset": "GOLD-001",
+          "amount": "1000000",
+          "ledgerTxHash": null
+        }
+      },
+      {
+        "id": "conf-1750184060279-a2fp4hksx",
+        "transferId": "transfer-1750184060279-1",
+        "routerId": "router-a",
+        "status": "confirmed",
+        "timestamp": "2025-06-17T18:14:20.279Z",
+        "signature": "dHJhbnNmZXItMTc1MDE4NDA2MDI3OS0xLXJvdXRlci1hLTUwMDAwMDAtMTc1MDE4NDA2MDI3OQ==",
+        "metadata": {
+          "fromAccount": "user-001@router-a.com",
+          "toAccount": "user-003@router-b.com",
+          "asset": "SILVER-001",
+          "amount": "5000000",
+          "ledgerTxHash": "tx-cujul1wj9t"
+        }
+      },
+      {
+        "id": "conf-1750184060389-qbzqp4d56",
+        "transferId": "transfer-1750184060279-2",
+        "routerId": "router-a",
+        "status": "confirmed",
+        "timestamp": "2025-06-17T18:14:20.389Z",
+        "signature": "dHJhbnNmZXItMTc1MDE4NDA2MDI3OS0yLXJvdXRlci1hLTIwMDAwMDAtMTc1MDE4NDA2MDM4OQ==",
+        "metadata": {
+          "fromAccount": "user-002@router-a.com",
+          "toAccount": "user-004@router-b.com",
+          "asset": "GOLD-001",
+          "amount": "2000000",
+          "ledgerTxHash": "tx-fyg93pnsyei"
+        }
+      },
+      {
+        "id": "conf-1750184060497-14gejsf6a",
+        "transferId": "transfer-1750184060279-3",
+        "routerId": "router-a",
+        "status": "confirmed",
+        "timestamp": "2025-06-17T18:14:20.497Z",
+        "signature": "dHJhbnNmZXItMTc1MDE4NDA2MDI3OS0zLXJvdXRlci1hLTUwMDAwMC0xNzUwMTg0MDYwNDk3",
+        "metadata": {
+          "fromAccount": "user-001@router-a.com",
+          "toAccount": "user-005@router-b.com",
+          "asset": "PLATINUM-001",
+          "amount": "500000",
+          "ledgerTxHash": "tx-2vzbj0laerd"
+        }
+      },
+      {
+        "id": "conf-1750184064632-uiivbzys9",
+        "transferId": "transfer-fail-1750184064632",
+        "routerId": "router-a",
+        "status": "failed",
+        "timestamp": "2025-06-17T18:14:24.632Z",
+        "signature": "dHJhbnNmZXItZmFpbC0xNzUwMTg0MDY0NjMyLXJvdXRlci1hLTEwMDAwMC0xNzUwMTg0MDY0NjMy",
+        "metadata": {
+          "fromAccount": "user-006@router-a.com",
+          "toAccount": "user-007@router-b.com",
+          "asset": "DIAMOND-001",
+          "amount": "100000",
+          "ledgerTxHash": null
+        },
+        "rollbackReason": "Router B confirmation timeout",
+        "rollbackTimestamp": "2025-06-17T18:14:24.633Z"
+      }
+    ]
+  },
+  "routerB": {
+    "routerId": "router-b",
+    "totalConfirmations": 4,
+    "assetTransactions": {
+      "GOLD-001": [
+        {
+          "confirmationId": "conf-1750184059262-nua4celr5",
+          "transferId": "transfer-1750184059258",
+          "amount": "1000000",
+          "fromAccount": "user-001@router-a.com",
+          "toAccount": "user-002@router-b.com",
+          "status": "confirmed",
+          "timestamp": "2025-06-17T18:14:19.262Z",
+          "signature": "dHJhbnNmZXItMTc1MDE4NDA1OTI1OC1yb3V0ZXItYi0xMDAwMDAwLTE3NTAxODQwNTkyNjI="
+        },
+        {
+          "confirmationId": "conf-1750184060389-09msu9gju",
+          "transferId": "transfer-1750184060279-2",
+          "amount": "2000000",
+          "fromAccount": "user-002@router-a.com",
+          "toAccount": "user-004@router-b.com",
+          "status": "confirmed",
+          "timestamp": "2025-06-17T18:14:20.389Z",
+          "signature": "dHJhbnNmZXItMTc1MDE4NDA2MDI3OS0yLXJvdXRlci1iLTIwMDAwMDAtMTc1MDE4NDA2MDM4OQ=="
+        }
+      ],
+      "SILVER-001": [
+        {
+          "confirmationId": "conf-1750184060279-7zrpo3ov0",
+          "transferId": "transfer-1750184060279-1",
+          "amount": "5000000",
+          "fromAccount": "user-001@router-a.com",
+          "toAccount": "user-003@router-b.com",
+          "status": "confirmed",
+          "timestamp": "2025-06-17T18:14:20.279Z",
+          "signature": "dHJhbnNmZXItMTc1MDE4NDA2MDI3OS0xLXJvdXRlci1iLTUwMDAwMDAtMTc1MDE4NDA2MDI3OQ=="
+        }
+      ],
+      "PLATINUM-001": [
+        {
+          "confirmationId": "conf-1750184060497-6dibxfjo3",
+          "transferId": "transfer-1750184060279-3",
+          "amount": "500000",
+          "fromAccount": "user-001@router-a.com",
+          "toAccount": "user-005@router-b.com",
+          "status": "confirmed",
+          "timestamp": "2025-06-17T18:14:20.497Z",
+          "signature": "dHJhbnNmZXItMTc1MDE4NDA2MDI3OS0zLXJvdXRlci1iLTUwMDAwMC0xNzUwMTg0MDYwNDk3"
+        }
+      ]
+    },
+    "confirmations": [
+      {
+        "id": "conf-1750184059262-nua4celr5",
+        "transferId": "transfer-1750184059258",
+        "routerId": "router-b",
+        "status": "confirmed",
+        "timestamp": "2025-06-17T18:14:19.262Z",
+        "signature": "dHJhbnNmZXItMTc1MDE4NDA1OTI1OC1yb3V0ZXItYi0xMDAwMDAwLTE3NTAxODQwNTkyNjI=",
+        "metadata": {
+          "fromAccount": "user-001@router-a.com",
+          "toAccount": "user-002@router-b.com",
+          "asset": "GOLD-001",
+          "amount": "1000000",
+          "ledgerTxHash": "tx-qzf0b1cnlpb"
+        }
+      },
+      {
+        "id": "conf-1750184060279-7zrpo3ov0",
+        "transferId": "transfer-1750184060279-1",
+        "routerId": "router-b",
+        "status": "confirmed",
+        "timestamp": "2025-06-17T18:14:20.279Z",
+        "signature": "dHJhbnNmZXItMTc1MDE4NDA2MDI3OS0xLXJvdXRlci1iLTUwMDAwMDAtMTc1MDE4NDA2MDI3OQ==",
+        "metadata": {
+          "fromAccount": "user-001@router-a.com",
+          "toAccount": "user-003@router-b.com",
+          "asset": "SILVER-001",
+          "amount": "5000000",
+          "ledgerTxHash": "tx-cujul1wj9t"
+        }
+      },
+      {
+        "id": "conf-1750184060389-09msu9gju",
+        "transferId": "transfer-1750184060279-2",
+        "routerId": "router-b",
+        "status": "confirmed",
+        "timestamp": "2025-06-17T18:14:20.389Z",
+        "signature": "dHJhbnNmZXItMTc1MDE4NDA2MDI3OS0yLXJvdXRlci1iLTIwMDAwMDAtMTc1MDE4NDA2MDM4OQ==",
+        "metadata": {
+          "fromAccount": "user-002@router-a.com",
+          "toAccount": "user-004@router-b.com",
+          "asset": "GOLD-001",
+          "amount": "2000000",
+          "ledgerTxHash": "tx-fyg93pnsyei"
+        }
+      },
+      {
+        "id": "conf-1750184060497-6dibxfjo3",
+        "transferId": "transfer-1750184060279-3",
+        "routerId": "router-b",
+        "status": "confirmed",
+        "timestamp": "2025-06-17T18:14:20.497Z",
+        "signature": "dHJhbnNmZXItMTc1MDE4NDA2MDI3OS0zLXJvdXRlci1iLTUwMDAwMC0xNzUwMTg0MDYwNDk3",
+        "metadata": {
+          "fromAccount": "user-001@router-a.com",
+          "toAccount": "user-005@router-b.com",
+          "asset": "PLATINUM-001",
+          "amount": "500000",
+          "ledgerTxHash": "tx-2vzbj0laerd"
+        }
+      }
+    ]
+  },
+  "summary": {
+    "totalTransfers": 5,
+    "successfulTransfers": 4,
+    "failedTransfers": 1,
+    "totalVolume": {
+      "GOLD-001": 3000000,
+      "SILVER-001": 5000000,
+      "PLATINUM-001": 500000,
+      "DIAMOND-001": 0
+    },
+    "complianceStatus": "COMPLIANT"
+  }
+}
