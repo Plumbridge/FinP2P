@@ -1,46 +1,27 @@
 import { FinP2PRouter } from '../../src/router/Router';
 import { ConfigOptions, LedgerType } from '../../src/types';
 import { createLogger } from '../../src/utils/logger';
-import { createClient } from 'redis';
+import { createTestRedisClient, cleanupRedis, closeRedisConnection } from '../helpers/redis';
+import { stopRouterSafely } from '../helpers/router-cleanup';
+import type { RedisClientType } from 'redis';
 
-// Mock Redis for testing
-jest.mock('redis');
-const mockCreateClient = createClient as jest.MockedFunction<typeof createClient>;
+
 
 describe('FinP2PRouter', () => {
   let router: FinP2PRouter;
   let config: ConfigOptions;
   let logger: any;
-  let mockRedis: any;
+  let redisClient: RedisClientType;
 
   // Increase test timeout to 10 seconds
   jest.setTimeout(10000);
 
-  beforeEach(() => {
-    // Create a complete Redis mock
-    mockRedis = {
-      hSet: jest.fn().mockResolvedValue(1),
-      hGet: jest.fn().mockResolvedValue(null),
-      hGetAll: jest.fn().mockResolvedValue({}),
-      hgetall: jest.fn().mockResolvedValue({}),
-      sAdd: jest.fn().mockResolvedValue(1),
-      sMembers: jest.fn().mockResolvedValue([]),
-      sRem: jest.fn().mockResolvedValue(1),
-      del: jest.fn().mockResolvedValue(1),
-      get: jest.fn().mockResolvedValue(null),
-      set: jest.fn().mockResolvedValue('OK'),
-      exists: jest.fn().mockResolvedValue(0),
-      keys: jest.fn().mockResolvedValue([]),
-      quit: jest.fn().mockResolvedValue('OK'),
-      connect: jest.fn().mockResolvedValue(undefined),
-      disconnect: jest.fn().mockResolvedValue(undefined),
-      ping: jest.fn().mockResolvedValue('PONG'),
-      isOpen: true,
-      isReady: true
-    };
+  beforeAll(async () => {
+    redisClient = await createTestRedisClient();
+  });
 
-    // Mock createClient to return our mock Redis instance
-    mockCreateClient.mockReturnValue(mockRedis);
+  beforeEach(async () => {
+    await cleanupRedis(redisClient);
     logger = createLogger({ level: 'error' });
     // Reduce log noise in tests
 
@@ -49,7 +30,8 @@ describe('FinP2PRouter', () => {
       port: 0, // Use random port
       host: 'localhost',
       redis: {
-        url: 'redis://localhost:6379',
+        url: process.env.TEST_REDIS_URL || 'redis://localhost:6379/1',
+        client: redisClient,
         keyPrefix: 'test:finp2p:',
         ttl: 3600
       },
@@ -92,14 +74,19 @@ describe('FinP2PRouter', () => {
   });
 
   afterEach(async () => {
-    if (router) {
-      try {
-        await router.stop();
-      } catch (error) {
+    await stopRouterSafely(router);
+    // Clear any remaining timers
+    jest.clearAllTimers();
+    jest.clearAllMocks();
+    try {
         // Ignore errors during cleanup
         console.warn('Error during router cleanup:', error);
       }
     }
+  });
+
+  afterAll(async () => {
+    await closeRedisConnection(redisClient);
     // Clear all mocks after each test
     jest.clearAllMocks();
     

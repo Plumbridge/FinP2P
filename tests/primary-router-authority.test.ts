@@ -11,40 +11,57 @@
  * 7. Protocol compliance validation
  */
 
-import { expect } from 'chai';
-import sinon from 'sinon';
+// Using Jest's built-in expect and mocking
 import { PrimaryRouterAuthority } from '../src/router/PrimaryRouterAuthority';
 import { ConfirmationRecordManager } from '../src/router/ConfirmationRecordManager';
-import Redis from 'ioredis';
+import { Transfer, TransferStatus } from '../src/types';
+
 
 describe('Primary Router Authority', () => {
   let authority: PrimaryRouterAuthority;
   let confirmationManager: ConfirmationRecordManager;
   let redisClient: any;
   let redisStub: any;
+  let logger: any;
 
   beforeEach(() => {
     // Mock Redis client
     redisStub = {
-      get: sinon.stub(),
-      set: sinon.stub(),
-      del: sinon.stub(),
-      hget: sinon.stub(),
-      hset: sinon.stub(),
-      hdel: sinon.stub(),
-      hgetall: sinon.stub(),
-      exists: sinon.stub(),
-      expire: sinon.stub(),
-      keys: sinon.stub()
+      get: jest.fn(),
+      set: jest.fn(),
+      del: jest.fn(),
+      hget: jest.fn(),
+      hGet: jest.fn(),
+      hset: jest.fn(),
+      hSet: jest.fn(),
+      hdel: jest.fn(),
+      hDel: jest.fn(),
+      hgetall: jest.fn(),
+      hGetAll: jest.fn(),
+      exists: jest.fn(),
+      expire: jest.fn(),
+      keys: jest.fn(),
+      srem: jest.fn(),
+      sRem: jest.fn(),
+      sadd: jest.fn(),
+      sAdd: jest.fn()
+    };
+    
+    // Mock logger
+    logger = {
+      info: jest.fn(),
+      error: jest.fn(),
+      warn: jest.fn(),
+      debug: jest.fn()
     };
     
     redisClient = redisStub;
-    authority = new PrimaryRouterAuthority('test-router-id', redisClient);
-    confirmationManager = new ConfirmationRecordManager(redisClient);
+    authority = new PrimaryRouterAuthority(redisClient, 'test-router-id');
+    confirmationManager = new ConfirmationRecordManager(redisClient, logger, 'test-router-id');
   });
 
   afterEach(() => {
-    sinon.restore();
+    jest.clearAllMocks();
   });
 
   describe('Asset Registration', () => {
@@ -61,9 +78,9 @@ describe('Primary Router Authority', () => {
         backupRouterIds: ['backup-router-1', 'backup-router-2']
       };
 
-      redisStub.exists.resolves(0); // Asset doesn't exist
-      redisStub.hset.resolves(1);
-      redisStub.expire.resolves(1);
+      redisStub.exists.mockResolvedValue(0); // Asset doesn't exist
+      redisStub.hSet.mockResolvedValue(1);
+      redisStub.expire.mockResolvedValue(1);
 
       const result = await authority.registerAsset(
         assetData.assetId,
@@ -71,10 +88,10 @@ describe('Primary Router Authority', () => {
         assetData.backupRouterIds
       );
 
-      expect(result.assetId).to.equal(assetData.assetId);
-      expect(result.primaryRouterId).to.equal('test-router-id');
-      expect(result.backupRouterIds).to.deep.equal(assetData.backupRouterIds);
-      expect(redisStub.hset.calledOnce).to.be.true;
+      expect(result.assetId).toBe(assetData.assetId);
+      expect(result.primaryRouterId).toBe('test-router-id');
+      expect(result.backupRouterIds).toEqual(assetData.backupRouterIds);
+      expect(redisStub.hset).toHaveBeenCalledTimes(1);
     });
 
     it('should reject registration of existing asset', async () => {
@@ -89,7 +106,22 @@ describe('Primary Router Authority', () => {
         backupRouterIds: []
       };
 
-      redisStub.hgetall.resolves({
+      redisStub.hGet.mockResolvedValue(JSON.stringify({
+        assetId: 'EXISTING-ASSET',
+        primaryRouterId: 'existing-router',
+        backupRouterIds: JSON.stringify([]),
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        metadata: JSON.stringify({ symbol: 'TEST' })
+      }));
+      redisStub.hGet.mockResolvedValue(JSON.stringify({
+        assetId: mockRegistration.assetId,
+        primaryRouterId: mockRegistration.primaryRouterId,
+        backupRouterIds: JSON.stringify(mockRegistration.backupRouterIds),
+        registeredAt: mockRegistration.registeredAt,
+        metadata: mockRegistration.metadata
+      }));
+      redisStub.hgetall.mockResolvedValue({
         assetId: 'EXISTING-ASSET',
         primaryRouterId: 'existing-router',
         backupRouterIds: JSON.stringify([]),
@@ -104,11 +136,11 @@ describe('Primary Router Authority', () => {
           assetData.metadata,
           assetData.backupRouterIds
         );
-        expect.fail('Should have thrown an error');
+        fail('Should have thrown an error');
       } catch (error) {
-        expect(error.message).to.include('already registered');
+        expect((error as Error).message).toContain('already registered');
       }
-      expect(redisStub.hset.called).to.be.false;
+      expect(redisStub.hSet).not.toHaveBeenCalled();
     });
 
     it('should validate required asset fields', async () => {
@@ -123,9 +155,9 @@ describe('Primary Router Authority', () => {
           invalidMetadata as any,
           []
         );
-        expect.fail('Should have thrown an error');
+        fail('Should have thrown an error');
       } catch (error) {
-         expect(error).to.exist;
+         expect(error).toBeDefined();
        }
      });
   });
@@ -141,7 +173,7 @@ describe('Primary Router Authority', () => {
         metadata: { symbol: 'TEST' }
       };
       
-      redisStub.hgetall.resolves({
+      redisStub.hgetall.mockResolvedValue({
         assetId: mockRegistration.assetId,
         primaryRouterId: mockRegistration.primaryRouterId,
         backupRouterIds: JSON.stringify(mockRegistration.backupRouterIds),
@@ -153,33 +185,31 @@ describe('Primary Router Authority', () => {
     it('should validate primary router authority', async () => {
       const result = await authority.validateAuthority('TEST-ASSET', 'test-router-id');
 
-      expect(result.isAuthorized).to.be.true;
-      expect(result.authorityType).to.equal('primary');
-      expect(result.routerId).to.equal('test-router-id');
+      expect(result.isAuthorized).toBe(true);
+      expect(result.primaryRouter).toBe('test-router-id');
     });
 
     it('should validate backup router authority', async () => {
       const result = await authority.validateAuthority('TEST-ASSET', 'backup-1');
 
-      expect(result.isAuthorized).to.be.true;
-      expect(result.authorityType).to.equal('backup');
-      expect(result.routerId).to.equal('backup-1');
+      expect(result.isAuthorized).toBe(true);
+      expect(result.backupRouters).toContain('backup-1');
     });
 
     it('should reject unauthorized router', async () => {
       const result = await authority.validateAuthority('TEST-ASSET', 'unauthorized-router');
 
-      expect(result.isAuthorized).to.be.false;
-      expect(result.reason).to.include('not authorized');
+      expect(result.isAuthorized).toBe(false);
+      expect(result.reason).toContain('not authorized');
     });
 
     it('should handle non-existent asset', async () => {
-      redisStub.hgetall.resolves(null);
+      redisStub.hgetall.mockResolvedValue(null);
 
       const result = await authority.validateAuthority('NON-EXISTENT', 'test-router-id');
 
-      expect(result.isAuthorized).to.be.false;
-      expect(result.reason).to.include('not found');
+      expect(result.isAuthorized).toBe(false);
+      expect(result.reason).toContain('not found');
     });
   });
 
@@ -193,7 +223,7 @@ describe('Primary Router Authority', () => {
         metadata: JSON.stringify({ symbol: 'TEST' })
       };
       
-      redisStub.hgetall.resolves({
+      redisStub.hgetall.mockResolvedValue({
         assetId: mockRegistration.assetId,
         primaryRouterId: mockRegistration.primaryRouterId,
         backupRouterIds: JSON.stringify(mockRegistration.backupRouterIds),
@@ -203,9 +233,9 @@ describe('Primary Router Authority', () => {
     });
 
     it('should transfer primary authority to backup router', async () => {
-      redisStub.hSet.resolves(1);
-      redisStub.sRem.resolves(1);
-      redisStub.sAdd.resolves(1);
+      redisStub.hSet.mockResolvedValue(1);
+      redisStub.sRem.mockResolvedValue(1);
+      redisStub.sAdd.mockResolvedValue(1);
 
       // Should not throw an error
       await authority.transferAuthority(
@@ -214,9 +244,9 @@ describe('Primary Router Authority', () => {
       );
       
       // Verify Redis update was called
-      expect(redisStub.hSet.called).to.be.true;
-      expect(redisStub.sRem.called).to.be.true;
-      expect(redisStub.sAdd.called).to.be.true;
+      expect(redisStub.hSet).toHaveBeenCalled();
+        expect(redisStub.sRem).toHaveBeenCalled();
+        expect(redisStub.sAdd).toHaveBeenCalled();
     });
 
     it('should reject transfer to unauthorized router', async () => {
@@ -225,56 +255,56 @@ describe('Primary Router Authority', () => {
           'TRANSFER-TEST-ASSET',
           'unauthorized-router'
         );
-        expect.fail('Should have thrown an error');
+        fail('Should have thrown an error');
       } catch (error) {
-        expect(error.message).to.include('Only primary router');
+        expect((error as Error).message).toContain('Only primary router');
       }
     });
 
     it('should reject transfer from non-primary router', async () => {
       // Change authority instance to simulate different router
-      const unauthorizedAuthority = new PrimaryRouterAuthority('backup-1', redisClient);
+      const unauthorizedAuthority = new PrimaryRouterAuthority(redisClient, 'backup-1');
       
       try {
         await unauthorizedAuthority.transferAuthority(
           'TRANSFER-TEST-ASSET',
           'backup-1'
         );
-        expect.fail('Should have thrown an error');
+        fail('Should have thrown an error');
       } catch (error) {
-        expect(error.message).to.include('Only primary router');
+        expect((error as Error).message).toContain('Only primary router');
       }
     });
   });
 
   describe('Primary Router Availability Check', () => {
     it('should detect available primary router', async () => {
-      redisStub.get.resolves(Date.now().toString());
+      redisStub.get.mockResolvedValue(Date.now().toString());
 
       const result = await authority.checkPrimaryRouterAvailability('TEST-ASSET');
 
-      expect(result.isAvailable).to.be.true;
-      expect(result.lastHeartbeat).to.be.a('number');
+      expect(result.isAvailable).toBe(true);
+      expect(typeof result.lastHeartbeat).toBe('number');
     });
 
     it('should detect unavailable primary router', async () => {
       // Simulate old heartbeat (more than 30 seconds ago)
       const oldHeartbeat = Date.now() - 60000;
-      redisStub.get.resolves(oldHeartbeat.toString());
+      redisStub.get.mockResolvedValue(oldHeartbeat.toString());
 
       const result = await authority.checkPrimaryRouterAvailability('TEST-ASSET');
 
-      expect(result.isAvailable).to.be.false;
-      expect(result.reason).to.include('heartbeat expired');
+      expect(result.isAvailable).toBe(false);
+      expect(result.reason).toContain('heartbeat expired');
     });
 
     it('should handle missing heartbeat', async () => {
-      redisStub.get.resolves(null);
+      redisStub.get.mockResolvedValue(null);
 
       const result = await authority.checkPrimaryRouterAvailability('TEST-ASSET');
 
-      expect(result.isAvailable).to.be.false;
-      expect(result.reason).to.include('No heartbeat found');
+      expect(result.isAvailable).toBe(false);
+      expect(result.reason).toContain('No heartbeat found');
     });
   });
 
@@ -288,7 +318,7 @@ describe('Primary Router Authority', () => {
         metadata: JSON.stringify({ symbol: 'TEST' })
       };
       
-      redisStub.hgetall.resolves({
+      redisStub.hgetall.mockResolvedValue({
         assetId: mockRegistration.assetId,
         primaryRouterId: mockRegistration.primaryRouterId,
         backupRouterIds: JSON.stringify(mockRegistration.backupRouterIds),
@@ -299,50 +329,72 @@ describe('Primary Router Authority', () => {
 
     it('should validate backup authority when primary is unavailable', async () => {
       // Simulate unavailable primary router
-      redisStub.get.resolves(null);
+      redisStub.get.mockResolvedValue(null);
       
-      const backupAuthority = new PrimaryRouterAuthority('backup-1', redisClient);
-      const result = await backupAuthority.validateBackupAuthority('BACKUP-TEST-ASSET');
+      const backupAuthority = new PrimaryRouterAuthority(redisClient, 'backup-1');
+      const result = await backupAuthority.validateBackupAuthority('BACKUP-TEST-ASSET', 'backup-1');
 
-      expect(result.canActAsPrimary).to.be.true;
-      expect(result.reason).to.include('Primary router unavailable');
+      expect(result.isAuthorized).toBe(true);
+      expect(result.reason).toContain('Primary router unavailable');
     });
 
     it('should reject backup authority when primary is available', async () => {
       // Simulate available primary router
-      redisStub.get.resolves(Date.now().toString());
+      redisStub.get.mockResolvedValue(Date.now().toString());
       
-      const backupAuthority = new PrimaryRouterAuthority('backup-1', redisClient);
-      const result = await backupAuthority.validateBackupAuthority('BACKUP-TEST-ASSET');
+      const backupAuthority = new PrimaryRouterAuthority(redisClient, 'backup-1');
+      const result = await backupAuthority.validateBackupAuthority('BACKUP-TEST-ASSET', 'backup-1');
 
-      expect(result.canActAsPrimary).to.be.false;
-      expect(result.reason).to.include('Primary router is available');
+      expect(result.isAuthorized).toBe(false);
+      expect(result.reason).toContain('Primary router is available');
     });
 
     it('should reject unauthorized backup router', async () => {
-      redisStub.get.resolves(null); // Primary unavailable
+      redisStub.get.mockResolvedValue(null); // Primary unavailable
       
-      const unauthorizedAuthority = new PrimaryRouterAuthority('unauthorized-router', redisClient);
-      const result = await unauthorizedAuthority.validateBackupAuthority('BACKUP-TEST-ASSET');
+      const unauthorizedAuthority = new PrimaryRouterAuthority(redisClient, 'unauthorized-router');
+      const result = await unauthorizedAuthority.validateBackupAuthority('BACKUP-TEST-ASSET', 'unauthorized-backup-router');
 
-      expect(result.canActAsPrimary).to.be.false;
-      expect(result.reason).to.include('not a backup router');
+      expect(result.isAuthorized).toBe(false);
+      expect(result.reason).toContain('not a backup router');
     });
   });
 
   describe('Integration with Confirmation Records', () => {
-    it('should create confirmation record with authority validation', async () => {
-      const transferData = {
+    it('should create confirmation record for authorized router', async () => {
+      const transferData: Transfer = {
         id: 'test-transfer-123',
-        assetId: 'TEST-ASSET',
-        from: { ledger: 'ethereum', address: '0x123' },
-        to: { ledger: 'sui', address: '0x456' },
-        amount: '1000000',
-        routerId: 'test-router-id'
+        fromAccount: {
+          id: 'from-account',
+          type: 'account',
+          domain: 'ethereum',
+          metadata: { address: '0x123' }
+        },
+        toAccount: {
+          id: 'to-account',
+          type: 'account',
+          domain: 'sui',
+          metadata: { address: '0x456' }
+        },
+        asset: {
+          id: 'TEST-ASSET',
+          type: 'asset',
+          domain: 'test',
+          metadata: { symbol: 'TEST' }
+        },
+        amount: BigInt('1000000'),
+        status: TransferStatus.PENDING,
+        route: [],
+        metadata: {
+          reference: 'test-ref',
+          description: 'Test transfer'
+        },
+        createdAt: new Date(),
+        updatedAt: new Date()
       };
 
       // Mock successful authority validation
-      redisStub.hgetall.resolves({
+      redisStub.hgetall.mockResolvedValue({
         assetId: 'TEST-ASSET',
         primaryRouterId: 'test-router-id',
         backupRouterIds: JSON.stringify(['backup-1']),
@@ -350,16 +402,16 @@ describe('Primary Router Authority', () => {
         metadata: JSON.stringify({ symbol: 'TEST' })
       });
 
-      redisStub.hset.resolves(1);
-      redisStub.expire.resolves(1);
+      redisStub.hset.mockResolvedValue(1);
+      redisStub.expire.mockResolvedValue(1);
 
       // Validate authority first
       const authorityResult = await authority.validateAuthority(
-        transferData.assetId,
-        transferData.routerId
+        transferData.asset.id,
+        'test-router-id'
       );
 
-      expect(authorityResult.isAuthorized).to.be.true;
+      expect(authorityResult.isAuthorized).toBe(true);
 
       // Create confirmation record
       const confirmationResult = await confirmationManager.createConfirmationRecord(
@@ -367,23 +419,45 @@ describe('Primary Router Authority', () => {
         'confirmed'
       );
 
-      expect(confirmationResult).to.exist;
-      expect(confirmationResult.transferId).to.equal(transferData.id);
-      expect(confirmationResult.status).to.equal('confirmed');
+      expect(confirmationResult).toBeDefined();
+      expect(confirmationResult.transferId).toBe(transferData.id);
+      expect(confirmationResult.status).toBe('confirmed');
     });
 
     it('should reject confirmation record for unauthorized router', async () => {
-      const transferData = {
+      const transferData: Transfer = {
         id: 'test-transfer-456',
-        assetId: 'TEST-ASSET',
-        from: { ledger: 'ethereum', address: '0x123' },
-        to: { ledger: 'sui', address: '0x456' },
-        amount: '1000000',
-        routerId: 'unauthorized-router'
+        fromAccount: {
+          id: 'from-account-2',
+          type: 'account',
+          domain: 'ethereum',
+          metadata: { address: '0x123' }
+        },
+        toAccount: {
+          id: 'to-account-2',
+          type: 'account',
+          domain: 'sui',
+          metadata: { address: '0x456' }
+        },
+        asset: {
+          id: 'TEST-ASSET',
+          type: 'asset',
+          domain: 'test',
+          metadata: { symbol: 'TEST' }
+        },
+        amount: BigInt('1000000'),
+        status: TransferStatus.PENDING,
+        route: [],
+        metadata: {
+          reference: 'test-ref-2',
+          description: 'Test transfer 2'
+        },
+        createdAt: new Date(),
+        updatedAt: new Date()
       };
 
       // Mock asset registration
-      redisStub.hgetall.resolves({
+      redisStub.hgetall.mockResolvedValue({
         assetId: 'TEST-ASSET',
         primaryRouterId: 'test-router-id',
         backupRouterIds: JSON.stringify(['backup-1']),
@@ -393,27 +467,27 @@ describe('Primary Router Authority', () => {
 
       // Validate authority (should fail)
       const authorityResult = await authority.validateAuthority(
-        transferData.assetId,
-        transferData.routerId
+        transferData.asset.id,
+        'unauthorized-router'
       );
 
-      expect(authorityResult.isAuthorized).to.be.false;
-      expect(authorityResult.reason).to.include('not authorized');
+      expect(authorityResult.isAuthorized).toBe(false);
+      expect(authorityResult.reason).toContain('not authorized');
     });
   });
 
   describe('Error Handling and Edge Cases', () => {
     it('should handle Redis connection errors gracefully', async () => {
-      redisStub.hgetall.rejects(new Error('Redis connection failed'));
+      redisStub.hgetall.mockRejectedValue(new Error('Redis connection failed'));
 
       const result = await authority.validateAuthority('TEST-ASSET', 'test-router-id');
 
-      expect(result.isAuthorized).to.be.false;
-      expect(result.reason).to.include('Redis connection failed');
+      expect(result.isAuthorized).toBe(false);
+      expect(result.reason).toContain('Redis connection failed');
     });
 
     it('should handle malformed asset data in Redis', async () => {
-      redisStub.hgetall.resolves({
+      redisStub.hgetall.mockResolvedValue({
         assetId: 'MALFORMED-ASSET',
         primaryRouterId: 'test-router-id',
         backupRouterIds: 'invalid-json', // Invalid JSON
@@ -423,8 +497,8 @@ describe('Primary Router Authority', () => {
 
       const result = await authority.validateAuthority('MALFORMED-ASSET', 'test-router-id');
 
-      expect(result.isAuthorized).to.be.false;
-      expect(result.reason).to.include('Failed to parse');
+      expect(result.isAuthorized).toBe(false);
+      expect(result.reason).toContain('Failed to parse');
     });
 
     it('should validate asset ID format', async () => {
@@ -441,9 +515,9 @@ describe('Primary Router Authority', () => {
           invalidMetadata,
           []
         );
-        expect.fail('Should have thrown an error');
+        fail('Should have thrown an error');
       } catch (error) {
-        expect(error).to.exist;
+        expect(error).toBeDefined();
       }
     });
 
@@ -456,12 +530,12 @@ describe('Primary Router Authority', () => {
       };
 
       // First call succeeds
-      redisStub.hgetall.onFirstCall().resolves(null);
-      redisStub.hset.resolves(1);
-      redisStub.expire.resolves(1);
+      redisStub.hgetall.mockResolvedValueOnce(null);
+      redisStub.hset.mockResolvedValue(1);
+      redisStub.expire.mockResolvedValue(1);
       
       // Second call fails (asset now exists)
-      redisStub.hgetall.onSecondCall().resolves({
+      redisStub.hgetall.mockResolvedValueOnce({
         assetId: 'CONCURRENT-TEST',
         primaryRouterId: 'primary-router',
         backupRouterIds: JSON.stringify([]),
@@ -479,8 +553,8 @@ describe('Primary Router Authority', () => {
       const successes = results.filter(r => r.status === 'fulfilled');
       const failures = results.filter(r => r.status === 'rejected');
       
-      expect(successes.length).to.equal(1);
-      expect(failures.length).to.equal(1);
+      expect(successes.length).toBe(1);
+      expect(failures.length).toBe(1);
     });
   });
 
@@ -500,9 +574,9 @@ describe('Primary Router Authority', () => {
         backupRouterIds: ['backup-1', 'backup-2']
       };
 
-      redisStub.exists.resolves(0);
-      redisStub.hset.resolves(1);
-      redisStub.expire.resolves(1);
+      redisStub.exists.mockResolvedValue(0);
+      redisStub.hset.mockResolvedValue(1);
+      redisStub.expire.mockResolvedValue(1);
 
       const result = await authority.registerAsset(
         protocolCompliantAsset.assetId,
@@ -510,9 +584,9 @@ describe('Primary Router Authority', () => {
         protocolCompliantAsset.backupRouterIds
       );
 
-      expect(result.assetId).to.equal(protocolCompliantAsset.assetId);
-      expect(result.metadata.symbol).to.equal('USDC');
-      expect(result.metadata.decimals).to.equal(6);
+      expect(result.assetId).toBe(protocolCompliantAsset.assetId);
+      expect(result.metadata.symbol).toBe('USDC');
+      expect(result.metadata.decimals).toBe(6);
     });
 
     it('should validate minimum backup router requirements', async () => {
@@ -527,9 +601,9 @@ describe('Primary Router Authority', () => {
         backupRouterIds: [] // No backup routers
       };
 
-      redisStub.exists.resolves(0);
-      redisStub.hset.resolves(1);
-      redisStub.expire.resolves(1);
+      redisStub.exists.mockResolvedValue(0);
+      redisStub.hset.mockResolvedValue(1);
+      redisStub.expire.mockResolvedValue(1);
 
       const result = await authority.registerAsset(
         assetWithoutBackups.assetId,
@@ -538,8 +612,8 @@ describe('Primary Router Authority', () => {
       );
 
       // Should still succeed
-      expect(result.assetId).to.equal(assetWithoutBackups.assetId);
-      expect(result.backupRouterIds).to.deep.equal([]);
+      expect(result.assetId).toBe(assetWithoutBackups.assetId);
+      expect(result.backupRouterIds).toEqual([]);
     });
 
     // TODO: Implement getValidationMetrics method in PrimaryRouterAuthority
