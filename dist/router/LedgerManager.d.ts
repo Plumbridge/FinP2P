@@ -28,6 +28,7 @@ export declare class LedgerManager {
     private balanceReservations;
     private crossLedgerOperations;
     private reservationTimeout;
+    private reservationQueues;
     constructor(config: ConfigOptions['ledgers'], logger: Logger);
     initialize(): Promise<void>;
     private createAdapter;
@@ -63,6 +64,7 @@ export declare class LedgerManager {
         reservationId?: string;
         reason?: string;
     }>;
+    private reserveBalanceInternal;
     lockReservedBalance(reservationId: string): Promise<{
         success: boolean;
         lockTxHash?: string;

@@ -11,6 +11,7 @@ class LedgerManager {
         this.balanceReservations = new Map();
         this.crossLedgerOperations = new Map();
         this.reservationTimeout = 300000; // 5 minutes default
+        this.reservationQueues = new Map();
         this.config = config;
         this.logger = logger;
         // Start cleanup timer for expired reservations
@@ -321,14 +322,28 @@ class LedgerManager {
         }
     }
     async reserveBalance(ledgerId, accountId, assetId, amount, operationId) {
-        const adapter = this.getAdapter(ledgerId);
-        if (!adapter) {
-            return {
-                success: false,
-                reason: `Ledger ${ledgerId} not supported`
-            };
+        const lockKey = `${ledgerId}:${accountId}:${assetId}`;
+        const queue = this.reservationQueues.get(lockKey);
+        if (queue) {
+            return new Promise(resolve => {
+                queue.push(() => {
+                    this.reserveBalanceInternal(ledgerId, accountId, assetId, amount, operationId).then(resolve);
+                });
+            });
         }
+        this.reservationQueues.set(lockKey, []);
+        return this.reserveBalanceInternal(ledgerId, accountId, assetId, amount, operationId);
+    }
+    async reserveBalanceInternal(ledgerId, accountId, assetId, amount, operationId) {
+        const lockKey = `${ledgerId}:${accountId}:${assetId}`;
         try {
+            const adapter = this.getAdapter(ledgerId);
+            if (!adapter) {
+                return {
+                    success: false,
+                    reason: `Ledger ${ledgerId} not supported`
+                };
+            }
             const availableBalance = await adapter.getAvailableBalance(accountId, assetId);
             const reservedAmount = this.getReservedAmount(ledgerId, accountId, assetId);
             const lockedBalance = await adapter.getLockedBalance(accountId, assetId);
@@ -361,6 +376,20 @@ class LedgerManager {
                 success: false,
                 reason: 'Reservation error occurred'
             };
+        }
+        finally {
+            const queue = this.reservationQueues.get(lockKey);
+            if (queue && queue.length > 0) {
+                const next = queue.shift();
+                if (next) {
+                    // Use setTimeout to avoid deep recursion and potential stack overflow
+                    setTimeout(next, 0);
+                }
+            }
+            else {
+                // If the queue is empty, we can remove it.
+                this.reservationQueues.delete(lockKey);
+            }
         }
     }
     async lockReservedBalance(reservationId) {

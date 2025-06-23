@@ -319,6 +319,8 @@ class MockAdapter {
         const newBalance = currentBalance + amount;
         accountBalances.set(assetId, newBalance);
         this.balances.set(accountId, accountBalances);
+        // Record balance change in history
+        this.recordBalanceChange(accountId, assetId, newBalance, 'mintTokens');
         this.logger.info(`Minted ${amount} of asset ${assetId} to account ${accountId}`);
     }
     async burnTokens(accountId, assetId, amount) {
@@ -335,6 +337,8 @@ class MockAdapter {
             accountBalances.set(assetId, newBalance);
         }
         this.balances.set(accountId, accountBalances);
+        // Record balance change in history
+        this.recordBalanceChange(accountId, assetId, newBalance, 'burnTokens');
         this.logger.info(`Burned ${amount} of asset ${assetId} from account ${accountId}`);
     }
     async getLockedBalance(accountId, assetId) {
