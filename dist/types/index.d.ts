@@ -148,6 +148,12 @@ export interface LedgerAdapter {
     unlockAsset(accountId: string, assetId: string, amount: bigint): Promise<string>;
     getTransaction(txHash: string): Promise<Transaction | null>;
     getTransactionStatus(txHash: string): Promise<TransactionStatus>;
+    getBalanceHistory(accountId: string): Array<{
+        timestamp: Date;
+        assetId: string;
+        balance: bigint;
+        operation: string;
+    }>;
 }
 export declare enum LedgerType {
     SUI = "sui",

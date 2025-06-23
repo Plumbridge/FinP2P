@@ -15,8 +15,12 @@ const TEST_REDIS_CONFIG = {
  */
 export async function createTestRedisClient(): Promise<RedisClientType> {
   const client = createClient({
-    ...TEST_REDIS_CONFIG,
-    url: `${TEST_REDIS_CONFIG.url}/${TEST_REDIS_CONFIG.database}`
+    url: process.env.TEST_REDIS_URL || 'redis://localhost:6379',
+    database: 1, // Use database 1 for tests
+    socket: {
+      connectTimeout: 5000,
+      reconnectStrategy: false
+    }
   });
 
   client.on('error', (err) => {

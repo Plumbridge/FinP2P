@@ -6,21 +6,43 @@ export interface LoggingConfig {
   file?: string;
 }
 
+// Helper to safely stringify objects with circular references
+function safeStringify(obj: any): string {
+  const seen = new WeakSet();
+  return JSON.stringify(obj, (key, value) => {
+    if (typeof value === 'object' && value !== null) {
+      if (seen.has(value)) {
+        return '[Circular]';
+      }
+      seen.add(value);
+    }
+    return value;
+  }, 2);
+}
+
 export function createLogger(config: LoggingConfig): winston.Logger {
   const logFormat = winston.format.combine(
     winston.format.timestamp({
       format: 'YYYY-MM-DD HH:mm:ss'
     }),
     winston.format.errors({ stack: true }),
-    winston.format.json(),
-    winston.format.printf(({ timestamp, level, message, ...meta }) => {
-      return `${timestamp} [${level.toUpperCase()}]: ${message} ${Object.keys(meta).length ? JSON.stringify(meta, null, 2) : ''}`;
-    })
+    winston.format.json()
   );
 
+  // For testing environment, use a simple format that works with console spies
+  const isTest = process.env.NODE_ENV === 'test';
+  
   const transports: winston.transport[] = [
     new winston.transports.Console({
-      format: winston.format.combine(
+      format: isTest ? winston.format.combine(
+        winston.format.timestamp({
+          format: 'YYYY-MM-DD HH:mm:ss'
+        }),
+        winston.format.printf(({ timestamp, level, message, ...meta }) => {
+          const metaStr = Object.keys(meta).length ? safeStringify(meta) : '';
+          return `${level}: ${message} ${metaStr}`.trim();
+        })
+      ) : winston.format.combine(
         winston.format.colorize(),
         winston.format.simple()
       )
@@ -31,7 +53,15 @@ export function createLogger(config: LoggingConfig): winston.Logger {
     transports.push(
       new winston.transports.File({
         filename: path.resolve(config.file),
-        format: logFormat
+        format: winston.format.combine(
+          winston.format.timestamp({
+            format: 'YYYY-MM-DD HH:mm:ss'
+          }),
+          winston.format.printf(({ timestamp, level, message, ...meta }) => {
+            const metaStr = Object.keys(meta).length ? safeStringify(meta) : '';
+            return `${timestamp} [${level.toUpperCase()}]: ${message} ${metaStr}`;
+          })
+        )
       })
     );
   }

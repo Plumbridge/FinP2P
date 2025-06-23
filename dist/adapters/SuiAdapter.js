@@ -464,6 +464,13 @@ class SuiAdapter {
     getPrivateKeyBase64() {
         return this.keypair.getSecretKey();
     }
+    // Balance history operations
+    getBalanceHistory(accountId) {
+        // TODO: Implement balance history tracking for Sui
+        // For now, return empty array as this feature requires additional infrastructure
+        this.logger.warn(`Balance history not yet implemented for Sui adapter. AccountId: ${accountId}`);
+        return [];
+    }
 }
 exports.SuiAdapter = SuiAdapter;
 //# sourceMappingURL=SuiAdapter.js.map

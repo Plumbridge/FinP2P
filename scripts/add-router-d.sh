@@ -4,7 +4,7 @@ echo "Adding Router D to the running FinP2P network..."
 echo
 
 echo "Step 1: Starting Router D with discovery profile"
-docker-compose --profile with-router-d up -d router-bank-d
+docker-compose -f docker/docker-compose.yml --profile with-router-d up -d router-bank-d
 
 echo
 echo "Step 2: Waiting for Router D to start and discover peers..."

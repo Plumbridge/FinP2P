@@ -553,4 +553,12 @@ export class SuiAdapter implements LedgerAdapter {
   public getPrivateKeyBase64(): string {
     return this.keypair.getSecretKey();
   }
+
+  // Balance history operations
+  getBalanceHistory(accountId: string): Array<{ timestamp: Date; assetId: string; balance: bigint; operation: string }> {
+    // TODO: Implement balance history tracking for Sui
+    // For now, return empty array as this feature requires additional infrastructure
+    this.logger.warn(`Balance history not yet implemented for Sui adapter. AccountId: ${accountId}`);
+    return [];
+  }
 }

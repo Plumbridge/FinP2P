@@ -116,5 +116,13 @@ export declare class ConfirmationRecordManager {
      * Clean up old confirmation records (for maintenance)
      */
     cleanupOldRecords(olderThanDays: number): Promise<number>;
+    /**
+     * Get confirmations filtered by status
+     */
+    getConfirmationsByStatus(status: 'pending' | 'confirmed' | 'failed' | 'rolled_back'): Promise<ConfirmationRecord[]>;
+    /**
+     * Clean up expired confirmations
+     */
+    cleanupExpiredConfirmations(maxAgeHours?: number): Promise<number>;
 }
 //# sourceMappingURL=ConfirmationRecordManager.d.ts.map

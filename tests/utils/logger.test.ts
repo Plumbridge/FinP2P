@@ -1,40 +1,58 @@
 import { createLogger } from '../../src/utils/logger';
+import winston from 'winston';
 
 describe('Logger', () => {
   let consoleSpy: jest.SpyInstance;
+  let processStdoutSpy: jest.SpyInstance;
 
   beforeEach(() => {
+    // Set test environment
+    process.env.NODE_ENV = 'test';
+    // Spy on both console.log and process.stdout.write which winston might use
     consoleSpy = jest.spyOn(console, 'log').mockImplementation();
+    processStdoutSpy = jest.spyOn(process.stdout, 'write').mockImplementation();
   });
 
   afterEach(() => {
     consoleSpy.mockRestore();
+    processStdoutSpy.mockRestore();
   });
 
   describe('createLogger', () => {
     it('should create logger with default configuration', () => {
-      const logger = createLogger();
+      const logger = createLogger({ level: 'info' });
       
       expect(logger).toBeDefined();
-      expect(typeof logger.info).toBe('function');
-      expect(typeof logger.error).toBe('function');
-      expect(typeof logger.warn).toBe('function');
-      expect(typeof logger.debug).toBe('function');
+      expect(logger.level).toBe('info');
+      expect(logger.transports).toHaveLength(1);
+    });
+
+    it('debug console output format', () => {
+      const logger = createLogger({ level: 'info' });
+      processStdoutSpy.mockClear();
+      
+      logger.info('Test message', { key: 'value' });
+      
+      // Check what was actually called
+      const calls = processStdoutSpy.mock.calls;
+      if (calls.length > 0) {
+        // Use a different console method to avoid the spy
+        process.stdout.write(`Actual call: ${JSON.stringify(calls[0])}\n`);
+      }
+      
+      expect(processStdoutSpy).toHaveBeenCalled();
     });
 
     it('should create logger with custom level', () => {
-      const logger = createLogger({ level: 'error' });
+      const logger = createLogger({ level: 'debug' });
       
-      expect(logger).toBeDefined();
+      expect(logger.level).toBe('debug');
     });
 
     it('should create logger with custom format', () => {
-      const logger = createLogger({ 
-        format: 'json',
-        level: 'info'
-      });
+      const logger = createLogger({ level: 'info', file: 'test.log' });
       
-      expect(logger).toBeDefined();
+      expect(logger.transports).toHaveLength(2);
     });
   });
 
@@ -45,7 +63,27 @@ describe('Logger', () => {
       logger.info('Test info message');
       logger.info('Info with data', { key: 'value' });
       
-      expect(consoleSpy).toHaveBeenCalled();
+      // Check both console.log and process.stdout.write
+      const consoleWasCalled = consoleSpy.mock.calls.length > 0;
+      const stdoutWasCalled = processStdoutSpy.mock.calls.length > 0;
+      
+      if (consoleWasCalled) {
+        expect(consoleSpy).toHaveBeenCalledWith(
+          expect.stringContaining('info: Test info message')
+        );
+        expect(consoleSpy).toHaveBeenCalledWith(
+          expect.stringContaining('info: Info with data')
+        );
+      } else if (stdoutWasCalled) {
+        expect(processStdoutSpy).toHaveBeenCalledWith(
+          expect.stringContaining('info: Test info message')
+        );
+        expect(processStdoutSpy).toHaveBeenCalledWith(
+          expect.stringContaining('info: Info with data')
+        );
+      } else {
+        fail('Neither console.log nor process.stdout.write was called');
+      }
     });
 
     it('should log error messages', () => {
@@ -54,7 +92,12 @@ describe('Logger', () => {
       logger.error('Test error message');
       logger.error('Error with stack', new Error('Test error'));
       
-      expect(consoleSpy).toHaveBeenCalled();
+      expect(processStdoutSpy).toHaveBeenCalledWith(
+        expect.stringContaining('error: Test error message')
+      );
+      expect(processStdoutSpy).toHaveBeenCalledWith(
+        expect.stringContaining('error: Error with stack')
+      );
     });
 
     it('should log warning messages', () => {
@@ -63,7 +106,12 @@ describe('Logger', () => {
       logger.warn('Test warning message');
       logger.warn('Warning with data', { warning: true });
       
-      expect(consoleSpy).toHaveBeenCalled();
+      expect(processStdoutSpy).toHaveBeenCalledWith(
+        expect.stringContaining('warn: Test warning message')
+      );
+      expect(processStdoutSpy).toHaveBeenCalledWith(
+        expect.stringContaining('warn: Warning with data')
+      );
     });
 
     it('should log debug messages when level allows', () => {
@@ -72,18 +120,21 @@ describe('Logger', () => {
       logger.debug('Test debug message');
       logger.debug('Debug with context', { context: 'test' });
       
-      expect(consoleSpy).toHaveBeenCalled();
+      expect(processStdoutSpy).toHaveBeenCalledWith(
+        expect.stringContaining('debug: Test debug message')
+      );
+      expect(processStdoutSpy).toHaveBeenCalledWith(
+        expect.stringContaining('debug: Debug with context')
+      );
     });
 
     it('should not log debug messages when level is higher', () => {
       const logger = createLogger({ level: 'error' });
+      processStdoutSpy.mockClear();
       
       logger.debug('This should not be logged');
       
-      // Debug messages should be filtered out at error level
-      expect(consoleSpy).not.toHaveBeenCalledWith(
-        expect.stringContaining('This should not be logged')
-      );
+      expect(processStdoutSpy).not.toHaveBeenCalled();
     });
   });
 
@@ -98,7 +149,12 @@ describe('Logger', () => {
       
       logger.info('User action', metadata);
       
-      expect(consoleSpy).toHaveBeenCalled();
+      expect(processStdoutSpy).toHaveBeenCalledWith(
+        expect.stringContaining('info: User action')
+      );
+      expect(processStdoutSpy).toHaveBeenCalledWith(
+        expect.stringContaining('user-123')
+      );
     });
 
     it('should handle error objects', () => {
@@ -108,7 +164,9 @@ describe('Logger', () => {
       
       logger.error('Operation failed', error);
       
-      expect(consoleSpy).toHaveBeenCalled();
+      expect(processStdoutSpy).toHaveBeenCalledWith(
+        expect.stringContaining('error: Operation failed')
+      );
     });
 
     it('should handle nested objects', () => {
@@ -127,7 +185,9 @@ describe('Logger', () => {
       
       logger.info('Complex transfer data', complexData);
       
-      expect(consoleSpy).toHaveBeenCalled();
+      expect(processStdoutSpy).toHaveBeenCalledWith(
+        expect.stringContaining('transfer-123')
+      );
     });
   });
 
@@ -137,28 +197,30 @@ describe('Logger', () => {
       const metrics = {
         operation: 'transfer_validation',
         duration: 150,
-        memory: 1024,
-        cpu: 25.5
+        cpu: 25.5,
+        memory: 1024
       };
       
       logger.info('Performance metrics', metrics);
       
-      expect(consoleSpy).toHaveBeenCalled();
+      expect(processStdoutSpy).toHaveBeenCalledWith(
+        expect.stringContaining('transfer_validation')
+      );
     });
 
-    it('should handle timing information', (done) => {
+    it('should handle timing information', async () => {
       const logger = createLogger({ level: 'debug' });
       const startTime = Date.now();
       
-      // Simulate some work
-      setTimeout(() => {
-        const duration = Date.now() - startTime;
-        logger.debug('Operation completed', { duration });
-        expect(consoleSpy).toHaveBeenCalled();
-        done();
-      }, 10);
+      // Use setTimeout with async/await instead of done callback
+      await new Promise(resolve => setTimeout(resolve, 10));
       
-      expect(logger).toBeDefined();
+      const duration = Date.now() - startTime;
+      logger.debug('Operation completed', { duration });
+      
+      expect(processStdoutSpy).toHaveBeenCalledWith(
+        expect.stringContaining('debug: Operation completed')
+      );
     });
   });
 
@@ -169,11 +231,13 @@ describe('Logger', () => {
       logger.warn('Authentication failed', {
         userId: 'user-123',
         ip: '192.168.1.1',
-        timestamp: new Date().toISOString()
-        // Note: should not log passwords or tokens
+        // Password should not be logged
+        password: 'should-not-appear'
       });
       
-      expect(consoleSpy).toHaveBeenCalled();
+      expect(processStdoutSpy).toHaveBeenCalledWith(
+        expect.stringContaining('user-123')
+      );
     });
 
     it('should log access control events', () => {
@@ -185,7 +249,9 @@ describe('Logger', () => {
         action: 'create'
       });
       
-      expect(consoleSpy).toHaveBeenCalled();
+      expect(processStdoutSpy).toHaveBeenCalledWith(
+        expect.stringContaining('transfer-endpoint')
+      );
     });
   });
 
@@ -198,7 +264,12 @@ describe('Logger', () => {
       logger.info('Processing transfer', { correlationId });
       logger.info('Request completed', { correlationId });
       
-      expect(consoleSpy).toHaveBeenCalledTimes(3);
+      const calls = processStdoutSpy.mock.calls.map(call => call[0]);
+      const correlationCalls = calls.filter(log =>
+        log.includes(correlationId)
+      );
+      
+      expect(correlationCalls).toHaveLength(3);
     });
   });
 
@@ -211,27 +282,38 @@ describe('Logger', () => {
       expect(() => {
         logger.info('Object with circular reference', obj);
       }).not.toThrow();
+      
+      expect(processStdoutSpy).toHaveBeenCalledWith(
+        expect.stringContaining('[Circular]')
+      );
     });
 
     it('should handle undefined and null values', () => {
       const logger = createLogger({ level: 'info' });
       
-      expect(() => {
-        logger.info('Undefined value', undefined);
-        logger.info('Null value', null);
-        logger.info('Mixed values', { a: undefined, b: null, c: 'valid' });
-      }).not.toThrow();
+      logger.info('Undefined value', { value: undefined });
+      logger.info('Null value', { value: null });
+      logger.info('Mixed values', {
+        a: undefined,
+        b: null,
+        c: 'valid'
+      });
+      
+      expect(processStdoutSpy).toHaveBeenCalled();
     });
 
     it('should handle very large objects', () => {
       const logger = createLogger({ level: 'info' });
-      const largeObj = {
-        data: new Array(1000).fill(0).map((_, i) => ({ id: i, value: `item-${i}` }))
-      };
+      const largeArray = Array.from({ length: 1000 }, (_, i) => ({
+        id: i,
+        value: `item-${i}`
+      }));
       
-      expect(() => {
-        logger.info('Large object', largeObj);
-      }).not.toThrow();
+      logger.info('Large object', { data: largeArray });
+      
+      expect(processStdoutSpy).toHaveBeenCalledWith(
+        expect.stringContaining('item-0')
+      );
     });
   });
 });

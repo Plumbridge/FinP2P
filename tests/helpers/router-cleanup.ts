@@ -3,7 +3,7 @@
  * Ensures proper shutdown of router instances to prevent hanging tests
  */
 
-import { FinP2PRouter } from '../../src/router/FinP2PRouter';
+import { FinP2PRouter } from '../../src/router/Router';
 
 /**
  * Safely stop a router instance with timeout
@@ -17,7 +17,7 @@ export async function stopRouterSafely(router: FinP2PRouter | null, timeoutMs: n
 
   try {
     // Check if router is running before attempting to stop
-    if (router.isRunning) {
+    if (router.isRunning()) {
       // Create a timeout promise
       const timeoutPromise = new Promise<void>((_, reject) => {
         setTimeout(() => reject(new Error(`Router stop timeout after ${timeoutMs}ms`)), timeoutMs);

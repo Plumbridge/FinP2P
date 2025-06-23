@@ -95,8 +95,11 @@ class FinP2PRouter extends events_1.EventEmitter {
             throw new Error('Encryption key is required and must be at least 32 characters');
         }
         // Validate monitoring configuration
-        if (!config.monitoring || !config.monitoring.logLevel) {
-            throw new Error('Monitoring configuration with log level is required');
+        if (!config.monitoring || typeof config.monitoring !== 'object') {
+            throw new Error('Monitoring configuration is required');
+        }
+        if (!config.monitoring.logLevel || typeof config.monitoring.logLevel !== 'string') {
+            throw new Error('Log level is required in monitoring configuration');
         }
         // Validate ledgers configuration
         if (!config.ledgers || typeof config.ledgers !== 'object') {
@@ -682,6 +685,62 @@ class FinP2PRouter extends events_1.EventEmitter {
                 ledgers: ledgerHealth
             }
         };
+    }
+    /**
+     * Sign a message using the router's private key
+     */
+    async signMessage(message) {
+        try {
+            const signature = this.cryptoUtils.sign(JSON.stringify(message));
+            return {
+                ...message,
+                signature
+            };
+        }
+        catch (error) {
+            this.logger.error('Failed to sign message:', error);
+            throw new Error('Message signing failed');
+        }
+    }
+    /**
+     * Verify a message signature
+     */
+    async verifyMessageSignature(signedMessage) {
+        try {
+            const { signature, ...message } = signedMessage;
+            if (!signature) {
+                return false;
+            }
+            // Get the public key for the router that sent the message
+            const publicKey = await this.getRouterPublicKey(message.routerId);
+            if (!publicKey) {
+                return false;
+            }
+            return this.cryptoUtils.verify(JSON.stringify(message), signature, publicKey);
+        }
+        catch (error) {
+            this.logger.error('Failed to verify message signature:', error);
+            return false;
+        }
+    }
+    /**
+     * Get the public key for a router
+     */
+    async getRouterPublicKey(routerId) {
+        try {
+            if (!routerId || routerId === this.routerInfo.id) {
+                // Return our own public key
+                return this.cryptoUtils.getPublicKey();
+            }
+            // For other routers, we would typically fetch from a registry or cache
+            // For now, return null as we don't have a router registry implemented
+            this.logger.warn(`Public key requested for unknown router: ${routerId}`);
+            return null;
+        }
+        catch (error) {
+            this.logger.error('Failed to get router public key:', error);
+            return null;
+        }
     }
 }
 exports.FinP2PRouter = FinP2PRouter;

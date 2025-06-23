@@ -42,5 +42,11 @@ export declare class HederaAdapter implements LedgerAdapter {
     getTreasuryId(): string;
     getOperatorBalance(): Promise<bigint>;
     associateToken(accountId: string, tokenId: string, accountKey: PrivateKey): Promise<string>;
+    getBalanceHistory(accountId: string): Array<{
+        timestamp: Date;
+        assetId: string;
+        balance: bigint;
+        operation: string;
+    }>;
 }
 //# sourceMappingURL=HederaAdapter.d.ts.map

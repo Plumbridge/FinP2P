@@ -325,6 +325,42 @@ class ConfirmationRecordManager {
             return 0;
         }
     }
+    /**
+     * Get confirmations filtered by status
+     */
+    async getConfirmationsByStatus(status) {
+        try {
+            const allConfirmations = await this.getAllConfirmationRecords();
+            return allConfirmations.filter(confirmation => confirmation.status === status);
+        }
+        catch (error) {
+            this.logger.error('Failed to get confirmations by status:', error);
+            return [];
+        }
+    }
+    /**
+     * Clean up expired confirmations
+     */
+    async cleanupExpiredConfirmations(maxAgeHours = 24) {
+        try {
+            const cutoffDate = new Date(Date.now() - maxAgeHours * 60 * 60 * 1000);
+            const allConfirmations = await this.getAllConfirmationRecords();
+            let deletedCount = 0;
+            for (const confirmation of allConfirmations) {
+                const confirmationDate = new Date(confirmation.timestamp);
+                if (confirmationDate < cutoffDate) {
+                    await this.redis.hDel(`${this.CONFIRMATIONS_KEY}:${this.routerId}`, confirmation.id);
+                    deletedCount++;
+                }
+            }
+            this.logger.info(`Cleaned up ${deletedCount} expired confirmation records`);
+            return deletedCount;
+        }
+        catch (error) {
+            this.logger.error('Failed to cleanup expired confirmations:', error);
+            return 0;
+        }
+    }
 }
 exports.ConfirmationRecordManager = ConfirmationRecordManager;
 //# sourceMappingURL=ConfirmationRecordManager.js.map

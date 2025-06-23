@@ -1,5 +1,7 @@
 import { jest } from '@jest/globals';
 
+import { createClient } from 'redis';
+
 // Set test environment variables
 process.env.NODE_ENV = 'test';
 process.env.LOG_LEVEL = 'error';
@@ -9,6 +11,31 @@ process.env.PORT = '0'; // Use random port for tests
 
 // Set global test timeout
 jest.setTimeout(10000);
+
+// Wait for Redis to be ready before running tests
+beforeAll(async () => {
+  const maxRetries = 10;
+  let retries = 0;
+  
+  while (retries < maxRetries) {
+    try {
+      const client = createClient({ url: process.env.TEST_REDIS_URL });
+      await client.connect();
+      await client.ping();
+      await client.quit();
+      console.log('Redis connection verified successfully');
+      break;
+    } catch (error) {
+      retries++;
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      console.log(`Redis connection attempt ${retries}/${maxRetries} failed:`, errorMessage);
+      if (retries === maxRetries) {
+        throw new Error(`Redis not ready after ${maxRetries} attempts: ${errorMessage}`);
+      }
+      await new Promise(resolve => setTimeout(resolve, 1000));
+    }
+  }
+});
 
 // Global cleanup to prevent hanging tests
 afterEach(async () => {
@@ -76,6 +103,14 @@ jest.mock('@hashgraph/sdk', () => ({
     forTestnet: jest.fn().mockReturnValue({
       setOperator: jest.fn().mockReturnThis(),
       close: jest.fn()
+    }),
+    forMainnet: jest.fn().mockReturnValue({
+      setOperator: jest.fn().mockReturnThis(),
+      close: jest.fn()
+    }),
+    forPreviewnet: jest.fn().mockReturnValue({
+      setOperator: jest.fn().mockReturnThis(),
+      close: jest.fn()
     })
   },
   AccountId: {
@@ -92,20 +127,95 @@ jest.mock('@hashgraph/sdk', () => ({
     setDecimals: jest.fn().mockReturnThis(),
     setInitialSupply: jest.fn().mockReturnThis(),
     setTreasuryAccountId: jest.fn().mockReturnThis(),
+    setSupplyType: jest.fn().mockReturnThis(),
+    setMaxSupply: jest.fn().mockReturnThis(),
+    setTokenType: jest.fn().mockReturnThis(),
     setAdminKey: jest.fn().mockReturnThis(),
-    // @ts-ignore
-    execute: jest.fn().mockResolvedValue({
-      // @ts-ignore
-      getReceipt: jest.fn().mockResolvedValue({ tokenId: { toString: () => 'mock-token-id' } })
-    })
+    setSupplyKey: jest.fn().mockReturnThis(),
+    setFreezeKey: jest.fn().mockReturnThis(),
+    setWipeKey: jest.fn().mockReturnThis(),
+    setTokenMemo: jest.fn().mockReturnThis(),
+    freezeWith: jest.fn().mockReturnThis(),
+    sign: jest.fn().mockResolvedValue({
+      execute: jest.fn().mockResolvedValue({
+        transactionId: { toString: () => 'mock-tx-id' },
+        getReceipt: jest.fn().mockResolvedValue({
+          status: 'SUCCESS',
+          tokenId: { toString: () => '0.0.999999' }
+        } as any)
+      } as any)
+    } as any)
   } as any)),
   TransferTransaction: jest.fn().mockImplementation(() => ({
     addHbarTransfer: jest.fn().mockReturnThis(),
-    // @ts-ignore
+    addTokenTransfer: jest.fn().mockReturnThis(),
+    freezeWith: jest.fn().mockReturnThis(),
+    sign: jest.fn().mockResolvedValue({
+      execute: jest.fn().mockResolvedValue({
+        transactionId: { toString: () => 'mock-tx-id' },
+        getReceipt: jest.fn().mockResolvedValue({ status: 'SUCCESS' } as any)
+      } as any)
+    } as any)
+  } as any)),
+  TokenSupplyType: {
+    Finite: 'FINITE',
+    Infinite: 'INFINITE'
+  },
+  TokenType: {
+    FungibleCommon: 'FUNGIBLE_COMMON',
+    NonFungibleUnique: 'NON_FUNGIBLE_UNIQUE'
+  },
+  Hbar: {
+    fromTinybars: jest.fn((amount: any) => ({
+      toTinybars: () => ({ toString: () => amount.toString() })
+    })),
+    from: jest.fn((amount: any) => ({
+      toTinybars: () => ({ toString: () => amount.toString() })
+    }))
+  },
+  TransactionId: {
+    fromString: jest.fn((id) => ({ toString: () => id }))
+  },
+  Status: {
+    Success: 'SUCCESS'
+  },
+  AccountCreateTransaction: jest.fn(() => ({
+    setKey: jest.fn().mockReturnThis(),
+    setInitialBalance: jest.fn().mockReturnThis(),
+    freezeWith: jest.fn().mockReturnThis(),
+    sign: jest.fn().mockResolvedValue({
+      execute: jest.fn().mockResolvedValue({
+        transactionId: { toString: () => 'mock-tx-id' },
+        getReceipt: jest.fn().mockResolvedValue({
+          status: 'SUCCESS',
+          accountId: { toString: () => '0.0.888888' }
+        } as any)
+      } as any)
+    } as any)
+  } as any)),
+  TransactionReceiptQuery: jest.fn(() => ({
+    setTransactionId: jest.fn().mockReturnThis(),
     execute: jest.fn().mockResolvedValue({
-      // @ts-ignore
-      getReceipt: jest.fn().mockResolvedValue({})
-    })
+      status: 'SUCCESS'
+    } as any)
+  } as any)),
+  AccountBalanceQuery: jest.fn(() => ({
+    setAccountId: jest.fn().mockReturnThis(),
+    execute: jest.fn().mockResolvedValue({
+      hbars: { toTinybars: () => ({ toString: () => '1000000' }) },
+      tokens: new Map()
+    } as any)
+  } as any)),
+  TokenAssociateTransaction: jest.fn(() => ({
+    setAccountId: jest.fn().mockReturnThis(),
+    setTokenIds: jest.fn().mockReturnThis(),
+    freezeWith: jest.fn().mockReturnThis(),
+    sign: jest.fn().mockResolvedValue({
+      execute: jest.fn().mockResolvedValue({
+        transactionId: { toString: () => 'mock-tx-id' },
+        getReceipt: jest.fn().mockResolvedValue({ status: 'SUCCESS' } as any)
+      } as any)
+    } as any)
   } as any))
 }));
 
@@ -121,7 +231,7 @@ jest.mock('jsonwebtoken', () => ({
 }));
 
 // Global test utilities
-global.testUtils = {
+(global as any).testUtils = {
   delay: (ms: number) => new Promise(resolve => setTimeout(resolve, ms)),
   generateTestId: () => `test-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
 };

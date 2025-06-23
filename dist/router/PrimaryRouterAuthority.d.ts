@@ -55,6 +55,14 @@ export declare class PrimaryRouterAuthority {
      */
     isPrimaryRouterAvailable(primaryRouterId: string): Promise<boolean>;
     /**
+     * Check primary router availability with detailed information
+     */
+    checkPrimaryRouterAvailability(assetId: string): Promise<{
+        isAvailable: boolean;
+        reason?: string;
+        lastHeartbeat?: number;
+    }>;
+    /**
      * Enable backup router to take over if primary is unavailable
      */
     validateBackupAuthority(assetId: string, backupRouterId: string): Promise<AuthorityValidationResult>;

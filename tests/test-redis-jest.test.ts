@@ -10,6 +10,7 @@ describe('Redis Connection Test', () => {
     logger = createLogger({ level: 'error' });
     config = {
       routerId: 'test-router',
+      host: 'localhost',
       port: 0,
       redis: {
         url: 'redis://localhost:6379',
@@ -24,7 +25,7 @@ describe('Redis Connection Test', () => {
       security: {
         enableAuth: false,
         jwtSecret: 'test-secret',
-        encryptionKey: 'test-encryption-key-32-chars!!',
+        encryptionKey: 'test-encryption-key-32-characters-long',
         privateKey: 'test-key',
         rateLimitWindow: 900000,
         rateLimitMax: 100

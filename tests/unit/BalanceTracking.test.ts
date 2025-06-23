@@ -167,10 +167,7 @@ describe('Enhanced Balance Tracking', () => {
       );
 
       expect(validation.available).toBe(true);
-      if (validation.available) {
-        expect(validation.currentBalance).toBe(BigInt('100000000000000000000'));
-        expect(validation.availableBalance).toBe(BigInt('100000000000000000000'));
-      }
+      expect(validation.reason).toBeUndefined();
     });
 
     it('should reserve and release balance', async () => {

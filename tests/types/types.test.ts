@@ -8,9 +8,7 @@ import {
   TransferStatus,
   RouteStep,
   TransferMetadata,
-  AssetAuthority,
-  AuthorizedTransfer,
-  PrimaryRouterRequest,
+
   Router,
   RouterStatus,
   RouterMetadata,
@@ -165,8 +163,8 @@ describe('Type Definitions', () => {
   describe('Enums', () => {
     it('should have correct DualConfirmationStatus values', () => {
       expect(DualConfirmationStatus.PENDING).toBe('pending');
-      expect(DualConfirmationStatus.CONFIRMED).toBe('confirmed');
-      expect(DualConfirmationStatus.REJECTED).toBe('rejected');
+      expect(DualConfirmationStatus.PARTIAL_CONFIRMED).toBe('partial_confirmed');
+      expect(DualConfirmationStatus.DUAL_CONFIRMED).toBe('dual_confirmed');
       expect(DualConfirmationStatus.FAILED).toBe('failed');
     });
 

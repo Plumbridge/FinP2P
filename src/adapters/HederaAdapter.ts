@@ -539,4 +539,12 @@ export class HederaAdapter implements LedgerAdapter {
 
     return associateSubmit.transactionId.toString();
   }
+
+  // Balance history operations
+  getBalanceHistory(accountId: string): Array<{ timestamp: Date; assetId: string; balance: bigint; operation: string }> {
+    // TODO: Implement balance history tracking for Hedera
+    // For now, return empty array as this feature requires additional infrastructure
+    this.logger.warn(`Balance history not yet implemented for Hedera adapter. AccountId: ${accountId}`);
+    return [];
+  }
 }

@@ -80,5 +80,17 @@ export declare class FinP2PRouter extends EventEmitter {
             ledgers: Record<string, boolean>;
         };
     }>;
+    /**
+     * Sign a message using the router's private key
+     */
+    signMessage(message: any): Promise<any>;
+    /**
+     * Verify a message signature
+     */
+    verifyMessageSignature(signedMessage: any): Promise<boolean>;
+    /**
+     * Get the public key for a router
+     */
+    getRouterPublicKey(routerId?: string): Promise<string | null>;
 }
 //# sourceMappingURL=Router.d.ts.map

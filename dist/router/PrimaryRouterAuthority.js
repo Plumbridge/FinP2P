@@ -144,6 +144,39 @@ class PrimaryRouterAuthority {
         return timeDiff < 30000;
     }
     /**
+     * Check primary router availability with detailed information
+     */
+    async checkPrimaryRouterAvailability(assetId) {
+        const registration = await this.getAssetRegistration(assetId);
+        if (!registration) {
+            return {
+                isAvailable: false,
+                reason: `Asset ${assetId} is not registered`
+            };
+        }
+        const lastHeartbeat = await this.redis.get(`finp2p:router_heartbeat:${registration.primaryRouterId}`);
+        if (!lastHeartbeat) {
+            return {
+                isAvailable: false,
+                reason: 'No heartbeat found for primary router'
+            };
+        }
+        const lastSeen = new Date(lastHeartbeat);
+        const now = new Date();
+        const timeDiff = now.getTime() - lastSeen.getTime();
+        if (timeDiff >= 30000) {
+            return {
+                isAvailable: false,
+                reason: 'Primary router heartbeat expired',
+                lastHeartbeat: parseInt(lastHeartbeat)
+            };
+        }
+        return {
+            isAvailable: true,
+            lastHeartbeat: parseInt(lastHeartbeat)
+        };
+    }
+    /**
      * Enable backup router to take over if primary is unavailable
      */
     async validateBackupAuthority(assetId, backupRouterId) {

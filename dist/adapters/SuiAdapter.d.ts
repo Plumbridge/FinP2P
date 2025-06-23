@@ -39,5 +39,11 @@ export declare class SuiAdapter implements LedgerAdapter {
     getGasBalance(): Promise<bigint>;
     requestFaucet(): Promise<void>;
     getPrivateKeyBase64(): string;
+    getBalanceHistory(accountId: string): Array<{
+        timestamp: Date;
+        assetId: string;
+        balance: bigint;
+        operation: string;
+    }>;
 }
 //# sourceMappingURL=SuiAdapter.d.ts.map

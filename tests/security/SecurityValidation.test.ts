@@ -3,6 +3,7 @@ import { MockAdapter } from '../../src/adapters/MockAdapter';
 import { createLogger } from '../../src/utils/logger';
 import { LedgerType } from '../../src/types';
 import { createTestRedisClient, cleanupRedis, closeRedisConnection } from '../helpers/redis';
+import { stopRouterSafely } from '../helpers/router-cleanup';
 import type { RedisClientType } from 'redis';
 
 describe('Security Validation Tests', () => {
@@ -15,25 +16,37 @@ describe('Security Validation Tests', () => {
   });
 
   beforeEach(async () => {
-    await cleanupRedis(redisClient);
+    // Clean up any existing router instance
+    if (router && router.isRunning && router.isRunning()) {
+      await stopRouterSafely(router);
+    }
+    
+    // Clean up Redis
+    if (redisClient && redisClient.isOpen) {
+      await cleanupRedis(redisClient);
+    }
+    
     logger = createLogger({ level: 'error' });
     
     const config = {
       routerId: 'security-test-router',
+      host: 'localhost',
       port: 0, // Random port
       redis: {
         url: process.env.TEST_REDIS_URL || 'redis://localhost:6379/1',
-        client: redisClient // Pass the client directly
+        keyPrefix: 'security-test:',
+        ttl: 3600
       },
       network: {
         peers: [],
-        maxConnections: 10,
-        connectionTimeout: 5000
+        heartbeatInterval: 30000,
+        maxRetries: 3,
+        timeout: 5000
       },
       security: {
         enableAuth: true,
         jwtSecret: 'test-secret-key-for-testing-only',
-        encryptionKey: 'test-encryption-key-32-chars-ok',
+        encryptionKey: 'test-encryption-key-32-characters-long',
         privateKey: 'test-private-key',
         rateLimitWindow: 60000,
         rateLimitMax: 100
@@ -56,7 +69,10 @@ describe('Security Validation Tests', () => {
   });
 
   afterEach(async () => {
-    await router.stop();
+    // Stop router safely if it's running
+    if (router && router.isRunning && router.isRunning()) {
+      await stopRouterSafely(router);
+    }
   });
 
   afterAll(async () => {
