@@ -3,7 +3,7 @@ import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import { v4 as uuidv4 } from 'uuid';
-import { createClient, RedisClientType } from 'redis';
+// Removed redis import - using ioredis instead
 import { Logger } from 'winston';
 import {
   Router as IRouter,
@@ -29,7 +29,7 @@ import { LedgerManager } from './LedgerManager';
 export class FinP2PRouter extends EventEmitter {
   private app: express.Application;
   private server: any;
-  private redis!: RedisClientType;
+  private redis!: any; // Using ioredis instead of redis
   private logger: Logger;
   private config: ConfigOptions;
   private routingEngine!: RoutingEngine;
@@ -39,6 +39,8 @@ export class FinP2PRouter extends EventEmitter {
   
   private routerInfo: IRouter;
   private _isRunning: boolean = false;
+  private isStarting: boolean = false;
+  private isStarted: boolean = false;
   private peerRouters: Map<string, string> = new Map(); // routerId -> endpoint
   private activeTransfers: Map<string, Transfer> = new Map();
   private routingTable: Map<string, RoutingTable> = new Map();
@@ -155,9 +157,16 @@ export class FinP2PRouter extends EventEmitter {
   private async initializeComponents(): Promise<void> {
     try {
       // Initialize Redis
-      this.redis = createClient({ url: this.config.redis.url });
-      await this.redis.connect();
-      
+      const Redis = require('ioredis');
+      this.redis = new Redis(this.config.redis.url, {
+        retryDelayOnFailover: 100,
+        maxRetriesPerRequest: 1,
+      });
+
+      this.redis.on('error', (err: Error) => {
+        this.logger.error('Redis connection error:', err);
+      });
+
       // Initialize routing engine
       this.routingEngine = new RoutingEngine(this.redis, this.logger);
       
@@ -229,13 +238,24 @@ export class FinP2PRouter extends EventEmitter {
   }
 
   public async start(): Promise<void> {
+    if (this.isStarted || this.isStarting) {
+      this.logger.warn('Router is already started or starting');
+      return;
+    }
+    
+    this.isStarting = true;
+    
     try {
-      // Initialize components first
-      await this.initializeComponents();
+      this.logger.info('Starting FinP2P Router...', { routerId: this.config.routerId });
+      
+      // Initialize components only if not already initialized
+      if (!this.redis || !this.redis.isOpen) {
+        await this.initializeComponents();
+      }
       
       // Start HTTP server
       this.server = this.app.listen(this.config.port, () => {
-      this.logger.info(`Router ${this.routerInfo.id} listening on port ${this.config.port}`);
+        this.logger.info(`Router ${this.routerInfo.id} listening on port ${this.config.port}`);
       });
 
       // Connect to peer routers
@@ -246,20 +266,26 @@ export class FinP2PRouter extends EventEmitter {
       
       this.routerInfo.status = RouterStatus.ONLINE;
       this._isRunning = true;
+      this.isStarted = true;
       
       this.emit('started');
       this.logger.info('FinP2P Router started successfully');
     } catch (error) {
       this.logger.error('Failed to start router:', error);
       throw error;
+    } finally {
+      this.isStarting = false;
     }
   }
 
   public async stop(): Promise<void> {
+    if (!this.isStarted) {
+      this.logger.debug('Router is not running');
+      return;
+    }
+    
     try {
-      if (!this._isRunning) {
-        return;
-      }
+      this.logger.info('Stopping FinP2P Router...');
       
       this._isRunning = false;
       this.routerInfo.status = RouterStatus.OFFLINE;
@@ -268,25 +294,16 @@ export class FinP2PRouter extends EventEmitter {
       this.intervals.forEach(interval => clearInterval(interval));
       this.intervals = [];
       
-      // Close server if exists
+      // Stop all components
       if (this.server) {
-        await new Promise<void>((resolve, reject) => {
-          this.server.close((err: any) => {
-            if (err) {
-              this.logger.warn('Error closing server:', err);
-              reject(err);
-            } else {
-              resolve();
-            }
-          });
+        await new Promise<void>((resolve) => {
+          this.server!.close(() => resolve());
         });
       }
       
-      // Disconnect Redis if connected
+      // Close Redis connection
       if (this.redis && this.redis.isOpen) {
-        await this.redis.quit().catch(err => {
-          this.logger.warn('Error quitting Redis:', err);
-        });
+        await this.redis.quit();
       }
       
       // Disconnect ledger manager if exists
@@ -296,9 +313,9 @@ export class FinP2PRouter extends EventEmitter {
         });
       }
       
+      this.isStarted = false;
       this.emit('stopped');
       this.logger.info('FinP2P Router stopped successfully');
-      return Promise.resolve();
     } catch (error) {
       this.logger.error('Error stopping router:', error);
       throw error;
@@ -669,7 +686,7 @@ export class FinP2PRouter extends EventEmitter {
   }
 
   public isRunning(): boolean {
-    return this._isRunning;
+    return this.isStarted;
   }
 
   public isOnline(): boolean {

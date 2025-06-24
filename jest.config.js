@@ -2,49 +2,23 @@ module.exports = {
   preset: 'ts-jest',
   testEnvironment: 'node',
   roots: ['<rootDir>/src', '<rootDir>/tests'],
-  testMatch: [
-    '**/__tests__/**/*.ts',
-    '**/?(*.)+(spec|test).ts',
-    '**/?(*.)+(spec|test).js'
-  ],
+  testMatch: ['**/*.test.ts', '**/*.test.js'],
   transform: {
-    '^.+\\.ts$': ['ts-jest', {
+    '^.+\.tsx?$': ['ts-jest', {
       tsconfig: {
-        strict: false,
         esModuleInterop: true,
-        skipLibCheck: true
-      }
-    }]
+        allowJs: true,
+      },
+    }],
+    '^.+\.js$': 'babel-jest',
   },
-  collectCoverageFrom: [
-    'src/**/*.ts',
-    '!src/**/*.d.ts',
-    '!src/index.ts'
-  ],
-  coverageDirectory: 'coverage',
-  coverageReporters: [
-    'text',
-    'lcov',
-    'html'
-  ],
-  setupFilesAfterEnv: ['<rootDir>/tests/setup.ts'],
-
-  testTimeout: 30000,
-  moduleNameMapper: {
-    '^@/(.*)$': '<rootDir>/src/$1'
-  },
-  reporters: [
-    'default'
-  ],
-  bail: false,
+  moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
   clearMocks: true,
-  collectCoverage: false,
-  forceExit: true,
+  restoreMocks: true,
+  resetMocks: true,
+  testTimeout: 15000,
+  bail: false,
   detectOpenHandles: true,
-  displayName: {
-    name: 'FinP2P Tests',
-    color: 'blue'
-  },
-  // Removed deprecated globals configuration
-  // ts-jest configuration is now handled in transform options above
+  forceExit: true,
+  setupFilesAfterEnv: ['<rootDir>/tests/setup.js'],
 };

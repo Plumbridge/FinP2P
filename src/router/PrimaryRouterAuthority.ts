@@ -24,12 +24,23 @@ export interface AuthorityValidationResult {
   backupRouters?: string[];
 }
 
+export interface ValidationMetrics {
+  totalValidations: number;
+  successfulValidations: number;
+  failedValidations: number;
+}
+
 export class PrimaryRouterAuthority {
   private redis: RedisClientType;
   private logger = createLogger({ level: 'info' });
   private routerId: string;
   private readonly ASSET_REGISTRY_KEY = 'finp2p:asset_registry';
   private readonly ROUTER_ASSETS_KEY = 'finp2p:router_assets';
+  private validationMetrics: ValidationMetrics = {
+    totalValidations: 0,
+    successfulValidations: 0,
+    failedValidations: 0
+  };
 
   constructor(redis: RedisClientType, routerId: string) {
     this.redis = redis;
@@ -88,7 +99,12 @@ export class PrimaryRouterAuthority {
       return null;
     }
 
-    return JSON.parse(registrationData);
+    try {
+      return JSON.parse(registrationData);
+    } catch (error) {
+      this.logger.error(`Failed to parse asset registration data for ${assetId}:`, error);
+      throw new Error(`Failed to parse asset registration data for ${assetId}`);
+    }
   }
 
   /**
@@ -98,17 +114,22 @@ export class PrimaryRouterAuthority {
     assetId: string,
     requestingRouterId: string
   ): Promise<AuthorityValidationResult> {
-    const registration = await this.getAssetRegistration(assetId);
+    this.validationMetrics.totalValidations++;
     
-    if (!registration) {
-      return {
-        isAuthorized: false,
-        reason: `Asset ${assetId} is not registered in the system`
-      };
-    }
+    try {
+      const registration = await this.getAssetRegistration(assetId);
+      
+      if (!registration) {
+        this.validationMetrics.failedValidations++;
+        return {
+          isAuthorized: false,
+          reason: `Asset ${assetId} is not registered in the system`
+        };
+      }
 
     // Check if requesting router is the primary authority
     if (registration.primaryRouterId === requestingRouterId) {
+      this.validationMetrics.successfulValidations++;
       return {
         isAuthorized: true,
         primaryRouter: registration.primaryRouterId,
@@ -118,22 +139,44 @@ export class PrimaryRouterAuthority {
 
     // Check if requesting router is a backup authority
     if (registration.backupRouterIds.includes(requestingRouterId)) {
-      // TODO: Add logic to check if primary router is unavailable
-      // For now, backup routers are not authorized unless primary is down
-      return {
-        isAuthorized: false,
-        reason: `Router ${requestingRouterId} is backup for asset ${assetId}, but primary router ${registration.primaryRouterId} is available`,
-        primaryRouter: registration.primaryRouterId,
-        backupRouters: registration.backupRouterIds
-      };
+      // Check if primary router is available
+      const primaryAvailability = await this.checkPrimaryRouterAvailability(assetId);
+      
+      if (primaryAvailability.isAvailable) {
+        this.validationMetrics.failedValidations++;
+        return {
+          isAuthorized: false,
+          reason: `Router ${requestingRouterId} is backup for asset ${assetId}, but primary router ${registration.primaryRouterId} is available`,
+          primaryRouter: registration.primaryRouterId,
+          backupRouters: registration.backupRouterIds
+        };
+      } else {
+        // Primary is unavailable, authorize backup router
+        this.validationMetrics.successfulValidations++;
+        return {
+          isAuthorized: true,
+          reason: `Primary router unavailable, backup router ${requestingRouterId} authorized for asset ${assetId}`,
+          primaryRouter: registration.primaryRouterId,
+          backupRouters: registration.backupRouterIds
+        };
+      }
     }
 
+    this.validationMetrics.failedValidations++;
     return {
       isAuthorized: false,
       reason: `Router ${requestingRouterId} has no authority over asset ${assetId}`,
       primaryRouter: registration.primaryRouterId,
       backupRouters: registration.backupRouterIds
     };
+    } catch (error) {
+      this.validationMetrics.failedValidations++;
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      return {
+        isAuthorized: false,
+        reason: `Failed to validate authority: ${errorMessage}`
+      };
+    }
   }
 
   /**
@@ -167,6 +210,11 @@ export class PrimaryRouterAuthority {
 
     if (registration.primaryRouterId !== this.routerId) {
       throw new Error(`Only primary router ${registration.primaryRouterId} can transfer authority for asset ${assetId}`);
+    }
+
+    // Validate that the new primary router is authorized (must be in backup routers list)
+    if (!registration.backupRouterIds.includes(newPrimaryRouterId)) {
+      throw new Error(`Router ${newPrimaryRouterId} is not authorized as a backup router for asset ${assetId}`);
     }
 
     // Update registration
@@ -207,9 +255,9 @@ export class PrimaryRouterAuthority {
       return false;
     }
 
-    const lastSeen = new Date(lastHeartbeat);
-    const now = new Date();
-    const timeDiff = now.getTime() - lastSeen.getTime();
+    const lastSeenTimestamp = parseInt(lastHeartbeat, 10);
+    const now = Date.now();
+    const timeDiff = now - lastSeenTimestamp;
     
     // Consider router unavailable if no heartbeat for 30 seconds
     return timeDiff < 30000;
@@ -239,9 +287,9 @@ export class PrimaryRouterAuthority {
       };
     }
 
-    const lastSeen = new Date(lastHeartbeat);
-    const now = new Date();
-    const timeDiff = now.getTime() - lastSeen.getTime();
+    const lastSeenTimestamp = parseInt(lastHeartbeat, 10);
+    const now = Date.now();
+    const timeDiff = now - lastSeenTimestamp;
     
     if (timeDiff >= 30000) {
       return {
@@ -291,9 +339,17 @@ export class PrimaryRouterAuthority {
 
     return {
       isAuthorized: true,
+      reason: `Primary router unavailable, backup router ${this.routerId} authorized for asset ${assetId}`,
       primaryRouter: registration.primaryRouterId,
       backupRouters: registration.backupRouterIds
     };
+  }
+
+  /**
+   * Get validation metrics
+   */
+  getValidationMetrics(): ValidationMetrics {
+    return { ...this.validationMetrics };
   }
 
   /**

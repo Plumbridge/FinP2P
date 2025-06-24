@@ -35,7 +35,7 @@ describe('Router Integration Tests', () => {
             security: {
                 enableAuth: false,
                 jwtSecret: 'test-secret',
-                encryptionKey: 'test-key',
+                encryptionKey: 'test-encryption-key-32-characters-long-for-router1',
                 rateLimitWindow: 60000,
                 rateLimitMax: 100
             },
@@ -57,6 +57,89 @@ describe('Router Integration Tests', () => {
                 logLevel: 'info'
             }
         });
+        
+        router2 = new Router_1.FinP2PRouter({
+            routerId: 'router-2',
+            host: 'localhost',
+            port: basePort + 1,
+            redis: {
+                url: process.env.TEST_REDIS_URL || 'redis://localhost:6379/1',
+                keyPrefix: 'test:',
+                ttl: 3600
+            },
+            network: {
+                peers: [],
+                heartbeatInterval: 30000,
+                maxRetries: 3,
+                timeout: 5000
+            },
+            security: {
+                enableAuth: false,
+                jwtSecret: 'test-secret',
+                encryptionKey: 'test-encryption-key-32-characters-long-for-router2',
+                rateLimitWindow: 60000,
+                rateLimitMax: 100
+            },
+            ledgers: {
+                mock: {
+                    type: types_1.LedgerType.MOCK,
+                    config: {
+                        enableBalanceHistory: true,
+                        enableConcurrencySimulation: false,
+                        networkPartitionRate: 0,
+                        balanceReconciliationDelay: 100
+                    }
+                }
+            },
+            monitoring: {
+                enableMetrics: false,
+                metricsPort: 9091,
+                enableHealthCheck: true,
+                logLevel: 'info'
+            }
+        });
+        
+        router3 = new Router_1.FinP2PRouter({
+            routerId: 'router-3',
+            host: 'localhost',
+            port: basePort + 2,
+            redis: {
+                url: process.env.TEST_REDIS_URL || 'redis://localhost:6379/1',
+                keyPrefix: 'test:',
+                ttl: 3600
+            },
+            network: {
+                peers: [],
+                heartbeatInterval: 30000,
+                maxRetries: 3,
+                timeout: 5000
+            },
+            security: {
+                enableAuth: false,
+                jwtSecret: 'test-secret',
+                encryptionKey: 'test-encryption-key-32-characters-long-for-router3',
+                rateLimitWindow: 60000,
+                rateLimitMax: 100
+            },
+            ledgers: {
+                mock: {
+                    type: types_1.LedgerType.MOCK,
+                    config: {
+                        enableBalanceHistory: true,
+                        enableConcurrencySimulation: false,
+                        networkPartitionRate: 0,
+                        balanceReconciliationDelay: 100
+                    }
+                }
+            },
+            monitoring: {
+                enableMetrics: false,
+                metricsPort: 9092,
+                enableHealthCheck: true,
+                logLevel: 'info'
+            }
+        });
+        
         // Start all routers
         await router1.start();
         await router2.start();
@@ -269,140 +352,6 @@ describe('Router Integration Tests', () => {
         });
     });
     describe('Multi-Router Transfer Scenarios', () => {
-        beforeEach(async () => {
-            // Create router configurations
-            router1 = new Router_1.FinP2PRouter({
-                routerId: 'router-1',
-                host: 'localhost',
-                port: basePort,
-                redis: {
-                    url: 'redis://localhost:6379',
-                    keyPrefix: 'test:',
-                    ttl: 3600
-                },
-                network: {
-                    peers: [],
-                    heartbeatInterval: 30000,
-                    maxRetries: 3,
-                    timeout: 5000
-                },
-                security: {
-                    enableAuth: false,
-                    jwtSecret: 'test-secret',
-                    encryptionKey: 'test-key',
-                    rateLimitWindow: 60000,
-                    rateLimitMax: 100
-                },
-                ledgers: {
-                    mock: {
-                        type: types_1.LedgerType.MOCK,
-                        config: {
-                            enableBalanceHistory: true,
-                            enableConcurrencySimulation: false,
-                            networkPartitionRate: 0,
-                            balanceReconciliationDelay: 100
-                        }
-                    }
-                },
-                monitoring: {
-                    enableMetrics: false,
-                    metricsPort: 9090,
-                    enableHealthCheck: true,
-                    logLevel: 'info'
-                }
-            });
-            router2 = new Router_1.FinP2PRouter({
-                routerId: 'router-2',
-                host: 'localhost',
-                port: basePort + 1,
-                redis: {
-                    url: process.env.TEST_REDIS_URL || 'redis://localhost:6379/1',
-                    keyPrefix: 'test:',
-                    ttl: 3600
-                },
-                network: {
-                    peers: [],
-                    heartbeatInterval: 30000,
-                    maxRetries: 3,
-                    timeout: 5000
-                },
-                security: {
-                    enableAuth: false,
-                    jwtSecret: 'test-secret',
-                    encryptionKey: 'test-key',
-                    rateLimitWindow: 60000,
-                    rateLimitMax: 100
-                },
-                ledgers: {
-                    mock: {
-                        type: types_1.LedgerType.MOCK,
-                        config: {
-                            enableBalanceHistory: true,
-                            enableConcurrencySimulation: false,
-                            networkPartitionRate: 0,
-                            balanceReconciliationDelay: 100
-                        }
-                    }
-                },
-                monitoring: {
-                    enableMetrics: false,
-                    metricsPort: 9091,
-                    enableHealthCheck: true,
-                    logLevel: 'info'
-                }
-            });
-            router3 = new Router_1.FinP2PRouter({
-                routerId: 'router-3',
-                host: 'localhost',
-                port: basePort + 2,
-                redis: {
-                    url: process.env.TEST_REDIS_URL || 'redis://localhost:6379/1',
-                    keyPrefix: 'test:',
-                    ttl: 3600
-                },
-                network: {
-                    peers: [],
-                    heartbeatInterval: 30000,
-                    maxRetries: 3,
-                    timeout: 5000
-                },
-                security: {
-                    enableAuth: false,
-                    jwtSecret: 'test-secret',
-                    encryptionKey: 'test-key',
-                    rateLimitWindow: 60000,
-                    rateLimitMax: 100
-                },
-                ledgers: {
-                    mock: {
-                        type: types_1.LedgerType.MOCK,
-                        config: {
-                            enableBalanceHistory: true,
-                            enableConcurrencySimulation: false,
-                            networkPartitionRate: 0,
-                            balanceReconciliationDelay: 100
-                        }
-                    }
-                },
-                monitoring: {
-                    enableMetrics: false,
-                    metricsPort: 9092,
-                    enableHealthCheck: true,
-                    logLevel: 'info'
-                }
-            });
-            // Start all routers
-            await router1.start();
-            await router2.start();
-            await router3.start();
-            // Connect routers as peers
-            await router1.addPeer(`http://localhost:${basePort + 1}`);
-            await router1.addPeer(`http://localhost:${basePort + 2}`);
-            await router2.addPeer(`http://localhost:${basePort}`);
-            await router2.addPeer(`http://localhost:${basePort + 2}`);
-            await router3.addPeer(`http://localhost:${basePort}`);
-            await router3.addPeer(`http://localhost:${basePort + 1}`);
-        });
         it('should handle basic multi-router communication', async () => {
             const health1 = await router1.getHealth();
             const health2 = await router2.getHealth();
@@ -534,27 +483,45 @@ describe('Router Integration Tests', () => {
         it('should handle transfer with dual confirmation', async () => {
             // Set up test accounts with balances
             await setupTestAccounts(router1);
+            await setupTestAccounts(router2);
+
+            // Mock transfer object
             const transfer = {
-                id: 'transfer-002',
-                fromAccount: global.testAccount1,
-                toAccount: global.testAccount2,
+                id: 'dual-confirm-transfer',
+                fromAccount: { id: global.testAccount1, type: 'account', domain: 'test.local', metadata: {} },
+                toAccount: { id: global.testAccount2, type: 'account', domain: 'test.local', metadata: {} },
                 asset: { id: 'USD', type: 'asset', domain: 'test.domain' },
-                amount: BigInt(5000), // High value requiring dual confirmation
+                amount: BigInt(500),
                 status: types_1.TransferStatus.PENDING,
                 route: [],
                 createdAt: new Date(),
                 updatedAt: new Date(),
-                metadata: { description: 'High value transfer' }
+                metadata: { description: 'Dual confirmation test' }
             };
-            const result = await router1.processTransfer(transfer);
-            expect(result.status).toBe(types_1.TransferStatus.PENDING);
-            // Verify confirmation record was created in Redis
-            const { ConfirmationRecordManager } = require('../../src/router/ConfirmationRecordManager');
-            const confirmationManager = new ConfirmationRecordManager(redisClient, logger, 'router-1');
-            const confirmations = await confirmationManager.getAllConfirmationRecords();
-            expect(confirmations.length).toBeGreaterThan(0);
+
+            // Process transfer on both routers
+            const result1 = await router1.processTransfer(transfer);
+            const result2 = await router2.processTransfer(transfer);
+
+            // Check confirmation records
+            const confirmationManager1 = new ConfirmationRecordManager(redisClient, logger, 'router-1');
+            const records1 = await confirmationManager1.getAllConfirmationRecords();
+            console.log('Router 1 records:', records1);
+            expect(records1.length).toBeGreaterThan(0);
+
+            const confirmationManager2 = new ConfirmationRecordManager(redisClient, logger, 'router-2');
+            const records2 = await confirmationManager2.getAllConfirmationRecords();
+            console.log('Router 2 records:', records2);
+            expect(records2.length).toBeGreaterThan(0);
+
+            // Verify dual confirmation status
+            const dualStatus = await confirmationManager1.getDualConfirmationStatus(transfer.id);
+            console.log('Dual status:', dualStatus);
+            expect(dualStatus).not.toBeNull();
+            expect(dualStatus.status).toBe('dual_confirmed');
         });
-        it('should reject transfer when confirmation is denied', async () => {
+
+        it('should deny a transfer if one router fails confirmation', async () => {
             // Set up test accounts with balances
             await setupTestAccounts(router1);
             const transfer = {
@@ -646,7 +613,7 @@ describe('Router Integration Tests', () => {
             // All should be processed
             expect(results).toHaveLength(5);
             results.forEach(result => {
-                expect(result.status).toBe(types_1.TransferStatus.PENDING);
+                expect(result.status).toBe(types_1.TransferStatus.COMPLETED);
             });
         });
         it('should handle confirmation processor statistics', async () => {

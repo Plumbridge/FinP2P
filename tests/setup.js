@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const globals_1 = require("@jest/globals");
-const redis_1 = require("redis");
+const Redis = require('ioredis');
 // Set test environment variables
 process.env.NODE_ENV = 'test';
 process.env.LOG_LEVEL = 'error';
@@ -9,30 +9,44 @@ process.env.TEST_REDIS_URL = process.env.TEST_REDIS_URL || 'redis://localhost:63
 process.env.ROUTER_ID = 'test-router';
 process.env.PORT = '0'; // Use random port for tests
 // Set global test timeout
-globals_1.jest.setTimeout(10000);
-// Wait for Redis to be ready before running tests
+globals_1.jest.setTimeout(15000);
+
+// Mock console methods to prevent output pollution
+global.console = {
+  ...console,
+  log: globals_1.jest.fn(),
+  debug: globals_1.jest.fn(),
+  info: globals_1.jest.fn(),
+  warn: globals_1.jest.fn(),
+  error: globals_1.jest.fn(),
+};
+
+// Ensure unhandled promise rejections fail tests
+process.on('unhandledRejection', (err) => {
+  throw err;
+});
 beforeAll(async () => {
-    const maxRetries = 10;
-    let retries = 0;
-    while (retries < maxRetries) {
-        try {
-            const client = (0, redis_1.createClient)({ url: process.env.TEST_REDIS_URL });
-            await client.connect();
-            await client.ping();
-            await client.quit();
-            console.log('Redis connection verified successfully');
-            break;
-        }
-        catch (error) {
-            retries++;
-            const errorMessage = error instanceof Error ? error.message : String(error);
-            console.log(`Redis connection attempt ${retries}/${maxRetries} failed:`, errorMessage);
-            if (retries === maxRetries) {
-                throw new Error(`Redis not ready after ${maxRetries} attempts: ${errorMessage}`);
-            }
-            await new Promise(resolve => setTimeout(resolve, 1000));
-        }
+  const maxRetries = 3;
+  let retries = 0;
+  
+  while (retries < maxRetries) {
+    try {
+      const redis = new Redis(process.env.TEST_REDIS_URL, {
+        retryDelayOnFailover: 100,
+        maxRetriesPerRequest: 1,
+      });
+      
+      await redis.ping();
+      await redis.disconnect();
+      break;
+    } catch (error) {
+      retries++;
+      if (retries >= maxRetries) {
+        throw new Error(`Redis connection failed after ${maxRetries} attempts. Please ensure Redis is running.`);
+      }
+      await new Promise(resolve => setTimeout(resolve, 1000));
     }
+  }
 });
 // Global cleanup to prevent hanging tests
 afterEach(async () => {
@@ -140,7 +154,7 @@ global.testUtils = {
     generateTestId: () => `test-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
 };
 // Increase timeout for integration tests
-globals_1.jest.setTimeout(30000);
+globals_1.jest.setTimeout(15000);
 // Add global teardown to ensure Redis connections are closed
 afterAll(async () => {
     // Give time for all connections to close

@@ -38,7 +38,7 @@ describe('Security Validation Tests', () => {
             security: {
                 enableAuth: true,
                 jwtSecret: 'test-secret-key-for-testing-only',
-                encryptionKey: 'test-encryption-key-32-chars-ok',
+                encryptionKey: 'test-encryption-key-32-chars-long!!',
                 privateKey: 'test-private-key',
                 rateLimitWindow: 60000,
                 rateLimitMax: 100

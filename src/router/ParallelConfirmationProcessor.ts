@@ -12,7 +12,7 @@ import { ConfirmationRecordManager, ConfirmationRecord } from './ConfirmationRec
 
 export interface ConfirmationTask {
   id: string;
-  transfer: Transfer;
+  transfer: Transfer; // This must be a valid Transfer object with an id
   routerId: string;
   priority: 'high' | 'medium' | 'low';
   timestamp: Date;
@@ -102,6 +102,14 @@ export class ParallelConfirmationProcessor {
     priority: 'high' | 'medium' | 'low' = 'medium',
     maxRetries: number = 3
   ): Promise<string> {
+    // Validate transfer object before creating task
+    if (!transfer) {
+      throw new Error('Transfer object is required but was undefined');
+    }
+    if (!transfer.id) {
+      throw new Error('Transfer ID is required but was undefined');
+    }
+    
     const taskId = `conf-task-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
     
     const task: ConfirmationTask = {
@@ -212,6 +220,15 @@ export class ParallelConfirmationProcessor {
     this.activeTasks.set(task.id, task);
     
     try {
+      // Validate task and transfer object
+      if (!task.transfer) {
+        throw new Error('Transfer object is undefined in confirmation task');
+      }
+      
+      if (!task.transfer.id) {
+        throw new Error('Transfer ID is undefined in confirmation task');
+      }
+      
       this.logger.debug('Processing confirmation task', {
         taskId: task.id,
         transferId: task.transfer.id,

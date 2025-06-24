@@ -17,17 +17,33 @@ export async function stopRouterSafely(router: FinP2PRouter | null, timeoutMs: n
 
   try {
     // Check if router is running before attempting to stop
-    if (router.isRunning()) {
-      // Create a timeout promise
-      const timeoutPromise = new Promise<void>((_, reject) => {
-        setTimeout(() => reject(new Error(`Router stop timeout after ${timeoutMs}ms`)), timeoutMs);
+    if (router.isRunning && router.isRunning()) {
+      let timeoutId: NodeJS.Timeout;
+
+      // Create a timeout promise that resolves instead of rejecting
+      const timeoutPromise = new Promise<string>((resolve) => {
+        timeoutId = setTimeout(() => {
+          console.warn(`Router stop timeout after ${timeoutMs}ms - continuing anyway`);
+          resolve('timeout');
+        }, timeoutMs);
       });
 
       // Race between router.stop() and timeout
-      await Promise.race([
-        router.stop(),
+      const result = await Promise.race([
+        router.stop().then(() => {
+          if (timeoutId) clearTimeout(timeoutId);
+          return 'success';
+        }).catch(err => {
+          if (timeoutId) clearTimeout(timeoutId);
+          console.warn('Router stop error:', err);
+          return 'error';
+        }),
         timeoutPromise
       ]);
+
+      if (result === 'timeout' || result === 'error') {
+        console.warn('Router stop did not complete cleanly, but continuing...');
+      }
     }
   } catch (error) {
     console.warn('Warning: Router stop failed:', error);

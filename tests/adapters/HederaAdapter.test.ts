@@ -313,4 +313,12 @@ describe('HederaAdapter', () => {
       // Cache is private, so we test through public methods
     });
   });
+
+  describe('Staking Operations', () => {
+    it('should handle staking operations', async () => {
+      // Staking is not implemented in HederaAdapter yet
+      // This test verifies that the adapter doesn't have staking functionality
+      expect(typeof (adapter as any).stake).toBe('undefined');
+    });
+  });
 });

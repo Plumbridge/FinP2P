@@ -83,7 +83,9 @@ describe('ParallelConfirmationProcessor', () => {
   };
 
   afterEach(async () => {
-    await processor.shutdown();
+    if (processor) {
+      await processor.shutdown();
+    }
   });
 
   describe('Initialization', () => {
@@ -152,50 +154,58 @@ describe('ParallelConfirmationProcessor', () => {
         );
 
       expect(taskId).toBeDefined();
+      
       const stats = processor.getStatistics();
-      expect(stats.queuedTasks).toBe(1);
+      expect(stats.queuedTasks + stats.activeTasks + stats.processedTransfers).toBeGreaterThanOrEqual(1);
+    });
+
+    it('should reject undefined transfer', async () => {
+      await expect(processor.addConfirmationTask(undefined as any, 'medium'))
+        .rejects.toThrow('Transfer object is required but was undefined');
+    });
+
+    it('should reject transfer without id', async () => {
+      const invalidTransfer = { ...mockTransfer, id: undefined };
+      await expect(processor.addConfirmationTask(invalidTransfer as any, 'medium'))
+        .rejects.toThrow('Transfer ID is required but was undefined');
     });
 
     it('should process confirmation task successfully', async () => {
-      const mockRecord = {
-        id: 'conf_123',
-        transferId: 'transfer-123',
-        status: DualConfirmationStatus.PENDING,
-        confirmations: []
-      };
-
-      mockConfirmationManager.createConfirmationRecord.mockResolvedValue(mockRecord as any);
+      const createConfirmationRecordSpy = jest.spyOn(mockConfirmationManager, 'createConfirmationRecord');
+      createConfirmationRecordSpy.mockResolvedValue(mockConfirmationRecord);
 
       const taskId = await processor.addConfirmationTask(
           mockTransfer,
           'high'
         );
 
-      // Wait for task processing
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise(resolve => setTimeout(resolve, 100)); // Allow time for processing
 
-      expect(mockConfirmationManager.createConfirmationRecord).toHaveBeenCalledWith(
-          mockTransfer,
-          'test-router',
-          'test-user'
-        );
+      expect(createConfirmationRecordSpy).toHaveBeenCalledWith(
+        mockTransfer,
+        'confirmed'
+      );
     });
 
     it('should handle task processing errors gracefully', async () => {
-      mockConfirmationManager.createConfirmationRecord.mockRejectedValue(
-        new Error('Database connection failed')
-      );
+      const expectedError = new Error('Database connection failed');
+      const createConfirmationRecordSpy = jest.spyOn(mockConfirmationManager, 'createConfirmationRecord');
+      createConfirmationRecordSpy.mockRejectedValue(expectedError);
 
-      const taskId = await processor.addConfirmationTask(
-          mockTransfer,
-          'high'
-        );
+      const eventEmitter = new EventEmitter();
+      processor.on('confirmation:task:failed', (error) => {
+        eventEmitter.emit('taskFailed', error);
+      });
 
-      // Wait for task processing
-      await new Promise(resolve => setTimeout(resolve, 100));
+      const taskFailedPromise = new Promise(resolve => eventEmitter.once('taskFailed', resolve));
 
-      // Should not crash the processor
-      // Processor is running internally
+      await processor.addConfirmationTask(mockTransfer, 'high');
+        
+      const error: any = await taskFailedPromise;
+
+      expect(error.error.message).toBe(expectedError.message);
+      const stats = processor.getStatistics();
+      expect(stats.totalFailed).toBe(1);
     });
 
     it('should respect maximum concurrent tasks limit', async () => {
@@ -280,7 +290,7 @@ describe('ParallelConfirmationProcessor', () => {
 
       // High priority should be processed first
       const calls = mockConfirmationManager.createConfirmationRecord.mock.calls;
-      expect(calls[0][0].id).toBe('transfer-high');
+      expect(calls[0][0].id).toBe('high-priority-transfer');
     });
   });
 

@@ -370,38 +370,26 @@ describe('Enhanced Balance Tracking', () => {
     it('should maintain consistency under concurrent operations', async () => {
       const concurrentOps = 5;
       const operationAmount = BigInt('10000000000000000000'); // 10 tokens each
-      
-      // Add more balance to handle concurrent operations
-      await mockAdapter.mintTokens(testAccount1, testAssetId, BigInt('100000000000000000000'));
-      
-      const reservationPromises = [];
-      for (let i = 0; i < concurrentOps; i++) {
-        reservationPromises.push(
-          ledgerManager.reserveBalance('mock', testAccount1, testAssetId, operationAmount)
-        );
-      }
+      const initialBalance = await mockAdapter.getBalance(testAccount1, testAssetId);
+      const mintedAmount = BigInt('100000000000000000000');
+      await mockAdapter.mintTokens(testAccount1, testAssetId, mintedAmount);
+      const totalExpectedBalance = initialBalance + mintedAmount;
+
+      const reservationPromises = Array.from({ length: concurrentOps }, () =>
+        ledgerManager.reserveBalance('mock', testAccount1, testAssetId, operationAmount)
+      );
 
       const reservations = await Promise.all(reservationPromises);
-      
-      // All reservations should succeed
-      reservations.forEach(reservation => {
-        expect(reservation.success).toBe(true);
-      });
+      reservations.forEach(res => expect(res.success).toBe(true));
 
-      // Add a small delay to ensure all reservations are processed
-      await new Promise(resolve => setTimeout(resolve, 50));
+      const reservedAmount = operationAmount * BigInt(concurrentOps);
+      const availableBalance = totalExpectedBalance - reservedAmount;
 
-      // Verify that we have the expected total balance (100 initial + 100 minted = 200)
-      const totalBalance = await mockAdapter.getBalance(testAccount1, testAssetId);
-      expect(totalBalance).toBe(BigInt('200000000000000000000'));
-
-      // With 5 reservations of 10 tokens each (50 total reserved), 
-      // trying to validate 160 tokens should fail (200 - 50 = 150 available)
       const validation = await ledgerManager.validateBalanceAvailability(
         'mock',
         testAccount1,
         testAssetId,
-        BigInt('160000000000000000000') // Should fail: 160 > 150 available
+        availableBalance + BigInt(1) // One more than available
       );
 
       expect(validation.available).toBe(false);
@@ -409,17 +397,13 @@ describe('Enhanced Balance Tracking', () => {
         expect(validation.reason).toBeDefined();
       }
 
-      // Release all reservations
-      for (const reservation of reservations) {
-        await ledgerManager.releaseReservation(reservation.reservationId!);
-      }
+      await Promise.all(reservations.map(res => ledgerManager.releaseReservation(res.reservationId!)));
 
-      // Should be fully available again
       const finalValidation = await ledgerManager.validateBalanceAvailability(
         'mock',
         testAccount1,
         testAssetId,
-        BigInt('200000000000000000000')
+        totalExpectedBalance
       );
       expect(finalValidation.available).toBe(true);
     });

@@ -85,6 +85,23 @@ export class ConfirmationRecordManager {
     status: 'confirmed' | 'failed',
     txHash?: string
   ): Promise<ConfirmationRecord> {
+    // Validate transfer object
+    if (!transfer) {
+      throw new Error('Transfer object is required but was undefined');
+    }
+    if (!transfer.id) {
+      throw new Error('Transfer ID is required but was undefined');
+    }
+    if (!transfer.fromAccount?.id) {
+      throw new Error('Transfer fromAccount.id is required but was undefined');
+    }
+    if (!transfer.toAccount?.id) {
+      throw new Error('Transfer toAccount.id is required but was undefined');
+    }
+    if (!transfer.asset?.id) {
+      throw new Error('Transfer asset.id is required but was undefined');
+    }
+    
     const confirmationId = `conf-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
     
     const confirmation: ConfirmationRecord = {

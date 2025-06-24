@@ -44,7 +44,7 @@ describe('Router Integration Tests', () => {
       security: {
         enableAuth: false,
         jwtSecret: 'test-secret',
-        encryptionKey: 'test-key',
+        encryptionKey: 'test-encryption-key-32-characters-long-for-router1',
         rateLimitWindow: 60000,
         rateLimitMax: 100
       },
@@ -398,7 +398,7 @@ describe('Router Integration Tests', () => {
         security: {
           enableAuth: false,
           jwtSecret: 'test-secret',
-          encryptionKey: 'test-key',
+          encryptionKey: 'test-encryption-key-32-characters-long-for-router2',
           rateLimitWindow: 60000,
           rateLimitMax: 100
         },
@@ -439,7 +439,7 @@ describe('Router Integration Tests', () => {
         security: {
           enableAuth: false,
           jwtSecret: 'test-secret',
-          encryptionKey: 'test-key',
+          encryptionKey: 'test-encryption-key-32-characters-long-for-router3',
           rateLimitWindow: 60000,
           rateLimitMax: 100
         },
@@ -480,7 +480,7 @@ describe('Router Integration Tests', () => {
         security: {
           enableAuth: false,
           jwtSecret: 'test-secret',
-          encryptionKey: 'test-key',
+          encryptionKey: 'test-encryption-key-32-characters-long-for-router4',
           rateLimitWindow: 60000,
           rateLimitMax: 100
         },
