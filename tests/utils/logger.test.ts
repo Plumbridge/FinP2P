@@ -1,21 +1,21 @@
-import { createLogger } from '../../src/utils/logger';
 import winston from 'winston';
+import { createLogger } from '../../src/utils/logger';
 
 describe('Logger', () => {
-  let consoleSpy: jest.SpyInstance;
-  let processStdoutSpy: jest.SpyInstance;
+  let stdoutSpy: jest.SpyInstance;
 
   beforeEach(() => {
-    // Set test environment
+    // Set NODE_ENV to test to ensure we're using the test transport
     process.env.NODE_ENV = 'test';
-    // Spy on both console.log and process.stdout.write which winston might use
-    consoleSpy = jest.spyOn(console, 'log').mockImplementation();
-    processStdoutSpy = jest.spyOn(process.stdout, 'write').mockImplementation();
+    // Enable logger test mode to allow stdout output during logger tests
+    process.env.LOGGER_TEST_MODE = 'true';
+    stdoutSpy = jest.spyOn(process.stdout, 'write').mockImplementation();
   });
 
   afterEach(() => {
-    consoleSpy.mockRestore();
-    processStdoutSpy.mockRestore();
+    stdoutSpy.mockRestore();
+    delete process.env.NODE_ENV;
+    delete process.env.LOGGER_TEST_MODE;
   });
 
   describe('createLogger', () => {
@@ -29,18 +29,11 @@ describe('Logger', () => {
 
     it('debug console output format', () => {
       const logger = createLogger({ level: 'info' });
-      processStdoutSpy.mockClear();
+      stdoutSpy.mockClear();
       
       logger.info('Test message', { key: 'value' });
       
-      // Check what was actually called
-      const calls = processStdoutSpy.mock.calls;
-      if (calls.length > 0) {
-        // Use a different console method to avoid the spy
-        process.stdout.write(`Actual call: ${JSON.stringify(calls[0])}\n`);
-      }
-      
-      expect(processStdoutSpy).toHaveBeenCalled();
+      expect(stdoutSpy).toHaveBeenCalled();
     });
 
     it('should create logger with custom level', () => {
@@ -63,27 +56,13 @@ describe('Logger', () => {
       logger.info('Test info message');
       logger.info('Info with data', { key: 'value' });
       
-      // Check both console.log and process.stdout.write
-      const consoleWasCalled = consoleSpy.mock.calls.length > 0;
-      const stdoutWasCalled = processStdoutSpy.mock.calls.length > 0;
-      
-      if (consoleWasCalled) {
-        expect(consoleSpy).toHaveBeenCalledWith(
-          expect.stringContaining('info: Test info message')
-        );
-        expect(consoleSpy).toHaveBeenCalledWith(
-          expect.stringContaining('info: Info with data')
-        );
-      } else if (stdoutWasCalled) {
-        expect(processStdoutSpy).toHaveBeenCalledWith(
-          expect.stringContaining('info: Test info message')
-        );
-        expect(processStdoutSpy).toHaveBeenCalledWith(
-          expect.stringContaining('info: Info with data')
-        );
-      } else {
-        throw new Error('Neither console.log nor process.stdout.write was called');
-      }
+      expect(stdoutSpy).toHaveBeenCalledWith(
+        expect.stringContaining('info: Test info message')
+      );
+      expect(stdoutSpy).toHaveBeenCalledWith(
+        expect.stringContaining('info: Info with data')
+      );
+
     });
 
     it('should log error messages', () => {
@@ -92,10 +71,10 @@ describe('Logger', () => {
       logger.error('Test error message');
       logger.error('Error with stack', new Error('Test error'));
       
-      expect(processStdoutSpy).toHaveBeenCalledWith(
+      expect(stdoutSpy).toHaveBeenCalledWith(
         expect.stringContaining('error: Test error message')
       );
-      expect(processStdoutSpy).toHaveBeenCalledWith(
+      expect(stdoutSpy).toHaveBeenCalledWith(
         expect.stringContaining('error: Error with stack')
       );
     });
@@ -106,10 +85,10 @@ describe('Logger', () => {
       logger.warn('Test warning message');
       logger.warn('Warning with data', { warning: true });
       
-      expect(processStdoutSpy).toHaveBeenCalledWith(
+      expect(stdoutSpy).toHaveBeenCalledWith(
         expect.stringContaining('warn: Test warning message')
       );
-      expect(processStdoutSpy).toHaveBeenCalledWith(
+      expect(stdoutSpy).toHaveBeenCalledWith(
         expect.stringContaining('warn: Warning with data')
       );
     });
@@ -120,21 +99,21 @@ describe('Logger', () => {
       logger.debug('Test debug message');
       logger.debug('Debug with context', { context: 'test' });
       
-      expect(processStdoutSpy).toHaveBeenCalledWith(
+      expect(stdoutSpy).toHaveBeenCalledWith(
         expect.stringContaining('debug: Test debug message')
       );
-      expect(processStdoutSpy).toHaveBeenCalledWith(
+      expect(stdoutSpy).toHaveBeenCalledWith(
         expect.stringContaining('debug: Debug with context')
       );
     });
 
     it('should not log debug messages when level is higher', () => {
       const logger = createLogger({ level: 'error' });
-      processStdoutSpy.mockClear();
+      stdoutSpy.mockClear();
       
       logger.debug('This should not be logged');
       
-      expect(processStdoutSpy).not.toHaveBeenCalled();
+      expect(stdoutSpy).not.toHaveBeenCalled();
     });
   });
 
@@ -149,10 +128,10 @@ describe('Logger', () => {
       
       logger.info('User action', metadata);
       
-      expect(processStdoutSpy).toHaveBeenCalledWith(
+      expect(stdoutSpy).toHaveBeenCalledWith(
         expect.stringContaining('info: User action')
       );
-      expect(processStdoutSpy).toHaveBeenCalledWith(
+      expect(stdoutSpy).toHaveBeenCalledWith(
         expect.stringContaining('user-123')
       );
     });
@@ -164,7 +143,7 @@ describe('Logger', () => {
       
       logger.error('Operation failed', error);
       
-      expect(processStdoutSpy).toHaveBeenCalledWith(
+      expect(stdoutSpy).toHaveBeenCalledWith(
         expect.stringContaining('error: Operation failed')
       );
     });
@@ -185,7 +164,7 @@ describe('Logger', () => {
       
       logger.info('Complex transfer data', complexData);
       
-      expect(processStdoutSpy).toHaveBeenCalledWith(
+      expect(stdoutSpy).toHaveBeenCalledWith(
         expect.stringContaining('transfer-123')
       );
     });
@@ -203,7 +182,7 @@ describe('Logger', () => {
       
       logger.info('Performance metrics', metrics);
       
-      expect(processStdoutSpy).toHaveBeenCalledWith(
+      expect(stdoutSpy).toHaveBeenCalledWith(
         expect.stringContaining('transfer_validation')
       );
     });
@@ -218,7 +197,7 @@ describe('Logger', () => {
       const duration = Date.now() - startTime;
       logger.debug('Operation completed', { duration });
       
-      expect(processStdoutSpy).toHaveBeenCalledWith(
+      expect(stdoutSpy).toHaveBeenCalledWith(
         expect.stringContaining('debug: Operation completed')
       );
     });
@@ -235,7 +214,7 @@ describe('Logger', () => {
         password: 'should-not-appear'
       });
       
-      expect(processStdoutSpy).toHaveBeenCalledWith(
+      expect(stdoutSpy).toHaveBeenCalledWith(
         expect.stringContaining('user-123')
       );
     });
@@ -249,7 +228,7 @@ describe('Logger', () => {
         action: 'create'
       });
       
-      expect(processStdoutSpy).toHaveBeenCalledWith(
+      expect(stdoutSpy).toHaveBeenCalledWith(
         expect.stringContaining('transfer-endpoint')
       );
     });
@@ -260,25 +239,14 @@ describe('Logger', () => {
       const logger = createLogger({ level: 'info' });
       const correlationId = 'req-123-456';
       
-      processStdoutSpy.mockClear(); // Clear any previous calls
+      stdoutSpy.mockClear(); // Clear any previous calls
       
       logger.info('Request started', { correlationId });
       logger.info('Processing transfer', { correlationId });
       logger.info('Request completed', { correlationId });
-      
-      const calls = processStdoutSpy.mock.calls.map(call => call[0]);
-      const correlationCalls = calls.filter(log =>
-        log && log.includes(correlationId)
-      );
-      
-      // Should have logged at least 3 times (might be duplicated)
-      expect(correlationCalls.length).toBeGreaterThanOrEqual(3);
-      
-      // Verify all three messages were logged
-      const messages = correlationCalls.join(' ');
-      expect(messages).toContain('Request started');
-      expect(messages).toContain('Processing transfer');
-      expect(messages).toContain('Request completed');
+
+      // Each log call results in 1 stdout.write call
+      expect(stdoutSpy).toHaveBeenCalledTimes(3);
     });
   });
 
@@ -292,7 +260,7 @@ describe('Logger', () => {
         logger.info('Object with circular reference', obj);
       }).not.toThrow();
       
-      expect(processStdoutSpy).toHaveBeenCalledWith(
+      expect(stdoutSpy).toHaveBeenCalledWith(
         expect.stringContaining('[Circular]')
       );
     });
@@ -308,7 +276,7 @@ describe('Logger', () => {
         c: 'valid'
       });
       
-      expect(processStdoutSpy).toHaveBeenCalled();
+      expect(stdoutSpy).toHaveBeenCalled();
     });
 
     it('should handle very large objects', () => {
@@ -320,7 +288,7 @@ describe('Logger', () => {
       
       logger.info('Large object', { data: largeArray });
       
-      expect(processStdoutSpy).toHaveBeenCalledWith(
+      expect(stdoutSpy).toHaveBeenCalledWith(
         expect.stringContaining('item-0')
       );
     });

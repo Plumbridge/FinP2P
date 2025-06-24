@@ -63,7 +63,7 @@ class SuiAdapter {
         if (!this.connected) {
             throw new Error('Not connected to Sui network');
         }
-        try {
+        try { // Prepare transaction
             const tx = new transactions_1.Transaction();
             // Call Move function to create asset
             tx.moveCall({
@@ -213,6 +213,36 @@ class SuiAdapter {
             throw error;
         }
     }
+    async importAccount(privateKey) {
+        if (!this.connected) {
+            throw new Error('Not connected to Sui network');
+        }
+        try {
+            // Create keypair from private key
+            const keypair = ed25519_1.Ed25519Keypair.fromSecretKey((0, utils_1.fromB64)(privateKey));
+            const address = keypair.getPublicKey().toSuiAddress();
+            // Create account object with imported keypair
+            const account = {
+                finId: {
+                    id: address,
+                    type: 'account',
+                    domain: 'sui.network'
+                },
+                address,
+                ledgerId: this.ledgerId,
+                institutionId: 'imported',
+                balances: new Map(),
+                createdAt: new Date(),
+                updatedAt: new Date()
+            };
+            this.logger.info(`Imported account: ${address}`);
+            return account;
+        }
+        catch (error) {
+            this.logger.error('Failed to import account on Sui:', error);
+            throw error;
+        }
+    }
     async getAccount(accountId) {
         if (!this.connected) {
             throw new Error('Not connected to Sui network');
@@ -267,25 +297,55 @@ class SuiAdapter {
             throw error;
         }
     }
-    async transfer(from, to, assetId, amount) {
+    async prepareTransfer(transferData) {
         if (!this.connected) {
             throw new Error('Not connected to Sui network');
         }
         try {
+            // Validate transfer data
+            const { from, to, assetId, asset, amount } = transferData;
+            const finalAssetId = assetId || asset;
+            if (!from || !to || !finalAssetId || !amount) {
+                throw new Error('Invalid transfer data');
+            }
+            // Check balance
+            const balance = await this.getBalance(from, finalAssetId);
+            if (balance < BigInt(amount)) {
+                throw new Error('Insufficient funds');
+            }
+            // Prepare transaction
             const tx = new transactions_1.Transaction();
-            // Call Move function to transfer asset
             tx.moveCall({
                 target: `${this.packageId}::${this.TRANSFER_MODULE}::transfer`,
                 arguments: [
-                    tx.object(from),
-                    tx.object(to),
-                    tx.object(assetId),
-                    tx.pure(bcs_1.bcs.u64().serialize(amount))
+                    tx.pure(from),
+                    tx.pure(to),
+                    tx.pure(finalAssetId),
+                    tx.pure(bcs_1.bcs.u64().serialize(BigInt(amount)))
                 ]
             });
+            return {
+                transaction: tx,
+                from,
+                to,
+                assetId: finalAssetId,
+                amount
+            };
+        }
+        catch (error) {
+            this.logger.error('Failed to prepare transfer on Sui:', error);
+            throw error;
+        }
+    }
+    async executeTransfer(transferData) {
+        if (!this.connected) {
+            throw new Error('Not connected to Sui network');
+        }
+        try {
+            const prepared = await this.prepareTransfer(transferData);
             const result = await this.client.signAndExecuteTransaction({
                 signer: this.keypair,
-                transaction: tx,
+                transaction: prepared.transaction,
                 options: {
                     showEffects: true
                 }
@@ -301,6 +361,9 @@ class SuiAdapter {
             this.logger.error('Failed to execute transfer on Sui:', error);
             throw error;
         }
+    }
+    async transfer(from, to, assetId, amount) {
+        return this.executeTransfer({ from, to, assetId, amount });
     }
     async lockAsset(accountId, assetId, amount) {
         if (!this.connected) {
@@ -398,7 +461,7 @@ class SuiAdapter {
         }
         catch (error) {
             this.logger.error(`Failed to get transaction ${txHash}:`, error);
-            return null;
+            throw error;
         }
     }
     async getLockedBalance(accountId, assetId) {
@@ -470,6 +533,9 @@ class SuiAdapter {
         // For now, return empty array as this feature requires additional infrastructure
         this.logger.warn(`Balance history not yet implemented for Sui adapter. AccountId: ${accountId}`);
         return [];
+    }
+    getLedgerType() {
+        return types_1.LedgerType.SUI;
     }
 }
 exports.SuiAdapter = SuiAdapter;

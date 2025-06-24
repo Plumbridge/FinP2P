@@ -25,7 +25,7 @@ describe('Redis Connection Test', () => {
       security: {
         enableAuth: false,
         jwtSecret: 'test-secret',
-        encryptionKey: 'test-encryption-key-32-characters-long',
+        encryptionKey: 'test-encryption-key-32-characters-long-12345678901234567890',
         privateKey: 'test-key',
         rateLimitWindow: 900000,
         rateLimitMax: 100

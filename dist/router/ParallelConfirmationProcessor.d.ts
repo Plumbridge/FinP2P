@@ -112,6 +112,6 @@ export declare class ParallelConfirmationProcessor {
     /**
      * Shutdown the processor gracefully
      */
-    shutdown(): Promise<void>;
+    shutdown(force?: boolean): Promise<void>;
 }
 //# sourceMappingURL=ParallelConfirmationProcessor.d.ts.map

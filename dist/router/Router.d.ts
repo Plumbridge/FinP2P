@@ -14,6 +14,8 @@ export declare class FinP2PRouter extends EventEmitter {
     private cryptoUtils;
     private routerInfo;
     private _isRunning;
+    private isStarting;
+    private isStarted;
     private peerRouters;
     private activeTransfers;
     private routingTable;

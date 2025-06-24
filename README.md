@@ -155,21 +155,22 @@ The project has been organized into a clean, modular structure:
 
 ### Prerequisites
 
+Before starting, ensure you have the following installed:
+
 - **Node.js 18+** - [Download here](https://nodejs.org/)
 - **Docker & Docker Compose** - [Download here](https://www.docker.com/get-started)
 - **Git** - [Download here](https://git-scm.com/)
-- **Redis** (for local development) - [Download here](https://redis.io/download)
 
 ### 📋 Step-by-Step Setup Guide
 
-#### Step 1: Clone and Navigate
+#### Step 1: Clone the Repository
 ```bash
 # Clone the repository
 git clone <repository-url>
 cd finp2p-implementation
 
 # Verify you're in the correct directory
-ls -la  # Should see package.json, src/, etc.
+ls -la  # Should see package.json, src/, tests/, etc.
 ```
 
 #### Step 2: Install Dependencies
@@ -177,21 +178,114 @@ ls -la  # Should see package.json, src/, etc.
 # Install all project dependencies
 npm install
 
-# Verify installation
+# Verify installation completed successfully
 npm list --depth=0
 ```
 
-#### Step 3: Environment Configuration
-```bash
-# The project includes a default .env file
-# For custom configuration, copy from examples:
-cp configs/environments/.env.example .env.local
+#### Step 3: Start the Project (Choose One Method)
 
-# Edit your configuration
-nano .env.local  # or use your preferred editor
+**🐳 Method A: Docker Compose (Recommended - Easiest)**
+
+This method starts everything you need with one command:
+
+```bash
+# Start the complete multi-router network
+docker-compose -f docker/docker-compose.yml up -d
+
+# Check that all services are running
+docker-compose -f docker/docker-compose.yml ps
 ```
 
-**Environment File Options:**
+This will start:
+- 3 Router instances (ports 3001, 3002, 3003)
+- Redis database
+- Mock ledger service
+- Monitoring tools (Prometheus & Grafana)
+
+**💻 Method B: Local Development**
+
+For development and testing:
+
+```bash
+# 1. Start Redis database
+docker run -d -p 6379:6379 --name finp2p-redis redis:alpine
+
+# 2. Build the project
+npm run build
+
+# 3. Start the main router
+npm start
+
+# 4. (Optional) Start additional routers in separate terminals:
+PORT=3001 ROUTER_ID=router-2 npm start
+PORT=3002 ROUTER_ID=router-3 npm start
+```
+
+#### Step 4: Verify Everything is Working
+
+```bash
+# Test the main router health
+curl http://localhost:3000/health
+# Expected response: {"status":"healthy","timestamp":"..."}
+
+# Check router information
+curl http://localhost:3000/info
+
+# For Docker Compose setup, test other routers:
+curl http://localhost:3001/health
+curl http://localhost:3002/health
+```
+
+#### Step 5: Run Tests (Optional but Recommended)
+
+```bash
+# Run all tests to ensure everything is working
+npm test
+
+# Run specific test categories
+npm run test:unit        # Unit tests
+npm run test:integration # Integration tests
+npm run test:router      # Router-specific tests
+```
+
+#### Step 6: Explore the System
+
+**Access Monitoring (Docker Compose only):**
+- Grafana Dashboard: http://localhost:3001 (admin/admin)
+- Prometheus Metrics: http://localhost:9090
+
+**Try Demo Applications:**
+```bash
+# Run a basic demo
+node demos/basic-demo.js
+
+# Try a complete transfer scenario
+node demos/complete-scenario-demo.js
+```
+
+**Stop the System:**
+```bash
+# For Docker Compose:
+docker-compose -f docker/docker-compose.yml down
+
+# For local development:
+# Press Ctrl+C in each terminal, then:
+docker stop finp2p-redis
+docker rm finp2p-redis
+```
+
+### 🎯 What's Next?
+
+1. **Read the Documentation**: Check the `docs/` folder for detailed guides
+2. **Explore APIs**: See the API endpoints section below
+3. **Run Demos**: Try the demo applications in the `demos/` folder
+4. **Customize Configuration**: Modify environment files in `configs/environments/`
+5. **Add New Adapters**: Follow the guide in `docs/NEW_ADAPTER_GUIDE.md`
+
+### 🔧 Advanced Configuration
+
+**Environment Variables:**
+The project includes pre-configured environment files:
 - `.env` - Default configuration (already provided)
 - `configs/environments/.env.example` - Template with all options
 - `configs/environments/.env.router-a` - Router A specific config
@@ -199,85 +293,14 @@ nano .env.local  # or use your preferred editor
 - `configs/environments/.env.router-c` - Router C specific config
 - `configs/environments/.env.testnet.example` - Testnet configuration
 
-#### Step 4: Build the Project
+**Custom Configuration:**
 ```bash
-# Compile TypeScript to JavaScript
-npm run build
+# Copy and modify environment template
+cp configs/environments/.env.example .env.local
 
-# Verify build success
-ls dist/  # Should see compiled JavaScript files
+# Edit your configuration
+nano .env.local  # or use your preferred editor
 ```
-
-#### Step 5: Choose Your Setup Method
-
-**Option A: Docker Compose (Recommended for beginners)**
-```bash
-# Start complete multi-router network
-docker-compose -f docker/docker-compose.yml up -d
-
-# Check status
-docker-compose -f docker/docker-compose.yml ps
-
-# View logs
-docker-compose -f docker/docker-compose.yml logs -f
-```
-
-**Option B: Local Development**
-```bash
-# Start Redis first
-docker run -d -p 6379:6379 --name finp2p-redis redis:alpine
-
-# Start the main router
-npm start
-
-# In separate terminals, start additional routers:
-PORT=3001 ROUTER_ID=router-2 npm start
-PORT=3002 ROUTER_ID=router-3 npm start
-```
-
-#### Step 6: Verify Installation
-```bash
-# Test the main router
-curl http://localhost:3000/health
-
-# Should return: {"status":"healthy","timestamp":"..."}
-
-# Check router info
-curl http://localhost:3000/info
-```
-
-#### Step 7: Run Tests (Optional)
-```bash
-# Run all tests
-npm test
-
-# Run specific test suites
-npm run test:unit
-npm run test:integration
-npm run test:e2e
-```
-
-### Running with Docker Compose (Recommended)
-
-The easiest way to run a complete multi-router network:
-
-```bash
-# Start the entire network
-docker-compose -f docker/docker-compose.yml up -d
-
-# View logs
-docker-compose -f docker/docker-compose.yml logs -f
-
-# Stop the network
-docker-compose -f docker/docker-compose.yml down
-```
-
-This will start:
-- 3 Router instances (Bank A, B, C) on ports 3001, 3002, 3003
-- Redis instance for shared state
-- Mock ledger service
-- Prometheus for metrics collection
-- Grafana for monitoring dashboard
 
 ### 🔧 Troubleshooting Setup Issues
 

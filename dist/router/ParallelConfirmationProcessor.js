@@ -42,6 +42,13 @@ class ParallelConfirmationProcessor {
      * Add a transfer for confirmation processing
      */
     async addConfirmationTask(transfer, priority = 'medium', maxRetries = 3) {
+        // Validate transfer object before creating task
+        if (!transfer) {
+            throw new Error('Transfer object is required but was undefined');
+        }
+        if (!transfer.id) {
+            throw new Error('Transfer ID is required but was undefined');
+        }
         const taskId = `conf-task-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
         const task = {
             id: taskId,
@@ -131,6 +138,13 @@ class ParallelConfirmationProcessor {
         // Add to active tasks
         this.activeTasks.set(task.id, task);
         try {
+            // Validate task and transfer object
+            if (!task.transfer) {
+                throw new Error('Transfer object is undefined in confirmation task');
+            }
+            if (!task.transfer.id) {
+                throw new Error('Transfer ID is undefined in confirmation task');
+            }
             this.logger.debug('Processing confirmation task', {
                 taskId: task.id,
                 transferId: task.transfer.id,
@@ -285,20 +299,25 @@ class ParallelConfirmationProcessor {
      */
     getStatistics() {
         return {
-            processedTransfers: this.completedTasks.size,
-            averageProcessingTime: 0, // Would calculate from completed tasks
-            successRate: 1.0, // Would calculate from success/failure ratio
+            ...this.metrics,
             activeTasks: this.activeTasks.size,
-            queuedTasks: this.processingQueue.length
+            queuedTasks: this.processingQueue.length,
+            completedTasks: this.completedTasks.size
         };
     }
     /**
      * Shutdown the processor gracefully
      */
-    async shutdown() {
+    async shutdown(force = false) {
         this.logger.info('Shutting down ParallelConfirmationProcessor');
+        if (force) {
+            // Force shutdown - clear active tasks immediately
+            this.activeTasks.clear();
+            this.logger.info('ParallelConfirmationProcessor force shutdown complete');
+            return;
+        }
         // Wait for active tasks to complete (with timeout)
-        const shutdownTimeout = 30000; // 30 seconds
+        const shutdownTimeout = process.env.NODE_ENV === 'test' ? 5000 : 30000; // 5 seconds in tests, 30 seconds in production
         const startTime = Date.now();
         while (this.activeTasks.size > 0 && Date.now() - startTime < shutdownTimeout) {
             await new Promise(resolve => setTimeout(resolve, 100));
@@ -307,6 +326,8 @@ class ParallelConfirmationProcessor {
             this.logger.warn('Shutdown timeout reached with active tasks remaining', {
                 activeTasksCount: this.activeTasks.size
             });
+            // Clear remaining tasks after timeout
+            this.activeTasks.clear();
         }
         this.logger.info('ParallelConfirmationProcessor shutdown complete');
     }

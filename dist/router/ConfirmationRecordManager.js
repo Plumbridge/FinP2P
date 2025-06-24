@@ -22,6 +22,22 @@ class ConfirmationRecordManager {
      * Create a confirmation record for a transfer
      */
     async createConfirmationRecord(transfer, status, txHash) {
+        // Validate transfer object
+        if (!transfer) {
+            throw new Error('Transfer object is required but was undefined');
+        }
+        if (!transfer.id) {
+            throw new Error('Transfer ID is required but was undefined');
+        }
+        if (!transfer.fromAccount?.id) {
+            throw new Error('Transfer fromAccount.id is required but was undefined');
+        }
+        if (!transfer.toAccount?.id) {
+            throw new Error('Transfer toAccount.id is required but was undefined');
+        }
+        if (!transfer.asset?.id) {
+            throw new Error('Transfer asset.id is required but was undefined');
+        }
         const confirmationId = `conf-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
         const confirmation = {
             id: confirmationId,

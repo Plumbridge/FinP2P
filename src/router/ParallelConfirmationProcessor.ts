@@ -418,22 +418,28 @@ export class ParallelConfirmationProcessor {
    */
   getStatistics(): any {
     return {
-      processedTransfers: this.completedTasks.size,
-      averageProcessingTime: 0, // Would calculate from completed tasks
-      successRate: 1.0, // Would calculate from success/failure ratio
+      ...this.metrics,
       activeTasks: this.activeTasks.size,
-      queuedTasks: this.processingQueue.length
+      queuedTasks: this.processingQueue.length,
+      completedTasks: this.completedTasks.size
     };
   }
 
   /**
    * Shutdown the processor gracefully
    */
-  async shutdown(): Promise<void> {
+  async shutdown(force: boolean = false): Promise<void> {
     this.logger.info('Shutting down ParallelConfirmationProcessor');
     
+    if (force) {
+      // Force shutdown - clear active tasks immediately
+      this.activeTasks.clear();
+      this.logger.info('ParallelConfirmationProcessor force shutdown complete');
+      return;
+    }
+    
     // Wait for active tasks to complete (with timeout)
-    const shutdownTimeout = 30000; // 30 seconds
+    const shutdownTimeout = process.env.NODE_ENV === 'test' ? 5000 : 30000; // 5 seconds in tests, 30 seconds in production
     const startTime = Date.now();
     
     while (this.activeTasks.size > 0 && Date.now() - startTime < shutdownTimeout) {
@@ -444,6 +450,8 @@ export class ParallelConfirmationProcessor {
       this.logger.warn('Shutdown timeout reached with active tasks remaining', {
         activeTasksCount: this.activeTasks.size
       });
+      // Clear remaining tasks after timeout
+      this.activeTasks.clear();
     }
     
     this.logger.info('ParallelConfirmationProcessor shutdown complete');

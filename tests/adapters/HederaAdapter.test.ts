@@ -2,102 +2,9 @@ import { HederaAdapter } from '../../src/adapters/HederaAdapter';
 import { LedgerType } from '../../src/types';
 import { createLogger } from '../../src/utils/logger';
 
-// Mock the Hedera SDK
-jest.mock('@hashgraph/sdk', () => ({
-  Client: {
-    forTestnet: jest.fn(() => ({
-      setOperator: jest.fn(),
-      close: jest.fn()
-    })),
-    forMainnet: jest.fn(() => ({
-      setOperator: jest.fn(),
-      close: jest.fn()
-    })),
-    forPreviewnet: jest.fn(() => ({
-      setOperator: jest.fn(),
-      close: jest.fn()
-    }))
-  },
-  AccountId: {
-    fromString: jest.fn((id) => ({ toString: () => id }))
-  },
-  PrivateKey: {
-    fromString: jest.fn(() => ({
-      publicKey: { toAccountId: jest.fn(() => ({ toString: () => '0.0.123456' })) }
-    }))
-  },
-  TokenCreateTransaction: jest.fn(() => ({
-     setTokenName: jest.fn().mockReturnThis(),
-     setTokenSymbol: jest.fn().mockReturnThis(),
-     setDecimals: jest.fn().mockReturnThis(),
-     setInitialSupply: jest.fn().mockReturnThis(),
-     setTreasuryAccountId: jest.fn().mockReturnThis(),
-     setSupplyType: jest.fn().mockReturnThis(),
-     setMaxSupply: jest.fn().mockReturnThis(),
-     setTokenType: jest.fn().mockReturnThis(),
-     setAdminKey: jest.fn().mockReturnThis(),
-     setSupplyKey: jest.fn().mockReturnThis(),
-      setFreezeKey: jest.fn().mockReturnThis(),
-      setWipeKey: jest.fn().mockReturnThis(),
-      setTokenMemo: jest.fn().mockReturnThis(),
-      freezeWith: jest.fn().mockReturnThis(),
-     sign: jest.fn().mockResolvedValue({
-       execute: jest.fn().mockResolvedValue({
-         transactionId: { toString: () => 'mock-tx-id' },
-         getReceipt: jest.fn().mockResolvedValue({
-           status: 'SUCCESS',
-           tokenId: { toString: () => '0.0.999999' }
-         })
-       })
-     })
-   })),
-  TransferTransaction: jest.fn(() => ({
-    addHbarTransfer: jest.fn().mockReturnThis(),
-    addTokenTransfer: jest.fn().mockReturnThis(),
-    freezeWith: jest.fn().mockReturnThis(),
-    sign: jest.fn().mockResolvedValue({
-      execute: jest.fn().mockResolvedValue({
-         transactionId: { toString: () => 'mock-tx-id' },
-         getReceipt: jest.fn().mockResolvedValue({ status: 'SUCCESS' })
-       })
-    })
-  })),
-  AccountCreateTransaction: jest.fn(() => ({
-    setKey: jest.fn().mockReturnThis(),
-    setInitialBalance: jest.fn().mockReturnThis(),
-    freezeWith: jest.fn().mockReturnThis(),
-    sign: jest.fn().mockResolvedValue({
-      execute: jest.fn().mockResolvedValue({
-        transactionId: { toString: () => 'mock-tx-id' },
-        getReceipt: jest.fn().mockResolvedValue({
-           status: 'SUCCESS',
-           accountId: { toString: () => '0.0.888888' }
-         })
-      })
-    })
-  })),
-  TransactionReceiptQuery: jest.fn(() => ({
-     setTransactionId: jest.fn().mockReturnThis(),
-     execute: jest.fn().mockResolvedValue({
-       status: 'SUCCESS'
-     })
-   })),
-  TransactionId: {
-    fromString: jest.fn((id) => ({ toString: () => id }))
-  },
-  Status: {
-     Success: 'SUCCESS'
-   },
-   TokenType: {
-     FungibleCommon: 'FUNGIBLE_COMMON'
-   },
-   TokenSupplyType: {
-     Finite: 'FINITE'
-   },
-   Hbar: {
-     fromTinybars: jest.fn((amount) => ({ toTinybars: () => ({ toString: () => amount.toString() }) }))
-   }
-}));
+// Mock is handled in setup.ts
+
+console.log('TEST FILE LOADED');
 
 describe('HederaAdapter', () => {
   let adapter: HederaAdapter;
@@ -119,6 +26,16 @@ describe('HederaAdapter', () => {
     
     // Mock the connect method to avoid actual network calls
     jest.spyOn(adapter, 'connect').mockResolvedValue();
+    
+    // Set up a mock client since connect() is mocked
+    const mockClient = {
+      setOperator: jest.fn(),
+      close: jest.fn(),
+      // Add any other methods that might be needed
+      getLedgerId: jest.fn().mockReturnValue({ toString: () => 'hedera' })
+    };
+    (adapter as any).client = mockClient;
+    (adapter as any).connected = true;
   });
 
   describe('Initialization', () => {
@@ -281,6 +198,8 @@ describe('HederaAdapter', () => {
     });
 
     it('should handle lock/unlock operations while disconnected', async () => {
+      (adapter as any).connected = false;
+      
       await expect(
         adapter.lockAsset('0.0.123456', 'asset-id', BigInt(100))
       ).rejects.toThrow('Not connected to Hedera network');
@@ -293,16 +212,18 @@ describe('HederaAdapter', () => {
 
   describe('Transaction Queries', () => {
     it('should handle transaction queries while disconnected', async () => {
+      (adapter as any).connected = false;
       await expect(adapter.getTransaction('test-hash')).rejects.toThrow('Not connected to Hedera network');
       await expect(adapter.getTransactionStatus('test-hash')).rejects.toThrow('Not connected to Hedera network');
+      (adapter as any).connected = true; // Reset for other tests
     });
 
     it('should handle transaction queries when connected', async () => {
-      (adapter as any).connected = true;
-      
       const result = await adapter.getTransaction('0.0.123@1234567890.123456789');
-      expect(result).toBeDefined();
-      expect(result?.hash).toBe('0.0.123@1234567890.123456789');
+        
+        expect(result).toBeDefined();
+        expect(result).not.toBeNull();
+        expect(result!.hash).toBe('0.0.123@1234567890.123456789');
     });
   });
 

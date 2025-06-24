@@ -552,6 +552,12 @@ export class MockAdapter implements LedgerAdapter {
   }
 
   private shouldSimulateNetworkPartition(): boolean {
+    // If explicitly set via simulateNetworkPartition(), use that
+    if (this.networkPartitioned) {
+      return true;
+    }
+    
+    // Otherwise use random simulation based on config
     if (!this.config.networkPartitionRate || this.config.networkPartitionRate <= 0) {
       return false;
     }

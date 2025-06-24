@@ -29,12 +29,14 @@ export declare class LedgerManager {
     private crossLedgerOperations;
     private reservationTimeout;
     private reservationQueues;
+    private cleanupTimer;
     constructor(config: ConfigOptions['ledgers'], logger: Logger);
     initialize(): Promise<void>;
     private createAdapter;
     disconnect(): Promise<void>;
     getAdapter(ledgerId: string): LedgerAdapter | null;
     getSupportedLedgers(): string[];
+    getAdapters(): LedgerAdapter[];
     isLedgerSupported(ledgerId: string): boolean;
     createAsset(ledgerId: string, assetData: Omit<Asset, 'id' | 'createdAt' | 'updatedAt'>): Promise<Asset>;
     getAsset(ledgerId: string, assetId: string): Promise<Asset | null>;
@@ -57,6 +59,8 @@ export declare class LedgerManager {
     healthCheck(): Promise<Record<string, boolean>>;
     validateBalanceAvailability(ledgerId: string, accountId: string, assetId: string, amount: bigint): Promise<{
         available: boolean;
+        currentBalance?: bigint;
+        availableBalance?: bigint;
         reason?: string;
     }>;
     reserveBalance(ledgerId: string, accountId: string, assetId: string, amount: bigint, operationId?: string): Promise<{

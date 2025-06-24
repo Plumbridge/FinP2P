@@ -41,28 +41,38 @@ export class LedgerManager {
   private crossLedgerOperations: Map<string, CrossLedgerOperation> = new Map();
   private reservationTimeout: number = 300000; // 5 minutes default
   private reservationQueues: Map<string, any[]> = new Map();
+  private cleanupTimer: NodeJS.Timeout | null = null;
 
   constructor(config: ConfigOptions['ledgers'], logger: Logger) {
     this.config = config;
     this.logger = logger;
     
     // Start cleanup timer for expired reservations
-    setInterval(() => this.cleanupExpiredReservations(), 60000); // Check every minute
+    this.cleanupTimer = setInterval(() => this.cleanupExpiredReservations(), 60000); // Check every minute
   }
 
   async initialize(): Promise<void> {
     try {
+      console.log('LedgerManager.initialize() called with config:', this.config);
       for (const [ledgerId, ledgerConfig] of Object.entries(this.config)) {
+        console.log(`Creating adapter for ledger: ${ledgerId}`, ledgerConfig);
         const adapter = await this.createAdapter(ledgerId, ledgerConfig);
+        console.log(`Created adapter for ${ledgerId}:`, adapter);
         if (adapter) {
+          console.log(`Connecting adapter for ${ledgerId}`);
           await adapter.connect();
           this.adapters.set(ledgerId, adapter);
+          console.log(`Successfully initialized adapter for ledger: ${ledgerId}`);
           this.logger.info(`Initialized adapter for ledger: ${ledgerId}`);
+        } else {
+          console.log(`Failed to create adapter for ${ledgerId}`);
         }
       }
       
+      console.log(`LedgerManager initialized with ${this.adapters.size} adapters`);
       this.logger.info(`Ledger manager initialized with ${this.adapters.size} adapters`);
     } catch (error) {
+      console.log('LedgerManager initialization error:', error);
       this.logger.error('Failed to initialize ledger manager:', error);
       throw error;
     }
@@ -105,6 +115,12 @@ export class LedgerManager {
 
   async disconnect(): Promise<void> {
     try {
+      // Clear cleanup timer
+      if (this.cleanupTimer) {
+        clearInterval(this.cleanupTimer);
+        this.cleanupTimer = null;
+      }
+      
       for (const [ledgerId, adapter] of this.adapters) {
         await adapter.disconnect();
         this.logger.info(`Disconnected from ledger: ${ledgerId}`);
@@ -122,6 +138,10 @@ export class LedgerManager {
 
   getSupportedLedgers(): string[] {
     return Array.from(this.adapters.keys());
+  }
+
+  getAdapters(): LedgerAdapter[] {
+    return Array.from(this.adapters.values());
   }
 
   isLedgerSupported(ledgerId: string): boolean {
@@ -392,17 +412,19 @@ export class LedgerManager {
     accountId: string,
     assetId: string,
     amount: bigint
-  ): Promise<{ available: boolean; availableBalance?: bigint; reason?: string }> {
+  ): Promise<{ available: boolean; currentBalance?: bigint; availableBalance?: bigint; reason?: string }> {
     const adapter = this.getAdapter(ledgerId);
     if (!adapter) {
       return {
         available: false,
+        currentBalance: BigInt(0),
         availableBalance: BigInt(0),
         reason: `Ledger ${ledgerId} not supported`
       };
     }
 
     try {
+      const currentBalance = await adapter.getBalance(accountId, assetId);
       const availableBalance = await adapter.getAvailableBalance(accountId, assetId);
       const reservedAmount = this.getReservedAmount(ledgerId, accountId, assetId);
       const lockedBalance = await adapter.getLockedBalance(accountId, assetId);
@@ -411,6 +433,7 @@ export class LedgerManager {
       
       return {
         available: trulyAvailable >= amount,
+        currentBalance,
         availableBalance: trulyAvailable,
         reason: trulyAvailable >= amount ? undefined : 
           `Insufficient balance (Available: ${trulyAvailable}, Requested: ${amount})`
@@ -419,6 +442,7 @@ export class LedgerManager {
       this.logger.error(`Failed to validate balance for ${accountId}:`, error);
       return {
         available: false,
+        currentBalance: BigInt(0),
         availableBalance: BigInt(0),
         reason: 'Balance validation failed'
       };

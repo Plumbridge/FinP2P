@@ -5,6 +5,24 @@ import { createTestRedisClient, cleanupRedis, closeRedisConnection } from '../he
 import { stopRouterSafely } from '../helpers/router-cleanup';
 import type { RedisClientType } from 'redis';
 
+// Mock ioredis
+jest.mock('ioredis', () => {
+  return jest.fn().mockImplementation(() => ({
+    on: jest.fn(),
+    ping: jest.fn().mockResolvedValue('PONG'),
+    quit: jest.fn().mockResolvedValue('OK'),
+    isOpen: true,
+    set: jest.fn().mockResolvedValue('OK'),
+    get: jest.fn().mockResolvedValue(null),
+    del: jest.fn().mockResolvedValue(1),
+    hSet: jest.fn().mockResolvedValue(1),
+    hGet: jest.fn().mockResolvedValue(null),
+    hGetAll: jest.fn().mockResolvedValue({}),
+    sAdd: jest.fn().mockResolvedValue(1),
+    sMembers: jest.fn().mockResolvedValue([])
+  }));
+});
+
 
 
 describe('FinP2PRouter', () => {

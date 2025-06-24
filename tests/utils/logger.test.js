@@ -2,12 +2,18 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const logger_1 = require("../../src/utils/logger");
 describe('Logger', () => {
-    let consoleSpy;
+    let stdoutSpy;
     beforeEach(() => {
-        consoleSpy = jest.spyOn(console, 'log').mockImplementation();
+        // Set NODE_ENV to test to ensure we're using the test transport
+        process.env.NODE_ENV = 'test';
+        // Enable logger test mode to allow stdout output during logger tests
+        process.env.LOGGER_TEST_MODE = 'true';
+        stdoutSpy = jest.spyOn(process.stdout, 'write').mockImplementation();
     });
     afterEach(() => {
-        consoleSpy.mockRestore();
+        stdoutSpy.mockRestore();
+        delete process.env.NODE_ENV;
+        delete process.env.LOGGER_TEST_MODE;
     });
     describe('createLogger', () => {
         it('should create logger with default configuration', () => {
@@ -35,31 +41,31 @@ describe('Logger', () => {
             const logger = (0, logger_1.createLogger)({ level: 'info' });
             logger.info('Test info message');
             logger.info('Info with data', { key: 'value' });
-            expect(consoleSpy).toHaveBeenCalled();
+            expect(stdoutSpy).toHaveBeenCalled();
         });
         it('should log error messages', () => {
             const logger = (0, logger_1.createLogger)({ level: 'error' });
             logger.error('Test error message');
             logger.error('Error with stack', new Error('Test error'));
-            expect(consoleSpy).toHaveBeenCalled();
+            expect(stdoutSpy).toHaveBeenCalled();
         });
         it('should log warning messages', () => {
             const logger = (0, logger_1.createLogger)({ level: 'warn' });
             logger.warn('Test warning message');
             logger.warn('Warning with data', { warning: true });
-            expect(consoleSpy).toHaveBeenCalled();
+            expect(stdoutSpy).toHaveBeenCalled();
         });
         it('should log debug messages when level allows', () => {
             const logger = (0, logger_1.createLogger)({ level: 'debug' });
             logger.debug('Test debug message');
             logger.debug('Debug with context', { context: 'test' });
-            expect(consoleSpy).toHaveBeenCalled();
+            expect(stdoutSpy).toHaveBeenCalled();
         });
         it('should not log debug messages when level is higher', () => {
             const logger = (0, logger_1.createLogger)({ level: 'error' });
             logger.debug('This should not be logged');
             // Debug messages should be filtered out at error level
-            expect(consoleSpy).not.toHaveBeenCalledWith(expect.stringContaining('This should not be logged'));
+            expect(stdoutSpy).not.toHaveBeenCalledWith(expect.stringContaining('This should not be logged'));
         });
     });
     describe('structured logging', () => {
@@ -71,14 +77,14 @@ describe('Logger', () => {
                 amount: 1000
             };
             logger.info('User action', metadata);
-            expect(consoleSpy).toHaveBeenCalled();
+            expect(stdoutSpy).toHaveBeenCalled();
         });
         it('should handle error objects', () => {
             const logger = (0, logger_1.createLogger)({ level: 'error' });
             const error = new Error('Test error');
             error.stack = 'Error stack trace';
             logger.error('Operation failed', error);
-            expect(consoleSpy).toHaveBeenCalled();
+            expect(stdoutSpy).toHaveBeenCalled();
         });
         it('should handle nested objects', () => {
             const logger = (0, logger_1.createLogger)({ level: 'info' });
@@ -94,7 +100,7 @@ describe('Logger', () => {
                 }
             };
             logger.info('Complex transfer data', complexData);
-            expect(consoleSpy).toHaveBeenCalled();
+            expect(stdoutSpy).toHaveBeenCalled();
         });
     });
     describe('performance logging', () => {
@@ -107,7 +113,7 @@ describe('Logger', () => {
                 cpu: 25.5
             };
             logger.info('Performance metrics', metrics);
-            expect(consoleSpy).toHaveBeenCalled();
+            expect(stdoutSpy).toHaveBeenCalled();
         });
         it('should handle timing information', (done) => {
             const logger = (0, logger_1.createLogger)({ level: 'debug' });
@@ -116,7 +122,7 @@ describe('Logger', () => {
             setTimeout(() => {
                 const duration = Date.now() - startTime;
                 logger.debug('Operation completed', { duration });
-                expect(consoleSpy).toHaveBeenCalled();
+                expect(stdoutSpy).toHaveBeenCalled();
                 done();
             }, 10);
             expect(logger).toBeDefined();
@@ -131,7 +137,7 @@ describe('Logger', () => {
                 timestamp: new Date().toISOString()
                 // Note: should not log passwords or tokens
             });
-            expect(consoleSpy).toHaveBeenCalled();
+            expect(stdoutSpy).toHaveBeenCalled();
         });
         it('should log access control events', () => {
             const logger = (0, logger_1.createLogger)({ level: 'info' });
@@ -140,7 +146,7 @@ describe('Logger', () => {
                 resource: 'transfer-endpoint',
                 action: 'create'
             });
-            expect(consoleSpy).toHaveBeenCalled();
+            expect(stdoutSpy).toHaveBeenCalled();
         });
     });
     describe('correlation IDs', () => {
@@ -150,7 +156,8 @@ describe('Logger', () => {
             logger.info('Request started', { correlationId });
             logger.info('Processing transfer', { correlationId });
             logger.info('Request completed', { correlationId });
-            expect(consoleSpy).toHaveBeenCalledTimes(3);
+            // Each log call results in 1 stdout.write call
+            expect(stdoutSpy).toHaveBeenCalledTimes(3);
         });
     });
     describe('error handling', () => {

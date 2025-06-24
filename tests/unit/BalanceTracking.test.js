@@ -117,9 +117,9 @@ describe('Enhanced Balance Tracking', () => {
             expect(totalBalance).toBe(BigInt('100000000000000000000'));
             // Lock some balance
             await mockAdapter.lockAsset(testAccount1, testAssetId, BigInt('30000000000000000000'));
-            const availableBalance = mockAdapter.getAvailableBalance(testAccount1, testAssetId);
+            const availableBalance = await mockAdapter.getAvailableBalance(testAccount1, testAssetId);
             expect(availableBalance).toBe(BigInt('70000000000000000000'));
-            const lockedBalance = mockAdapter.getLockedBalance(testAccount1, testAssetId);
+            const lockedBalance = await mockAdapter.getLockedBalance(testAccount1, testAssetId);
             expect(lockedBalance).toBe(BigInt('30000000000000000000'));
         });
     });
@@ -156,13 +156,13 @@ describe('Enhanced Balance Tracking', () => {
             expect(lock.success).toBe(true);
             expect(lock.lockTxHash).toBeDefined();
             // Check that locked amount affects available balance
-            const availableBalance = mockAdapter.getAvailableBalance(testAccount1, testAssetId);
+            const availableBalance = await mockAdapter.getAvailableBalance(testAccount1, testAssetId);
             expect(availableBalance).toBe(BigInt('75000000000000000000'));
             // Release with unlock
             const release = await ledgerManager.releaseReservation(reservation.reservationId, true);
             expect(release.success).toBe(true);
             // Check that balance is fully available again
-            const finalAvailable = mockAdapter.getAvailableBalance(testAccount1, testAssetId);
+            const finalAvailable = await mockAdapter.getAvailableBalance(testAccount1, testAssetId);
             expect(finalAvailable).toBe(BigInt('100000000000000000000'));
         });
         it('should handle cross-ledger transfer initiation', async () => {

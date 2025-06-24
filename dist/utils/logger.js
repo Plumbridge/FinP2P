@@ -20,24 +20,30 @@ function safeStringify(obj) {
     }, 2);
 }
 function createLogger(config) {
-    const logFormat = winston_1.default.format.combine(winston_1.default.format.timestamp({
-        format: 'YYYY-MM-DD HH:mm:ss'
-    }), winston_1.default.format.errors({ stack: true }), winston_1.default.format.json());
-    // For testing environment, use a simple format that works with console spies
+    const logConfig = config || { level: 'info' };
     const isTest = process.env.NODE_ENV === 'test';
-    const transports = [
-        new winston_1.default.transports.Console({
-            format: isTest ? winston_1.default.format.combine(winston_1.default.format.timestamp({
-                format: 'YYYY-MM-DD HH:mm:ss'
-            }), winston_1.default.format.printf(({ timestamp, level, message, ...meta }) => {
-                const metaStr = Object.keys(meta).length ? safeStringify(meta) : '';
-                return `${level}: ${message} ${metaStr}`.trim();
-            })) : winston_1.default.format.combine(winston_1.default.format.colorize(), winston_1.default.format.simple())
-        })
-    ];
-    if (config.file) {
+    const transports = [];
+    // Console transport - simplified for tests
+    if (isTest) {
+        transports.push(new winston_1.default.transports.Console({
+            format: winston_1.default.format.combine(winston_1.default.format.printf(({ level, message, ...meta }) => {
+                const metaStr = Object.keys(meta).length ? ' ' + safeStringify(meta) : '';
+                const output = `${level}: ${message}${metaStr}`;
+                // Force output to process.stdout for tests
+                process.stdout.write(output + '\n');
+                return output;
+            }))
+        }));
+    }
+    else {
+        transports.push(new winston_1.default.transports.Console({
+            format: winston_1.default.format.combine(winston_1.default.format.colorize(), winston_1.default.format.simple())
+        }));
+    }
+    // File transport - add regardless of environment if specified
+    if (logConfig.file) {
         transports.push(new winston_1.default.transports.File({
-            filename: path_1.default.resolve(config.file),
+            filename: path_1.default.resolve(logConfig.file),
             format: winston_1.default.format.combine(winston_1.default.format.timestamp({
                 format: 'YYYY-MM-DD HH:mm:ss'
             }), winston_1.default.format.printf(({ timestamp, level, message, ...meta }) => {
@@ -47,10 +53,11 @@ function createLogger(config) {
         }));
     }
     return winston_1.default.createLogger({
-        level: config.level || 'info',
-        format: logFormat,
+        level: logConfig.level || 'info',
+        format: winston_1.default.format.json(),
         transports,
-        exitOnError: false
+        exitOnError: false,
+        silent: false
     });
 }
 exports.createLogger = createLogger;

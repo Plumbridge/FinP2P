@@ -26,8 +26,11 @@ export declare class SuiAdapter implements LedgerAdapter {
     createAsset(assetData: Omit<Asset, 'id' | 'createdAt' | 'updatedAt'>): Promise<Asset>;
     getAsset(assetId: string): Promise<Asset | null>;
     createAccount(institutionId: string): Promise<Account>;
+    importAccount(privateKey: string): Promise<Account>;
     getAccount(accountId: string): Promise<Account | null>;
     getBalance(accountId: string, assetId: string): Promise<bigint>;
+    prepareTransfer(transferData: any): Promise<any>;
+    executeTransfer(transferData: any): Promise<string>;
     transfer(from: string, to: string, assetId: string, amount: bigint): Promise<string>;
     lockAsset(accountId: string, assetId: string, amount: bigint): Promise<string>;
     unlockAsset(accountId: string, assetId: string, amount: bigint): Promise<string>;
@@ -45,5 +48,6 @@ export declare class SuiAdapter implements LedgerAdapter {
         balance: bigint;
         operation: string;
     }>;
+    getLedgerType(): LedgerType;
 }
 //# sourceMappingURL=SuiAdapter.d.ts.map

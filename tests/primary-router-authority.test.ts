@@ -84,6 +84,9 @@ describe('Primary Router Authority', () => {
     });
 
     it('should validate backup router authority', async () => {
+      // Set up primary router heartbeat to make it available
+      await redisClient.set(`finp2p:router_heartbeat:test-router-id`, Date.now().toString());
+      
       const result = await authority.validateAuthority('TEST-ASSET', 'backup-1');
 
       expect(result.isAuthorized).toBe(false); // Should be false since primary is available

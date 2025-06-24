@@ -117,19 +117,24 @@ jest.mock('@hashgraph/sdk', () => ({
       } as any)
     } as any)
   })),
-  TransferTransaction: jest.fn().mockImplementation(() => ({
-    addHbarTransfer: jest.fn().mockReturnThis(),
-    addTokenTransfer: jest.fn().mockReturnThis(),
-    // @ts-ignore
-    sign: jest.fn().mockResolvedValue({
-      // @ts-ignore
+  TransferTransaction: jest.fn().mockImplementation(() => {
+    const mockTransaction = {
+      addHbarTransfer: jest.fn().mockReturnValue(mockTransaction),
+      addTokenTransfer: jest.fn().mockReturnValue(mockTransaction),
+      freezeWith: jest.fn().mockReturnValue(mockTransaction),
       execute: jest.fn().mockResolvedValue({
         transactionId: { toString: () => 'mock-tx-id' },
-        // @ts-ignore
         getReceipt: jest.fn().mockResolvedValue({ status: 'SUCCESS' })
+      }),
+      sign: jest.fn().mockResolvedValue({
+        execute: jest.fn().mockResolvedValue({
+          transactionId: { toString: () => 'mock-tx-id' },
+          getReceipt: jest.fn().mockResolvedValue({ status: 'SUCCESS' })
+        })
       })
-    })
-  })),
+    };
+    return mockTransaction;
+  }),
   AccountCreateTransaction: jest.fn().mockImplementation(() => ({
     setKey: jest.fn().mockReturnThis(),
     setInitialBalance: jest.fn().mockReturnThis(),
@@ -181,7 +186,62 @@ jest.mock('@hashgraph/sdk', () => ({
   },
   TokenId: {
     fromString: jest.fn().mockImplementation((str) => ({ toString: () => str }))
-  }
+  },
+  TransactionReceiptQuery: jest.fn().mockImplementation(() => ({
+    setTransactionId: jest.fn().mockReturnThis(),
+    execute: jest.fn().mockResolvedValue({
+      status: 'SUCCESS',
+      accountId: { toString: () => '0.0.888888' },
+      tokenId: { toString: () => '0.0.999999' }
+    })
+  })),
+  TransactionId: {
+    fromString: jest.fn((id) => ({ toString: () => id }))
+  },
+  Status: {
+    Success: 'SUCCESS'
+  },
+  TokenType: {
+    FungibleCommon: 'FUNGIBLE_COMMON',
+    NonFungibleUnique: 'NON_FUNGIBLE_UNIQUE'
+  },
+  TokenSupplyType: {
+    Infinite: 'INFINITE',
+    Finite: 'FINITE'
+  },
+  TokenFreezeTransaction: jest.fn().mockImplementation(() => ({
+    setAccountId: jest.fn().mockReturnThis(),
+    setTokenId: jest.fn().mockReturnThis(),
+    freezeWith: jest.fn().mockReturnThis(),
+    sign: jest.fn().mockResolvedValue({
+      execute: jest.fn().mockResolvedValue({
+        transactionId: { toString: () => 'mock-tx-id' },
+        getReceipt: jest.fn().mockResolvedValue({ status: 'SUCCESS' })
+      })
+    })
+  })),
+  TokenUnfreezeTransaction: jest.fn().mockImplementation(() => ({
+    setAccountId: jest.fn().mockReturnThis(),
+    setTokenId: jest.fn().mockReturnThis(),
+    freezeWith: jest.fn().mockReturnThis(),
+    sign: jest.fn().mockResolvedValue({
+      execute: jest.fn().mockResolvedValue({
+        transactionId: { toString: () => 'mock-tx-id' },
+        getReceipt: jest.fn().mockResolvedValue({ status: 'SUCCESS' })
+      })
+    })
+  })),
+  AccountStakeToAccountTransaction: jest.fn().mockImplementation(() => ({
+    setAccountId: jest.fn().mockReturnThis(),
+    setStakedAccountId: jest.fn().mockReturnThis(),
+    freezeWith: jest.fn().mockReturnThis(),
+    sign: jest.fn().mockResolvedValue({
+      execute: jest.fn().mockResolvedValue({
+        transactionId: { toString: () => 'mock-tx-id' },
+        getReceipt: jest.fn().mockResolvedValue({ status: 'SUCCESS' })
+      })
+    })
+  }))
 }));
 
 // Mock jsonwebtoken

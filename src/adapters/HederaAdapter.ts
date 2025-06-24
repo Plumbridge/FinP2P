@@ -459,13 +459,21 @@ export class HederaAdapter implements LedgerAdapter {
     }
 
     try {
+      console.log('DEBUG: Starting getTransaction with hash:', txHash);
+      console.log('DEBUG: Connected status:', this.connected);
+      console.log('DEBUG: Client:', this.client);
+      
       // Parse transaction ID from hash
       const transactionId = TransactionId.fromString(txHash);
+      console.log('DEBUG: Parsed transaction ID:', transactionId);
       
       // Query transaction receipt
-      const receipt = await new TransactionReceiptQuery()
-        .setTransactionId(transactionId)
-        .execute(this.client);
+      const receiptQuery = new TransactionReceiptQuery()
+        .setTransactionId(transactionId);
+      console.log('DEBUG: Created receipt query:', receiptQuery);
+      
+      const receipt = await receiptQuery.execute(this.client);
+      console.log('DEBUG: Got receipt:', receipt);
 
       const transaction: Transaction = {
         hash: txHash,
@@ -481,8 +489,10 @@ export class HederaAdapter implements LedgerAdapter {
         gasUsed: BigInt(0) // Hedera uses fixed fees
       };
 
+      console.log('DEBUG: Created transaction:', transaction);
       return transaction;
     } catch (error) {
+      console.log('DEBUG: Error in getTransaction:', error);
       this.logger.error(`Failed to get transaction ${txHash}:`, error);
       return null;
     }

@@ -19,12 +19,18 @@ export interface AuthorityValidationResult {
     primaryRouter?: string;
     backupRouters?: string[];
 }
+export interface ValidationMetrics {
+    totalValidations: number;
+    successfulValidations: number;
+    failedValidations: number;
+}
 export declare class PrimaryRouterAuthority {
     private redis;
     private logger;
     private routerId;
     private readonly ASSET_REGISTRY_KEY;
     private readonly ROUTER_ASSETS_KEY;
+    private validationMetrics;
     constructor(redis: RedisClientType, routerId: string);
     /**
      * Register a new asset with this router as the primary authority
@@ -66,6 +72,10 @@ export declare class PrimaryRouterAuthority {
      * Enable backup router to take over if primary is unavailable
      */
     validateBackupAuthority(assetId: string, backupRouterId: string): Promise<AuthorityValidationResult>;
+    /**
+     * Get validation metrics
+     */
+    getValidationMetrics(): ValidationMetrics;
     /**
      * Check if this router is authorized to handle a transfer
      */
