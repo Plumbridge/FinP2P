@@ -425,6 +425,11 @@ class MockAdapter {
         return Math.random() * 100 < this.config.failureRate;
     }
     shouldSimulateNetworkPartition() {
+        // If explicitly set via simulateNetworkPartition(), use that
+        if (this.networkPartitioned) {
+            return true;
+        }
+        // Otherwise use random simulation based on config
         if (!this.config.networkPartitionRate || this.config.networkPartitionRate <= 0) {
             return false;
         }

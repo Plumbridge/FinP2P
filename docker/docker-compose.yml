@@ -5,7 +5,7 @@ services:
   redis:
     image: redis:7-alpine
     ports:
-      - "6379:6379"
+      - "6380:6379"
     volumes:
       - redis_data:/data
     command: redis-server --appendonly yes
@@ -13,8 +13,8 @@ services:
   # Router 1 - Bank A
   router-bank-a:
     build:
-      context: .
-      dockerfile: Dockerfile
+      context: ..
+      dockerfile: docker/Dockerfile
     ports:
       - "3001:3000"
       - "50051:50051"
@@ -35,8 +35,8 @@ services:
   # Router 2 - Bank B
   router-bank-b:
     build:
-      context: .
-      dockerfile: Dockerfile
+      context: ..
+      dockerfile: docker/Dockerfile
     ports:
       - "3002:3000"
       - "50052:50051"
@@ -57,8 +57,8 @@ services:
   # Router 3 - Bank C
   router-bank-c:
     build:
-      context: .
-      dockerfile: Dockerfile
+      context: ..
+      dockerfile: docker/Dockerfile
     ports:
       - "3003:3000"
       - "50053:50051"
@@ -79,8 +79,8 @@ services:
   # Mock Ledger Service
   mock-ledger:
     build:
-      context: .
-      dockerfile: Dockerfile.ledger
+      context: ..
+      dockerfile: docker/Dockerfile.ledger
     ports:
       - "4000:4000"
     environment:
@@ -96,7 +96,7 @@ services:
     ports:
       - "9090:9090"
     volumes:
-      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ../monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
       - '--storage.tsdb.path=/prometheus'

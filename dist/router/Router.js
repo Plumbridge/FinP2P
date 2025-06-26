@@ -9,6 +9,7 @@ const express_1 = __importDefault(require("express"));
 const cors_1 = __importDefault(require("cors"));
 const helmet_1 = __importDefault(require("helmet"));
 const uuid_1 = require("uuid");
+const redis_1 = require("redis");
 const types_1 = require("../types");
 const logger_1 = require("../utils/logger");
 const validation_1 = require("../utils/validation");
@@ -114,14 +115,16 @@ class FinP2PRouter extends events_1.EventEmitter {
     async initializeComponents() {
         try {
             // Initialize Redis
-            const Redis = require('ioredis');
-            this.redis = new Redis(this.config.redis.url, {
-                retryDelayOnFailover: 100,
-                maxRetriesPerRequest: 1,
+            this.redis = (0, redis_1.createClient)({
+                url: this.config.redis.url,
+                socket: {
+                    reconnectStrategy: (retries) => Math.min(retries * 50, 500)
+                }
             });
             this.redis.on('error', (err) => {
                 this.logger.error('Redis connection error:', err);
             });
+            await this.redis.connect();
             // Initialize routing engine
             this.routingEngine = new RoutingEngine_1.RoutingEngine(this.redis, this.logger);
             // Initialize ledger manager
@@ -232,8 +235,8 @@ class FinP2PRouter extends events_1.EventEmitter {
                 });
             }
             // Close Redis connection
-            if (this.redis && this.redis.isOpen) {
-                await this.redis.quit();
+            if (this.redis && this.redis.isReady) {
+                await this.redis.disconnect();
             }
             // Disconnect ledger manager if exists
             if (this.ledgerManager) {

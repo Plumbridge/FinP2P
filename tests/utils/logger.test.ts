@@ -244,9 +244,9 @@ describe('Logger', () => {
       logger.info('Request started', { correlationId });
       logger.info('Processing transfer', { correlationId });
       logger.info('Request completed', { correlationId });
-
-      // Each log call results in 1 stdout.write call
-      expect(stdoutSpy).toHaveBeenCalledTimes(3);
+      
+      // Each log call results in 2 stdout.write calls (message + newline)
+      expect(stdoutSpy).toHaveBeenCalledTimes(6);
     });
   });
 
@@ -276,7 +276,7 @@ describe('Logger', () => {
         c: 'valid'
       });
       
-      expect(stdoutSpy).toHaveBeenCalled();
+      expect(processStdoutSpy).toHaveBeenCalled();
     });
 
     it('should handle very large objects', () => {
@@ -288,7 +288,7 @@ describe('Logger', () => {
       
       logger.info('Large object', { data: largeArray });
       
-      expect(stdoutSpy).toHaveBeenCalledWith(
+      expect(processStdoutSpy).toHaveBeenCalledWith(
         expect.stringContaining('item-0')
       );
     });

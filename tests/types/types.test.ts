@@ -23,6 +23,7 @@ import {
   PerformanceMetrics,
   ConfigOptions
 } from '../../src/types';
+import { getTestRedisConfig } from '../helpers/test-config';
 
 describe('Type Definitions', () => {
   describe('FinID', () => {
@@ -424,13 +425,13 @@ describe('Type Definitions', () => {
   });
 
   describe('ConfigOptions', () => {
-    it('should create valid ConfigOptions objects', () => {
+    it('should create valid ConfigOptions objects', async () => {
       const config: ConfigOptions = {
         routerId: 'router-123',
         port: 3000,
         host: 'localhost',
         redis: {
-          url: 'redis://localhost:6379',
+          ...(await getTestRedisConfig()),
           keyPrefix: 'router:',
           ttl: 3600
         },

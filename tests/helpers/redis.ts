@@ -1,27 +1,12 @@
 import { createClient, RedisClientType } from 'redis';
-
-// Test Redis configuration
-const TEST_REDIS_CONFIG = {
-  url: process.env.TEST_REDIS_URL || 'redis://localhost:6379',
-  database: 1, // Use database 1 for tests to avoid conflicts
-  socket: {
-    connectTimeout: 5000,
-    reconnectStrategy: false // Don't reconnect during tests
-  }
-};
+import { getTestRedisConfig } from './test-config';
 
 /**
- * Create a Redis client for testing
+ * Create a Redis client for testing using centralized configuration
  */
 export async function createTestRedisClient(): Promise<RedisClientType> {
-  const client = createClient({
-    url: process.env.TEST_REDIS_URL || 'redis://localhost:6379',
-    database: 1, // Use database 1 for tests
-    socket: {
-      connectTimeout: 5000,
-      reconnectStrategy: false
-    }
-  });
+  const config = await getTestRedisConfig();
+  const client = createClient(config);
 
   client.on('error', (err) => {
     console.error('Test Redis Client Error:', err);
@@ -32,12 +17,16 @@ export async function createTestRedisClient(): Promise<RedisClientType> {
 }
 
 /**
- * Clean up test data in Redis
+ * Clean up Redis data for tests
  */
-export async function cleanupRedis(client: RedisClientType): Promise<void> {
+export async function cleanupRedis(): Promise<void> {
+  const config = await getTestRedisConfig();
+  const client = createClient(config);
+  
   try {
-    // Clear all keys in the test database
-    await client.flushDb();
+    await client.connect();
+    await client.flushDb(); // Clear current database
+    await client.quit();
   } catch (error) {
     console.warn('Failed to cleanup Redis:', error);
   }

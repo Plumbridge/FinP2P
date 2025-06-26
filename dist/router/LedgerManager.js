@@ -20,28 +20,17 @@ class LedgerManager {
     }
     async initialize() {
         try {
-            console.log('LedgerManager.initialize() called with config:', this.config);
             for (const [ledgerId, ledgerConfig] of Object.entries(this.config)) {
-                console.log(`Creating adapter for ledger: ${ledgerId}`, ledgerConfig);
                 const adapter = await this.createAdapter(ledgerId, ledgerConfig);
-                console.log(`Created adapter for ${ledgerId}:`, adapter);
                 if (adapter) {
-                    console.log(`Connecting adapter for ${ledgerId}`);
                     await adapter.connect();
                     this.adapters.set(ledgerId, adapter);
-                    console.log(`Successfully initialized adapter for ledger: ${ledgerId}`);
-                    this.logger.info(`Initialized adapter for ledger: ${ledgerId}`);
-                }
-                else {
-                    console.log(`Failed to create adapter for ${ledgerId}`);
                 }
             }
-            console.log(`LedgerManager initialized with ${this.adapters.size} adapters`);
-            this.logger.info(`Ledger manager initialized with ${this.adapters.size} adapters`);
+            this.logger.info('All ledger adapters initialized successfully');
         }
         catch (error) {
-            console.log('LedgerManager initialization error:', error);
-            this.logger.error('Failed to initialize ledger manager:', error);
+            this.logger.error('Failed to initialize ledger adapters:', error);
             throw error;
         }
     }

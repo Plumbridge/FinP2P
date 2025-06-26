@@ -1,6 +1,5 @@
 // Create a proper mock for the Transaction class
 function createMockTransaction() {
-  console.log('Manual mock Transaction constructor called');
   
   const mockPure = jest.fn((value) => ({ kind: 'Pure', value }));
   mockPure.u8 = jest.fn((value) => ({ kind: 'Pure', value }));
@@ -32,8 +31,6 @@ function createMockTransaction() {
     setSender: jest.fn().mockReturnThis(),
   };
   
-  console.log('Transaction instance created:', instance);
-  console.log('instance.pure:', instance.pure);
   return instance;
 }
 

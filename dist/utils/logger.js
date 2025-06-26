@@ -25,13 +25,18 @@ function createLogger(config) {
     const transports = [];
     // Console transport - simplified for tests
     if (isTest) {
+        // In test mode, use a custom transport to control output
+        // Test spies will capture process.stdout.write calls when needed
         transports.push(new winston_1.default.transports.Console({
             format: winston_1.default.format.combine(winston_1.default.format.printf(({ level, message, ...meta }) => {
                 const metaStr = Object.keys(meta).length ? ' ' + safeStringify(meta) : '';
                 const output = `${level}: ${message}${metaStr}`;
-                // Force output to process.stdout for tests
-                process.stdout.write(output + '\n');
-                return output;
+                // Only write to stdout when explicitly testing logger functionality
+                if (process.env.LOGGER_TEST_MODE === 'true') {
+                    process.stdout.write(output + '\n');
+                }
+                // Return empty string to prevent Winston's default console output
+                return process.env.LOGGER_TEST_MODE === 'true' ? output : '';
             }))
         }));
     }

@@ -3,25 +3,10 @@ import { ConfigOptions, LedgerType } from '../../src/types';
 import { createLogger } from '../../src/utils/logger';
 import { createTestRedisClient, cleanupRedis, closeRedisConnection } from '../helpers/redis';
 import { stopRouterSafely } from '../helpers/router-cleanup';
+import { getTestConfig } from '../helpers/test-config';
 import type { RedisClientType } from 'redis';
 
-// Mock ioredis
-jest.mock('ioredis', () => {
-  return jest.fn().mockImplementation(() => ({
-    on: jest.fn(),
-    ping: jest.fn().mockResolvedValue('PONG'),
-    quit: jest.fn().mockResolvedValue('OK'),
-    isOpen: true,
-    set: jest.fn().mockResolvedValue('OK'),
-    get: jest.fn().mockResolvedValue(null),
-    del: jest.fn().mockResolvedValue(1),
-    hSet: jest.fn().mockResolvedValue(1),
-    hGet: jest.fn().mockResolvedValue(null),
-    hGetAll: jest.fn().mockResolvedValue({}),
-    sAdd: jest.fn().mockResolvedValue(1),
-    sMembers: jest.fn().mockResolvedValue([])
-  }));
-});
+// Router now uses standard redis client, no mocking needed
 
 
 
@@ -47,18 +32,20 @@ describe('FinP2PRouter', () => {
     
     // Clean up Redis
     if (redisClient && redisClient.isOpen) {
-      await cleanupRedis(redisClient);
+      await cleanupRedis();
     }
     
     logger = createLogger({ level: 'error' });
     // Reduce log noise in tests
 
+    const testConfig = getTestConfig();
+    
     config = {
       routerId: 'test-router',
       port: 0, // Use random port
       host: 'localhost',
       redis: {
-        url: process.env.TEST_REDIS_URL || 'redis://localhost:6379/1',
+        url: testConfig.redis.url,
         keyPrefix: 'test:finp2p:',
         ttl: 3600
       },
@@ -226,18 +213,6 @@ describe('FinP2PRouter', () => {
   });
 
   describe('Error Handling', () => {
-    it.skip('should handle Redis connection errors gracefully', async () => {
-      const badConfig = {
-        ...config,
-        redis: { ...config.redis, url: 'redis://invalid:6379' }
-      };
-      
-      const badRouter = new FinP2PRouter(badConfig);
-      
-      // Should not throw, but should log error
-      await expect(badRouter.start()).rejects.toThrow();
-    });
-
     it('should handle graceful shutdown', async () => {
       if (router?.isRunning()) {
         await router.stop();
@@ -383,12 +358,7 @@ describe('FinP2PRouter', () => {
       const mockAdapter = ledgerManager.getAdapter('mock');
       
       // Use the test account and asset from beforeEach
-      console.log('Using testAccountId:', testAccountId);
-      console.log('Using testAssetId:', testAssetId);
-
-      
-      // Debug: Check if accounts exist
-      console.log('Accounts in adapter:', Array.from(mockAdapter.accounts.keys()));
+      // Debug: Check what accounts exist in the adapter
       
       // Get initial history
       const initialHistory = mockAdapter.getBalanceHistory(testAccountId);
@@ -396,12 +366,7 @@ describe('FinP2PRouter', () => {
       
       // Create another account for transfer
       const account2 = await mockAdapter.createAccount('test-institution-2');
-      console.log('Created account2:', account2.id);
-      console.log('Accounts after creating account2:', Array.from(mockAdapter.accounts.keys()));
-      
-      // Verify both accounts exist before transfer
-      console.log('Account 1 exists:', mockAdapter.accounts.has(testAccountId));
-      console.log('Account 2 exists:', mockAdapter.accounts.has(account2.id));
+      // Verify both accounts exist
       
       // Perform transfer
       try {
@@ -411,10 +376,9 @@ describe('FinP2PRouter', () => {
           testAssetId,
           BigInt('10000000000000000000') // 10 tokens
         );
-        console.log('Transfer completed successfully');
-      } catch (error) {
-        console.log('Transfer failed:', (error as Error).message);
-        console.log('Final accounts state:', Array.from(mockAdapter.accounts.keys()));
+        // Transfer completed successfully
+    } catch (error) {
+      // Transfer failed
         throw error;
       }
       

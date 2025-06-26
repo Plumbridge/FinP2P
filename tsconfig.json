@@ -29,7 +29,8 @@
       "@utils/*": ["src/utils/*"]
     },
     "experimentalDecorators": true,
-    "emitDecoratorMetadata": true
+    "emitDecoratorMetadata": true,
+    "types": ["node", "jest", "@types/jest"]
   },
   "include": [
     "src/**/*"
@@ -37,9 +38,6 @@
   "exclude": [
     "node_modules",
     "dist",
-    "tests",
-    "**/*.test.ts",
-    "**/*.spec.ts",
     "../src/**/*",
     "../../src/**/*"
   ]

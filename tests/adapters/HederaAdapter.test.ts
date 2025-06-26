@@ -1,10 +1,9 @@
 import { HederaAdapter } from '../../src/adapters/HederaAdapter';
-import { LedgerType } from '../../src/types';
+import { HederaAdapterConfig } from '../../src/types/adapter';
 import { createLogger } from '../../src/utils/logger';
+import { AssetType } from '../../src/types/asset';
 
 // Mock is handled in setup.ts
-
-console.log('TEST FILE LOADED');
 
 describe('HederaAdapter', () => {
   let adapter: HederaAdapter;

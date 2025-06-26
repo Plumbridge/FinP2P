@@ -14,7 +14,7 @@ describe('ConfirmationRecordManager', () => {
   });
 
   beforeEach(async () => {
-    await cleanupRedis(redisClient);
+    await cleanupRedis();
     logger = createLogger({ level: 'error' });
     manager = new ConfirmationRecordManager(redisClient, logger, 'test-router-1');
   });

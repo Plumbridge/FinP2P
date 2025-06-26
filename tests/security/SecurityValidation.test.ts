@@ -4,6 +4,7 @@ import { createLogger } from '../../src/utils/logger';
 import { LedgerType } from '../../src/types';
 import { createTestRedisClient, cleanupRedis, closeRedisConnection } from '../helpers/redis';
 import { stopRouterSafely } from '../helpers/router-cleanup';
+import { getTestRedisConfig } from '../helpers/test-config';
 import type { RedisClientType } from 'redis';
 
 describe('Security Validation Tests', () => {
@@ -23,7 +24,7 @@ describe('Security Validation Tests', () => {
     
     // Clean up Redis
     if (redisClient && redisClient.isOpen) {
-      await cleanupRedis(redisClient);
+      await cleanupRedis();
     }
     
     logger = createLogger({ level: 'error' });
@@ -33,7 +34,7 @@ describe('Security Validation Tests', () => {
       host: 'localhost',
       port: 0, // Random port
       redis: {
-        url: process.env.TEST_REDIS_URL || 'redis://localhost:6379/1',
+        ...(await getTestRedisConfig()),
         keyPrefix: 'security-test:',
         ttl: 3600
       },

@@ -1,25 +1,32 @@
 FROM node:18-alpine
 
+# Create non-root user first
+RUN addgroup -g 1001 -S nodejs && \
+    adduser -S finp2p -u 1001 -G nodejs
+
 # Set working directory
 WORKDIR /app
 
-# Install dependencies first (for better caching)
-COPY package*.json ./
-RUN npm ci --only=production
+# Create necessary directories with correct ownership
+RUN mkdir -p /app/logs /app/config && \
+    chown -R finp2p:nodejs /app
 
-# Copy source code
-COPY . .
+# Switch to non-root user early
+USER finp2p
+
+# Install dependencies first (for better caching)
+COPY --chown=finp2p:nodejs package.json ./
+RUN npm install
+
+# Copy only necessary source files
+COPY --chown=finp2p:nodejs src/ ./src/
+COPY --chown=finp2p:nodejs tsconfig.json ./
 
 # Build TypeScript
 RUN npm run build
 
-# Create non-root user
-RUN addgroup -g 1001 -S nodejs
-RUN adduser -S finp2p -u 1001
-
-# Create necessary directories
-RUN mkdir -p /app/logs /app/config
-RUN chown -R finp2p:nodejs /app
+# Remove dev dependencies to reduce image size
+RUN npm prune --production
 
 # Switch to non-root user
 USER finp2p

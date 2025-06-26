@@ -1,8 +1,19 @@
 // Mock for ioredis to prevent Redis connection issues in tests
+const eventListeners = {};
+
 const mockRedis = {
-  on: jest.fn(),
+  on: jest.fn((event, listener) => {
+    if (!eventListeners[event]) {
+      eventListeners[event] = [];
+    }
+    eventListeners[event].push(listener);
+  }),
   off: jest.fn(),
-  emit: jest.fn(),
+  emit: jest.fn((event, ...args) => {
+    if (eventListeners[event]) {
+      eventListeners[event].forEach(listener => listener(...args));
+    }
+  }),
   connect: jest.fn().mockResolvedValue(undefined),
   quit: jest.fn().mockResolvedValue('OK'),
   disconnect: jest.fn().mockResolvedValue(undefined),

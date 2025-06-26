@@ -52,20 +52,25 @@ finp2p-implementation/
 │   ├── types/              # TypeScript type definitions
 │   │   └── index.ts
 │   └── index.ts            # Application entry point
-├── tests/                  # Test suites
-│   ├── adapters/           # Adapter-specific tests
+├── tests/                  # Organized test suites
+│   ├── __mocks__/          # Jest mock configurations
+│   ├── adapters/           # DLT adapter tests (Sui, Hedera, Mock)
 │   ├── confirmation/       # Confirmation mechanism tests
-│   ├── helpers/            # Test helper utilities
-│   ├── integration/        # Integration tests
-│   ├── logs/               # Test execution logs
-│   │   ├── test-results.log # Test execution results
-│   │   ├── test.log        # General test logs
-│   │   └── testnet-demo.log # Testnet demonstration logs
+│   ├── helpers/            # Test helper utilities and setup
+│   ├── integration/        # Integration tests (Redis, router networks)
+│   │   └── redis-connection.test.ts # Redis connectivity tests
 │   ├── router/             # Router component tests
+│   │   ├── minimal-router-test.test.js # Basic router functionality
+│   │   ├── primary-router-authority.test.js # Primary router authority
+│   │   └── primary-router-authority.test.ts # TypeScript version
 │   ├── security/           # Security validation tests
-│   ├── types/              # Type definition tests
-│   ├── unit/               # Unit tests
-│   └── utils/              # Utility function tests
+│   ├── types/              # TypeScript type definition tests
+│   ├── unit/               # Unit tests for individual components
+│   ├── utils/              # Utility function tests
+│   ├── jest-env-setup.js   # Jest environment configuration
+│   ├── setup.js            # Test setup and configuration
+│   ├── setup.ts            # TypeScript test setup
+│   └── tsconfig.json       # TypeScript configuration for tests
 ├── configs/                # Configuration files
 │   ├── environments/       # Environment configurations
 │   │   ├── .env.example    # Environment template
@@ -184,41 +189,75 @@ npm list --depth=0
 
 #### Step 3: Start the Project (Choose One Method)
 
-**🐳 Method A: Docker Compose (Recommended - Easiest)**
+**🐳 Method A: Docker Compose (Recommended - Production-like)**
 
-This method starts everything you need with one command:
+This method starts everything you need with one command and includes Redis initialization:
 
 ```bash
-# Start the complete multi-router network
+# Navigate to project directory
+cd finp2p-implementation
+
+# Option 1: Direct Docker Compose command
 docker-compose -f docker/docker-compose.yml up -d
+
+# Option 2: Using npm script (equivalent to above)
+npm run compose:up
+
+# Wait for services to initialize (Redis needs ~10 seconds)
+sleep 10
 
 # Check that all services are running
 docker-compose -f docker/docker-compose.yml ps
+
+# View logs if needed
+docker-compose -f docker/docker-compose.yml logs
+# OR: npm run compose:logs
 ```
 
 This will start:
-- 3 Router instances (ports 3001, 3002, 3003)
-- Redis database
-- Mock ledger service
-- Monitoring tools (Prometheus & Grafana)
+- **Redis database** (port 6379) - Automatically initialized with persistence
+- **3 Router instances** (ports 3001, 3002, 3003) - Connected to Redis
+- **Mock ledger service** (port 4000) - For testing transactions
+- **Monitoring tools** - Prometheus (9090) & Grafana (3000)
 
 **💻 Method B: Local Development**
 
-For development and testing:
+For development and testing with manual Redis setup:
 
 ```bash
-# 1. Start Redis database
-docker run -d -p 6379:6379 --name finp2p-redis redis:alpine
+# 1. Start Redis database with persistence
+docker run -d -p 6379:6379 --name finp2p-redis \
+  -v finp2p_redis_data:/data \
+  redis:7-alpine redis-server --appendonly yes
 
-# 2. Build the project
+# 2. Wait for Redis to initialize
+sleep 5
+
+# 3. Verify Redis is running
+docker exec finp2p-redis redis-cli ping
+# Expected response: PONG
+
+# 4. Build the project
 npm run build
 
-# 3. Start the main router
+# 5. Start the main router
 npm start
 
-# 4. (Optional) Start additional routers in separate terminals:
+# 6. (Optional) Start additional routers in separate terminals:
 PORT=3001 ROUTER_ID=router-2 npm start
 PORT=3002 ROUTER_ID=router-3 npm start
+```
+
+**🔧 Method C: Quick Test (No Docker)**
+
+For rapid testing without Docker:
+
+```bash
+# Run tests without Docker dependencies
+npm run test:no-docker
+
+# Start in development mode (uses in-memory storage)
+npm run dev
 ```
 
 #### Step 4: Verify Everything is Working
@@ -246,6 +285,85 @@ npm test
 npm run test:unit        # Unit tests
 npm run test:integration # Integration tests
 npm run test:router      # Router-specific tests
+```
+
+## 🔧 Troubleshooting
+
+### Common Docker Issues
+
+**Problem: Docker build is very slow**
+```bash
+# Solution: Clean Docker cache and rebuild
+docker system prune -f
+docker-compose -f docker/docker-compose.yml build --no-cache
+docker-compose -f docker/docker-compose.yml up -d
+```
+
+**Problem: Services fail to start**
+```bash
+# Check service status
+docker-compose -f docker/docker-compose.yml ps
+
+# View detailed logs
+docker-compose -f docker/docker-compose.yml logs [service-name]
+
+# Restart specific service
+docker-compose -f docker/docker-compose.yml restart [service-name]
+```
+
+**Problem: Port conflicts**
+```bash
+# Check what's using the ports
+netstat -tulpn | grep :3001
+netstat -tulpn | grep :6379
+
+# Stop conflicting services
+docker stop $(docker ps -q)
+```
+
+### Redis Connection Issues
+
+**Problem: "Redis connection failed"**
+```bash
+# Check Redis is running
+docker exec finp2p-redis redis-cli ping
+
+# If using Docker Compose:
+docker-compose -f docker/docker-compose.yml exec redis redis-cli ping
+
+# Check Redis logs
+docker logs finp2p-redis
+```
+
+**Problem: Redis data persistence**
+```bash
+# Verify Redis data volume
+docker volume ls | grep redis
+
+# Backup Redis data
+docker exec finp2p-redis redis-cli BGSAVE
+```
+
+### Quick Reset
+
+If everything fails, use this complete reset:
+
+```bash
+# Stop and remove all containers
+docker-compose -f docker/docker-compose.yml down -v
+
+# Remove all project-related containers and volumes
+docker system prune -f
+docker volume prune -f
+
+# Rebuild and restart
+docker-compose -f docker/docker-compose.yml up -d --build
+
+# Wait for initialization
+sleep 15
+
+# Test the setup
+curl http://localhost:3001/health
 ```
 
 #### Step 6: Explore the System
@@ -301,6 +419,27 @@ cp configs/environments/.env.example .env.local
 # Edit your configuration
 nano .env.local  # or use your preferred editor
 ```
+
+### 📁 Test Organization
+
+The test suite has been comprehensively organized for better maintainability:
+
+**Test Structure:**
+- **`tests/router/`** - Router-specific tests including minimal router tests and primary router authority
+- **`tests/integration/`** - Integration tests including Redis connectivity and network tests
+- **`tests/adapters/`** - DLT adapter tests for Sui, Hedera, and Mock adapters
+- **`tests/unit/`** - Unit tests for individual components
+- **`tests/security/`** - Security validation and authentication tests
+- **`tests/utils/`** - Utility function tests
+- **`tests/helpers/`** - Test helper utilities and shared setup functions
+- **`tests/__mocks__/`** - Jest mock configurations for external dependencies
+
+**Test Configuration:**
+- **`jest-env-setup.js`** - Jest environment configuration
+- **`setup.js/ts`** - Test setup and initialization
+- **`tsconfig.json`** - TypeScript configuration for tests
+
+All debug and temporary test files have been removed to maintain a clean test environment.
 
 ### 🔧 Troubleshooting Setup Issues
 
@@ -434,17 +573,32 @@ HEDERA_NETWORK=testnet
 
 ## 🧪 Testing
 
-### Unit Tests
+The project features a comprehensive, well-organized test suite with strategic mocking and real component testing.
+
+### Test Categories
+
+**Unit Tests**
 ```bash
-npm test
+npm test                    # Run all tests
+npm run test:unit          # Unit tests only
 ```
 
-### Integration Tests
+**Integration Tests**
 ```bash
-npm run test:integration
+npm run test:integration   # Integration tests with Redis
 ```
 
-### End-to-End Tests
+**Router Tests**
+```bash
+npm run test:router        # Router-specific functionality
+```
+
+**Adapter Tests**
+```bash
+npm run test:adapters      # DLT adapter tests
+```
+
+**End-to-End Tests**
 ```bash
 # Start the network first
 docker-compose -f docker/docker-compose.yml up -d
@@ -453,10 +607,22 @@ docker-compose -f docker/docker-compose.yml up -d
 npm run test:e2e
 ```
 
-### Performance Testing
+**Performance Testing**
 ```bash
 npm run test:performance
 ```
+
+### Test Organization
+
+The test suite is organized into logical categories:
+
+- **`tests/router/`** - Core router functionality tests
+- **`tests/integration/`** - Redis connectivity and network integration tests
+- **`tests/adapters/`** - Blockchain adapter tests (Sui, Hedera, Mock)
+- **`tests/unit/`** - Individual component unit tests
+- **`tests/security/`** - Security validation tests
+- **`tests/utils/`** - Utility function tests
+- **`tests/helpers/`** - Shared test utilities and setup functions
 
 ### Testing Architecture & Component Mocking Strategy
 
