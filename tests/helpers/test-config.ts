@@ -27,12 +27,23 @@ let testConfig: TestConfig | null = null;
  */
 export function detectRedisContainer(): { port: number; url: string } | null {
   try {
-    const output = execSync('docker ps --filter name=redis --format "table {{.Names}}\t{{.Ports}}"', { 
+    // First try to read from .test-redis-config.json
+    const redisConfigPath = path.join(__dirname, '..', '..', '.test-redis-config.json');
+    if (fs.existsSync(redisConfigPath)) {
+      const redisConfig = JSON.parse(fs.readFileSync(redisConfigPath, 'utf8'));
+      return {
+        url: redisConfig.url,
+        port: redisConfig.port
+      };
+    }
+
+    // Fallback to Docker container detection
+    const output = execSync('docker ps --filter name=redis-test --format "table {{.Names}}\t{{.Ports}}"', { 
       encoding: 'utf8'
     }).trim();
     
     if (!output) {
-      return { url: 'redis://localhost:6379', port: 6379 };
+      throw new Error('No Redis containers found');
     }
     
     const lines = output.split('\n').filter(line => line.includes('redis'));
@@ -42,11 +53,11 @@ export function detectRedisContainer(): { port: number; url: string } | null {
       const port = parseInt(portMatch[1]);
       const url = `redis://localhost:${port}`;
       return { url, port };
-    } else {
-      return { url: 'redis://localhost:6379', port: 6379 };
     }
+
+    throw new Error('Could not determine Redis port from container');
   } catch (error) {
-    console.warn('🔍 [TS] Failed to detect Redis container:', error instanceof Error ? error.message : String(error));
+    console.warn('🔍 [TS] Failed to detect Redis configuration:', error instanceof Error ? error.message : String(error));
     return null;
   }
 }
@@ -105,8 +116,7 @@ export async function getTestRedisUrl(): Promise<string> {
 export async function getTestRedisConfig() {
   const config = await getTestConfig();
   return {
-    url: config.redis.url,
-    database: config.redis.database,
+    ...config.redis,
     socket: {
       connectTimeout: 5000
     }

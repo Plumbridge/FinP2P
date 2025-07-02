@@ -14,25 +14,52 @@ let config;
 // Function to detect Redis container dynamically
 function detectRedisContainer() {
   try {
-    const output = execSync('docker ps --filter name=docker-redis-test', { 
+    // Look for any container with redis-test in the name
+    const output = execSync('docker ps --filter "name=redis-test" --format "{{.Names}} {{.Ports}}"', { 
       encoding: 'utf8'
     });
     
-    // Parse port mapping from docker ps output
-    const portMatch = output.match(/0\.0\.0\.0:(\d+)->6379\/tcp/);
-    
-    if (portMatch) {
-      const port = parseInt(portMatch[1]);
-      return {
-        url: `redis://localhost:${port}`,
-        port: port
-      };
+    if (!output) {
+      return null;
     }
+    
+    // Split by lines to handle multiple containers
+    const lines = output.trim().split('\n');
+    
+    for (const line of lines) {
+      // Parse port mapping - looking for format like "0.0.0.0:6381->6379/tcp"
+      const portMatch = line.match(/0\.0\.0\.0:(\d+)->6379\/tcp/);
+      
+      if (portMatch) {
+        const port = parseInt(portMatch[1]);
+        console.log(`✅ Found Redis test container on port ${port}`);
+        return {
+          url: `redis://localhost:${port}`,
+          port: port
+        };
+      }
+    }
+    
     return null;
   } catch (error) {
     console.warn('Failed to detect Redis container:', error.message);
     return null;
   }
+}
+
+// Function to read dynamic config if available
+function readDynamicConfig() {
+  const dynamicConfigFile = path.join(__dirname, '..', '.test-redis-config.json');
+  if (fs.existsSync(dynamicConfigFile)) {
+    try {
+      const dynamicConfig = JSON.parse(fs.readFileSync(dynamicConfigFile, 'utf8'));
+      console.log(`📍 Using dynamic Redis config: ${dynamicConfig.url}`);
+      return dynamicConfig;
+    } catch (error) {
+      console.warn('Failed to read dynamic config:', error.message);
+    }
+  }
+  return null;
 }
 
 // Read base config
@@ -43,16 +70,28 @@ if (!fs.existsSync(configFile)) {
 try {
   config = JSON.parse(fs.readFileSync(configFile, 'utf8'));
   
-  // Dynamically detect Redis container
-  const redisInfo = detectRedisContainer();
-  if (redisInfo) {
-    config.redis.url = redisInfo.url;
-    config.redis.port = redisInfo.port;
+  // First try to read dynamic config from setup script
+  const dynamicConfig = readDynamicConfig();
+  
+  if (dynamicConfig) {
+    config.redis.url = dynamicConfig.url;
+    config.redis.port = dynamicConfig.port;
     config.redis.host = 'localhost';
     config.redis.database = 1;
   } else {
-    throw new Error('No Redis test container found. Please run "npm run test:setup" first to start Redis for testing.');
+    // Fallback to detecting Redis container
+    const redisInfo = detectRedisContainer();
+    if (redisInfo) {
+      config.redis.url = redisInfo.url;
+      config.redis.port = redisInfo.port;
+      config.redis.host = 'localhost';
+      config.redis.database = 1;
+    } else {
+      throw new Error('No Redis test container found. Please run "npm run test:setup" first to start Redis for testing.');
+    }
   }
+  
+  console.log(`🔧 Test Redis URL: ${config.redis.url}`);
 } catch (error) {
   throw new Error(`Failed to read test configuration: ${error.message}`);
 }

@@ -3,7 +3,7 @@ import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import { v4 as uuidv4 } from 'uuid';
-import { createClient, RedisClientType } from 'redis';
+// Removed redis import - using ioredis instead
 import { Logger } from 'winston';
 import {
   Router as IRouter,
@@ -29,7 +29,7 @@ import { LedgerManager } from './LedgerManager';
 export class FinP2PRouter extends EventEmitter {
   private app: express.Application;
   private server: any;
-  private redis!: RedisClientType;
+  private redis!: any; // Using ioredis instead of redis
   private logger: Logger;
   private config: ConfigOptions;
   private routingEngine!: RoutingEngine;
@@ -157,19 +157,15 @@ export class FinP2PRouter extends EventEmitter {
   private async initializeComponents(): Promise<void> {
     try {
       // Initialize Redis
-      console.log('🔍 [Router] Redis URL being used:', this.config.redis.url);
-      this.redis = createClient({
-        url: this.config.redis.url,
-        socket: {
-          reconnectStrategy: (retries) => Math.min(retries * 50, 500)
-        }
+      const Redis = require('ioredis');
+      this.redis = new Redis(this.config.redis.url, {
+        retryDelayOnFailover: 100,
+        maxRetriesPerRequest: 1,
       });
 
-      this.redis.on('error', (err: Error) => {
+      this.redis.on('error', (err) => {
         this.logger.error('Redis connection error:', err);
       });
-
-      await this.redis.connect();
 
       // Initialize routing engine
       this.routingEngine = new RoutingEngine(this.redis, this.logger);
@@ -306,8 +302,8 @@ export class FinP2PRouter extends EventEmitter {
       }
       
       // Close Redis connection
-      if (this.redis && this.redis.isReady) {
-        await this.redis.disconnect();
+      if (this.redis && this.redis.isOpen) {
+        await this.redis.quit();
       }
       
       // Disconnect ledger manager if exists

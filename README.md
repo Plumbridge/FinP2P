@@ -185,6 +185,10 @@ npm install
 
 # Verify installation completed successfully
 npm list --depth=0
+
+# Builds the project
+npm run build
+
 ```
 
 #### Step 3: Start the Project (Choose One Method)
@@ -197,16 +201,13 @@ This method starts everything you need with one command and includes Redis initi
 # Navigate to project directory
 cd finp2p-implementation
 
-# Option 1: Direct Docker Compose command
+# Start all services (Redis, 3 routers, monitoring)
 docker-compose -f docker/docker-compose.yml up -d
 
-# Option 2: Using npm script (equivalent to above)
-npm run compose:up
+# sets up test
+npm run test:setup
 
-# Wait for services to initialize (Redis needs ~10 seconds)
-sleep 10
-
-# Check that all services are running
+# Verify everything is running
 docker-compose -f docker/docker-compose.yml ps
 
 # View logs if needed
@@ -278,13 +279,34 @@ curl http://localhost:3002/health
 #### Step 5: Run Tests (Optional but Recommended)
 
 ```bash
-# Run all tests to ensure everything is working
+# Ensure Redis is running first!
+docker ps | grep redis
+
+# Setup for tests
+npm run test:setup
+
+# Run all tests
 npm test
 
-# Run specific test categories
-npm run test:unit        # Unit tests
-npm run test:integration # Integration tests
-npm run test:router      # Router-specific tests
+# Or run tests without Docker setup/teardown
+npm run test:no-docker
+```
+
+## Cleanup
+
+```bash 
+#Stop Docker Compose services
+docker-compose -f docker/docker-compose.yml down
+
+# Stop manual Redis
+docker stop finp2p-redis
+docker rm finp2p-redis
+
+# Clean build artifacts
+npm run clean
+
+# Clean test artifacts
+npm run test:teardown
 ```
 
 ## 🔧 Troubleshooting

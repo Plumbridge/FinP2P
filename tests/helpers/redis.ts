@@ -19,14 +19,25 @@ export async function createTestRedisClient(): Promise<RedisClientType> {
 /**
  * Clean up Redis data for tests
  */
-export async function cleanupRedis(): Promise<void> {
-  const config = await getTestRedisConfig();
-  const client = createClient(config);
-  
+export async function cleanupRedis(existingClient?: RedisClientType): Promise<void> {
+  let client: RedisClientType;
+  let shouldClose = false;
+
   try {
-    await client.connect();
+    if (existingClient && existingClient.isOpen) {
+      client = existingClient;
+    } else {
+      const config = await getTestRedisConfig();
+      client = createClient(config);
+      await client.connect();
+      shouldClose = true;
+    }
+
     await client.flushDb(); // Clear current database
-    await client.quit();
+
+    if (shouldClose) {
+      await client.quit();
+    }
   } catch (error) {
     console.warn('Failed to cleanup Redis:', error);
   }

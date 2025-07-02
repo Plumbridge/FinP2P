@@ -15,11 +15,34 @@ describe('Router Integration Tests', () => {
   let router1: FinP2PRouter;
   let router2: FinP2PRouter;
   let router3: FinP2PRouter;
+  let mockAdapter1: MockAdapter;
+  let mockAdapter2: MockAdapter;
+  let mockAdapter3: MockAdapter;
   let redisClient: RedisClientType;
   let logger: any;
   
   // Use static ports to avoid conflicts
   const basePort = 5000 + Math.floor(Math.random() * 1000);
+
+  beforeEach(async () => {
+    // Clean up Redis before each test
+    await cleanupRedis(redisClient);
+
+    // Start routers
+    await router1.start();
+    await router2.start();
+    await router3.start();
+
+    // Get mock adapters
+    mockAdapter1 = (router1 as any).getLedgerAdapter('mock') as MockAdapter;
+    mockAdapter2 = (router2 as any).getLedgerAdapter('mock') as MockAdapter;
+    mockAdapter3 = (router3 as any).getLedgerAdapter('mock') as MockAdapter;
+  });
+
+  afterEach(async () => {
+    // Stop routers
+    await stopRoutersSafely([router1, router2, router3]);
+  });
 
   beforeAll(async () => {
     redisClient = await createTestRedisClient();
@@ -33,14 +56,17 @@ describe('Router Integration Tests', () => {
       port: basePort,
       redis: {
         ...(await getTestRedisConfig()),
-        keyPrefix: 'test:',
+        keyPrefix: 'test:router1:',
         ttl: 3600
       },
       network: {
-        peers: [],
-        heartbeatInterval: 30000,
+        peers: [
+          `localhost:${basePort + 1}`,
+          `localhost:${basePort + 2}`,
+        ],
+        heartbeatInterval: 5000,
         maxRetries: 3,
-        timeout: 5000
+        timeout: 2000
       },
       security: {
              enableAuth: false,
@@ -74,14 +100,17 @@ describe('Router Integration Tests', () => {
       port: basePort + 1,
       redis: {
         ...(await getTestRedisConfig()),
-        keyPrefix: 'test:',
+        keyPrefix: 'test:router2:',
         ttl: 3600
       },
       network: {
-        peers: [],
-        heartbeatInterval: 30000,
+        peers: [
+          `localhost:${basePort}`,
+          `localhost:${basePort + 2}`,
+        ],
+        heartbeatInterval: 5000,
         maxRetries: 3,
-        timeout: 5000
+        timeout: 2000
       },
       security: {
         enableAuth: false,
@@ -115,14 +144,17 @@ describe('Router Integration Tests', () => {
       port: basePort + 2,
       redis: {
         ...(await getTestRedisConfig()),
-        keyPrefix: 'test:',
+        keyPrefix: 'test:router3:',
         ttl: 3600
       },
       network: {
-        peers: [],
-        heartbeatInterval: 30000,
+        peers: [
+          `localhost:${basePort}`,
+          `localhost:${basePort + 1}`,
+        ],
+        heartbeatInterval: 5000,
         maxRetries: 3,
-        timeout: 5000
+        timeout: 2000
       },
       security: {
         enableAuth: false,
@@ -165,43 +197,27 @@ describe('Router Integration Tests', () => {
   });
 
   beforeEach(async () => {
-    // Clean up any existing router states
-    const routers = [router1, router2, router3].filter(r => r);
-    for (const router of routers) {
-      if (router && router.isRunning && router.isRunning()) {
-        await stopRouterSafely(router);
-      }
-    }
+    // Stop routers before cleaning up Redis
+    await stopRoutersSafely([router1, router2, router3]);
+
+    // Clean up Redis before each test
+    await cleanupRedis();
     
-    // Clean up Redis
-    if (redisClient && redisClient.isOpen) {
-      await cleanupRedis();
-    }
+    // Wait a bit to ensure Redis is clean
+    await new Promise(resolve => setTimeout(resolve, 1000));
     
-    // Restart routers for tests that need them
-    if (router1 && !router1.isRunning()) {
-      await router1.start();
-    }
-    if (router2 && !router2.isRunning()) {
-      await router2.start();
-    }
-    if (router3 && !router3.isRunning()) {
-      await router3.start();
-    }
-    
-    // Re-establish peer connections
-    if (router1 && router1.isRunning()) {
-      await router1.addPeer(`http://localhost:${basePort + 1}`);
-      await router1.addPeer(`http://localhost:${basePort + 2}`);
-    }
-    if (router2 && router2.isRunning()) {
-      await router2.addPeer(`http://localhost:${basePort}`);
-      await router2.addPeer(`http://localhost:${basePort + 2}`);
-    }
-    if (router3 && router3.isRunning()) {
-      await router3.addPeer(`http://localhost:${basePort}`);
-      await router3.addPeer(`http://localhost:${basePort + 1}`);
-    }
+    // Start all routers
+    await router1.start();
+    await router2.start();
+    await router3.start();
+
+    // Connect routers as peers
+    await router1.addPeer(`http://localhost:${basePort + 1}`);
+    await router1.addPeer(`http://localhost:${basePort + 2}`);
+    await router2.addPeer(`http://localhost:${basePort}`);
+    await router2.addPeer(`http://localhost:${basePort + 2}`);
+    await router3.addPeer(`http://localhost:${basePort}`);
+    await router3.addPeer(`http://localhost:${basePort + 1}`);
   });
   
   afterEach(async () => {
@@ -226,17 +242,25 @@ describe('Router Integration Tests', () => {
     let account2Id: string;
 
     beforeEach(async () => {
-      // Start routers before accessing adapters
-      await router1.start();
-      await router2.start();
-      await router3.start();
+      // Ensure routers are running before accessing adapters
+      const startPromises = [];
+      
+      if (!router1.isRunning()) startPromises.push(router1.start());
+      if (!router2.isRunning()) startPromises.push(router2.start());
+      if (!router3.isRunning()) startPromises.push(router3.start());
+      
+      if (startPromises.length > 0) {
+        await Promise.all(startPromises);
+        // Give routers time to establish connections
+        await new Promise(resolve => setTimeout(resolve, 1000));
+      }
       
       // Setup test data on router1
-      const ledgerManager1 = router1.getLedgerManager();
-      const mockAdapter1 = ledgerManager1.getAdapter('mock');
+      
+
       
       // Create test asset
-      if (!mockAdapter1) throw new Error('Mock adapter 1 not found');
+
       const asset = await mockAdapter1.createAsset({
         finId: { id: 'fin-inttest-001', type: 'asset', domain: 'test.local' },
         symbol: 'INTTEST',
@@ -249,8 +273,8 @@ describe('Router Integration Tests', () => {
       testAssetId = asset.id;
       
       // Create accounts on different routers
-      const account1 = await ledgerManager1.createAccount('mock', 'test-institution-1');
-      const account2 = await router2.getLedgerManager().createAccount('mock', 'test-institution-2');
+      const account1 = await mockAdapter1.createAccount('test-institution-1');
+      const account2 = await mockAdapter2.createAccount('test-institution-2');
       account1Id = account1.finId.id;
       account2Id = account2.finId.id;
       
@@ -259,7 +283,6 @@ describe('Router Integration Tests', () => {
       await (mockAdapter1 as any).mintTokens(account1Id, testAssetId, BigInt('200000000000000000000')); // 200 tokens
       
       // Also create the asset and account on router2 for cross-router operations
-      const mockAdapter2 = router2.getLedgerManager().getAdapter('mock');
       if (!mockAdapter2) throw new Error('Mock adapter 2 not found');
       await mockAdapter2.createAsset({
         finId: { id: 'fin-inttest-001', type: 'asset', domain: 'test.local' },
@@ -343,7 +366,7 @@ describe('Router Integration Tests', () => {
 
     it('should handle cross-router transfer operations with balance tracking', async () => {
       const ledgerManager1 = router1.getLedgerManager();
-      const mockAdapter1 = ledgerManager1.getAdapter('mock');
+
       
       // Get initial balance history
       const initialHistory = (mockAdapter1 as any)?.getBalanceHistory(account1Id) || [];

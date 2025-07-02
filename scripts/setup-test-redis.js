@@ -1,111 +1,134 @@
 #!/usr/bin/env node
 
-const { spawn } = require('child_process');
-const net = require('net');
-const { promisify } = require('util');
 const { exec } = require('child_process');
+const { promisify } = require('util');
+const net = require('net');
+const fs = require('fs');
+const path = require('path');
 
 const execAsync = promisify(exec);
 
 /**
  * Check if a port is available
  */
-function isPortAvailable(port) {
-  return new Promise((resolve) => {
-    const server = net.createServer();
-    
-    server.listen(port, () => {
-      server.close(() => {
-        resolve(true);
-      });
-    });
-    
-    server.on('error', () => {
-      resolve(false);
-    });
+function checkPortAvailable(port) {
+  return new Promise((resolve, reject) => {
+    const tester = net.createServer()
+      .once('error', err => {
+        if (err.code === 'EADDRINUSE') {
+          resolve(false);
+        } else {
+          reject(err);
+        }
+      })
+      .once('listening', () => {
+        tester.once('close', () => resolve(true)).close();
+      })
+      .listen(port);
   });
 }
 
 /**
- * Find an available port starting from a given port
+ * Find an available port starting from a base port
  */
-async function findAvailablePort(startPort = 6380, maxAttempts = 100) {
-  for (let port = startPort; port < startPort + maxAttempts; port++) {
-    if (await isPortAvailable(port)) {
+async function findAvailablePort(basePort = 6379) {
+  let port = basePort;
+  const maxAttempts = 10;
+  
+  for (let i = 0; i < maxAttempts; i++) {
+    if (await checkPortAvailable(port)) {
       return port;
     }
+    port++;
   }
-  throw new Error(`No available port found in range ${startPort}-${startPort + maxAttempts}`);
+  
+  throw new Error(`No available ports found between ${basePort} and ${port}`);
 }
 
 /**
- * Setup Redis test environment with dynamic port
+ * Save Redis configuration for tests
+ */
+async function saveRedisConfig(port) {
+  const config = {
+    url: `redis://localhost:${port}`,
+    port: port,
+    timestamp: new Date().toISOString()
+  };
+  
+  const configPath = path.join(__dirname, '..', '.test-redis-config.json');
+  fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
+  console.log(`💾 Saved Redis config to ${configPath}`);
+}
+
+/**
+ * Wait for Redis to be ready using docker exec
+ */
+async function waitForRedis(port, maxAttempts = 60) {
+  console.log('⏳ Waiting for Redis to be ready...');
+  
+  for (let i = 1; i <= maxAttempts; i++) {
+    try {
+      // Use docker exec to ping Redis inside the container
+      const { stdout } = await execAsync('docker exec docker-redis-test-1 redis-cli ping');
+      
+      if (stdout.trim() === 'PONG') {
+        console.log('✅ Redis is ready!');
+        return;
+      }
+    } catch (error) {
+      if (i % 10 === 0) {
+        console.log(`⏳ Still waiting... (attempt ${i}/${maxAttempts})`);
+      }
+    }
+    
+    // Wait 1 second between attempts
+    await new Promise(resolve => setTimeout(resolve, 1000));
+  }
+  
+  // If we get here, Redis didn't start properly
+  // Get container logs for debugging
+  try {
+    const { stdout: logs } = await execAsync('docker logs docker-redis-test-1 --tail 20');
+    console.error('Redis container logs:', logs);
+  } catch (error) {
+    console.error('Could not retrieve logs:', error.message);
+  }
+  
+  throw new Error(`Redis not ready after ${maxAttempts} attempts`);
+}
+
+/**
+ * Setup Redis test environment
  */
 async function setupTestRedis() {
   try {
     console.log('🔍 Finding available port for Redis test...');
-    const port = await findAvailablePort(6380);
+    const port = await findAvailablePort(6379);
     console.log(`✅ Found available port: ${port}`);
     
-    // Write configuration to file for tests to read
-  // Set environment variables for immediate use
-  process.env.TEST_REDIS_URL = `redis://localhost:${port}`;
-  process.env.REDIS_TEST_PORT = port.toString();
-  process.env.REDIS_URL = `redis://localhost:${port}`;
+    // Set environment variable for docker-compose
+    process.env.REDIS_TEST_PORT = port.toString();
     
     console.log(`🐳 Starting Redis test container on port ${port}...`);
-    
-    // Start Redis container with dynamic port
-    const { stdout, stderr } = await execAsync(
-      `docker-compose -f docker/docker-compose.test.yml up -d redis-test`,
-      { 
-        env: { 
-          ...process.env, 
-          REDIS_TEST_PORT: port.toString() 
-        } 
-      }
-    );
-    
-    if (stderr && !stderr.includes('warning')) {
-      console.error('Docker compose stderr:', stderr);
-    }
+    await execAsync(`docker-compose -f docker/docker-compose.test.yml up -d redis-test`);
     
     console.log('✅ Redis test container started successfully');
     console.log(`📍 Redis URL: redis://localhost:${port}`);
     console.log(`🔧 Set TEST_REDIS_URL environment variable to: redis://localhost:${port}`);
     
-    // Wait for Redis to be ready
-    console.log('⏳ Waiting for Redis to be ready...');
-    await waitForRedis(port);
-    console.log('✅ Redis is ready for testing');
+    // Save configuration
+    await saveRedisConfig(port);
     
-    return port;
+    // Wait for Redis to be ready
+    await waitForRedis(port);
+    
+    // Set environment variables for the current process
+    process.env.TEST_REDIS_URL = `redis://localhost:${port}`;
+    process.env.REDIS_URL = `redis://localhost:${port}`;
     
   } catch (error) {
     console.error('❌ Failed to setup Redis test environment:', error.message);
     process.exit(1);
-  }
-}
-
-/**
- * Wait for Redis to be ready
- */
-async function waitForRedis(port, maxAttempts = 30) {
-  const redis = require('redis');
-  
-  for (let attempt = 0; attempt < maxAttempts; attempt++) {
-    try {
-      const client = redis.createClient({ url: `redis://localhost:${port}` });
-      await client.connect();
-      await client.ping();
-      await client.quit();
-      return;
-    } catch (error) {
-      if (attempt === maxAttempts - 1) {
-        throw new Error(`Redis not ready after ${maxAttempts} attempts`);
-      }
-      await new Promise(resolve => setTimeout(resolve, 1000));
-    }
   }
 }
 
@@ -118,8 +141,6 @@ async function cleanupTestRedis() {
     await execAsync('docker-compose -f docker/docker-compose.test.yml down');
     
     // Remove the config file
-    const fs = require('fs');
-    const path = require('path');
     const configFile = path.join(__dirname, '..', '.test-redis-config.json');
     if (fs.existsSync(configFile)) {
       fs.unlinkSync(configFile);

@@ -4,7 +4,7 @@
     "module": "commonjs",
     "lib": ["ES2020"],
     "outDir": "./dist",
-    "rootDir": "./src",
+    "rootDir": "./",
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
@@ -33,12 +33,11 @@
     "types": ["node", "jest", "@types/jest"]
   },
   "include": [
-    "src/**/*"
+    "**/*.ts",
+    "**/*.tsx"
   ],
   "exclude": [
     "node_modules",
-    "dist",
-    "../src/**/*",
-    "../../src/**/*"
+    "dist"
   ]
 }
