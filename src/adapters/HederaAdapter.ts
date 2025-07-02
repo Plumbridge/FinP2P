@@ -8,16 +8,21 @@ import {
   AccountBalanceQuery,
   TransactionReceiptQuery,
   TokenId,
+  TopicId,
   Hbar,
   Status,
   TransactionId,
   AccountCreateTransaction,
   TokenSupplyType,
   TokenType,
-  TokenFreezeTransaction,
-  TokenUnfreezeTransaction
+  TokenMintTransaction,
+  TopicCreateTransaction,
+  TopicMessageSubmitTransaction,
+  TopicMessageQuery,
+  TransactionReceipt
 } from '@hashgraph/sdk';
 import { Logger } from 'winston';
+import { EventEmitter } from 'events';
 import {
   LedgerAdapter,
   LedgerType,
@@ -29,14 +34,14 @@ import {
 } from '../types';
 
 export interface HederaAdapterConfig {
-  network: 'mainnet' | 'testnet' | 'previewnet';
-  operatorId: string;
-  operatorKey: string;
+  operatorId?: string;
+  operatorKey?: string;
   treasuryId?: string;
   treasuryKey?: string;
+  network?: 'testnet' | 'mainnet';
 }
 
-export class HederaAdapter implements LedgerAdapter {
+export class HederaAdapter extends EventEmitter implements LedgerAdapter {
   public readonly ledgerId: string = 'hedera';
   public readonly name: string = 'Hedera Hashgraph';
   public readonly type: LedgerType = LedgerType.HEDERA;
@@ -46,59 +51,40 @@ export class HederaAdapter implements LedgerAdapter {
   private operatorKey: PrivateKey;
   private treasuryId: AccountId;
   private treasuryKey: PrivateKey;
-  private config: HederaAdapterConfig;
   private logger: Logger;
   private connected: boolean = false;
+  private hcsTopicId?: TopicId;
+  private config: HederaAdapterConfig;
 
   // Cache for created tokens and accounts
   private tokenCache: Map<string, TokenId> = new Map();
   private accountCache: Map<string, AccountId> = new Map();
 
   constructor(config: HederaAdapterConfig, logger: Logger) {
+    super();
     this.config = config;
     this.logger = logger;
-    
-    // Initialize operator credentials
-    this.operatorId = AccountId.fromString(config.operatorId);
-    this.operatorKey = PrivateKey.fromString(config.operatorKey);
-    
-    // Initialize treasury (defaults to operator if not provided)
-    this.treasuryId = config.treasuryId 
-      ? AccountId.fromString(config.treasuryId) 
-      : this.operatorId;
-    this.treasuryKey = config.treasuryKey 
-      ? PrivateKey.fromString(config.treasuryKey) 
-      : this.operatorKey;
+
+    // Initialize from config or environment variables
+    this.operatorId = AccountId.fromString(config.operatorId || process.env.HEDERA_OPERATOR_ID || '');
+    this.operatorKey = PrivateKey.fromString(config.operatorKey || process.env.HEDERA_OPERATOR_KEY || '');
+    this.treasuryId = AccountId.fromString(config.treasuryId || process.env.HEDERA_TREASURY_ID || this.operatorId.toString());
+    this.treasuryKey = PrivateKey.fromString(config.treasuryKey || process.env.HEDERA_TREASURY_KEY || process.env.HEDERA_OPERATOR_KEY || '');
   }
 
   async connect(): Promise<void> {
     try {
-      // Initialize Hedera client based on network
-      switch (this.config.network) {
-        case 'mainnet':
-          this.client = Client.forMainnet();
-          break;
-        case 'testnet':
-          this.client = Client.forTestnet();
-          break;
-        case 'previewnet':
-          this.client = Client.forPreviewnet();
-          break;
-        default:
-          throw new Error(`Unsupported network: ${this.config.network}`);
-      }
+      this.client = Client.forTestnet().setOperator(this.operatorId, this.operatorKey);
 
-      // Set operator
-      this.client.setOperator(this.operatorId, this.operatorKey);
-      
-      // Test connection by querying operator balance
+      // Test connection
       const balance = await new AccountBalanceQuery()
         .setAccountId(this.operatorId)
         .execute(this.client);
-      
-      this.logger.info(`Connected to Hedera ${this.config.network}`);
-      this.logger.info(`Operator balance: ${balance.hbars.toString()}`);
-      
+      this.logger.info(`Connected to Hedera Testnet. Operator balance: ${balance.hbars.toString()}`);
+
+      // Initialize HCS topic
+      await this.initializeHcs();
+
       this.connected = true;
     } catch (error) {
       this.logger.error('Failed to connect to Hedera network:', error);
@@ -116,6 +102,19 @@ export class HederaAdapter implements LedgerAdapter {
 
   isConnected(): boolean {
     return this.connected;
+  }
+
+  private async executeTransaction(tx: any): Promise<TransactionReceipt & { transactionId?: TransactionId }> {
+    const signedTx = await tx.sign(this.operatorKey);
+    const txResponse = await signedTx.execute(this.client);
+    const receipt = await txResponse.getReceipt(this.client);
+
+    if (receipt.status !== Status.Success) {
+      throw new Error(`Transaction failed with status: ${receipt.status.toString()}`);
+    }
+    // Add transaction ID to receipt for hash purposes
+    (receipt as any).transactionId = txResponse.transactionId;
+    return receipt;
   }
 
   async createAsset(assetData: Omit<Asset, 'id' | 'createdAt' | 'updatedAt'>): Promise<Asset> {
@@ -142,13 +141,7 @@ export class HederaAdapter implements LedgerAdapter {
         .freezeWith(this.client);
 
       // Sign and execute
-      const tokenCreateSign = await tokenCreateTx.sign(this.treasuryKey);
-      const tokenCreateSubmit = await tokenCreateSign.execute(this.client);
-      const tokenCreateReceipt = await tokenCreateSubmit.getReceipt(this.client);
-      
-      if (tokenCreateReceipt.status !== Status.Success) {
-        throw new Error(`Token creation failed: ${tokenCreateReceipt.status}`);
-      }
+      const tokenCreateReceipt = await this.executeTransaction(tokenCreateTx);
 
       const tokenId = tokenCreateReceipt.tokenId;
       if (!tokenId) {
@@ -184,18 +177,98 @@ export class HederaAdapter implements LedgerAdapter {
     }
   }
 
+
+
+  async mintToken(assetId: string, amount: number): Promise<Transaction> {
+    if (!this.isConnected()) {
+      throw new Error('Not connected to Hedera network');
+    }
+
+    const tokenId = this.tokenCache.get(assetId);
+    if (!tokenId) {
+      throw new Error(`Token ${assetId} not found in cache`);
+    }
+
+    const mintTx = new TokenMintTransaction()
+      .setTokenId(tokenId)
+      .setAmount(amount)
+      .freezeWith(this.client);
+
+    const receipt = await this.executeTransaction(mintTx);
+
+    return {
+      hash: receipt.transactionId?.toString() || 'unknown',
+      status: TransactionStatus.CONFIRMED,
+      ledgerId: this.ledgerId,
+      assetId,
+      from: 'mint',
+      to: this.treasuryId.toString(),
+      amount: BigInt(amount),
+      timestamp: new Date()
+    };
+  }
+
+
+
+  async subscribeToMirrorNode(): Promise<void> {
+    if (!this.hcsTopicId) {
+      this.logger.warn('HCS Topic ID not set, cannot subscribe to mirror node.');
+      return;
+    }
+
+    new TopicMessageQuery()
+      .setTopicId(this.hcsTopicId)
+      .subscribe(this.client, (message) => {
+        if (message?.contents) {
+          this.logger.info('Received message from HCS:', message.contents.toString());
+          this.emit('hcs-message', message.contents.toString());
+        }
+      }, (error) => {
+        this.logger.error('Error in HCS subscription:', error);
+      });
+
+    this.logger.info(`Subscribed to HCS topic ${this.hcsTopicId}`);
+  }
+
+  private async initializeHcs(): Promise<void> {
+    // Create a new topic for HCS
+    const topicCreateTx = new TopicCreateTransaction().setAdminKey(this.operatorKey.publicKey);
+    const receipt = await this.executeTransaction(topicCreateTx.freezeWith(this.client));
+    this.hcsTopicId = receipt.topicId || undefined;
+    this.logger.info(`HCS topic created: ${this.hcsTopicId}`);
+  }
+
+  public async submitHcsMessage(message: string): Promise<void> {
+    if (!this.hcsTopicId) {
+      throw new Error('HCS topic not initialized');
+    }
+
+    const submitMessageTx = new TopicMessageSubmitTransaction({
+      topicId: this.hcsTopicId,
+      message,
+    }).freezeWith(this.client);
+
+    await this.executeTransaction(submitMessageTx);
+    this.logger.info('Submitted message to HCS topic.');
+  }
+
+  private async associateToken(accountId: AccountId, tokenId: TokenId): Promise<void> {
+    const associateTx = new TokenAssociateTransaction()
+      .setAccountId(accountId)
+      .setTokenIds([tokenId])
+      .freezeWith(this.client);
+
+    await this.executeTransaction(associateTx);
+    this.logger.info(`Associated account ${accountId} with token ${tokenId}`);
+  }
+
   async getAsset(assetId: string): Promise<Asset | null> {
     if (!this.isConnected()) {
       return null;
     }
 
     try {
-      // For Hedera, we would need to query token info
-      // This is a simplified implementation
-      const tokenId = TokenId.fromString(assetId);
-      
-      // In a real implementation, you would query token info from Hedera
-      // For now, return a mock asset if token exists in cache
+      // This is a simplified implementation. A real implementation would query token info.
       if (this.tokenCache.has(assetId)) {
         const asset: Asset = {
           id: assetId,
@@ -394,65 +467,6 @@ export class HederaAdapter implements LedgerAdapter {
     }
   }
 
-  async lockAsset(accountId: string, assetId: string, amount: bigint): Promise<string> {
-    if (!this.isConnected()) {
-      throw new Error('Not connected to Hedera network');
-    }
-
-    try {
-      // For Hedera, we can use token freeze functionality
-      const hederaAccountId = AccountId.fromString(accountId);
-      const tokenId = TokenId.fromString(assetId);
-      
-      const freezeTx = new TokenFreezeTransaction()
-        .setAccountId(hederaAccountId)
-        .setTokenId(tokenId)
-        .freezeWith(this.client);
-
-      const freezeSign = await freezeTx.sign(this.treasuryKey);
-      const freezeSubmit = await freezeSign.execute(this.client);
-      const freezeReceipt = await freezeSubmit.getReceipt(this.client);
-      
-      if (freezeReceipt.status !== Status.Success) {
-        throw new Error(`Asset lock failed: ${freezeReceipt.status}`);
-      }
-
-      return freezeSubmit.transactionId.toString();
-    } catch (error) {
-      this.logger.error('Failed to lock asset on Hedera:', error);
-      throw error;
-    }
-  }
-
-  async unlockAsset(accountId: string, assetId: string, amount: bigint): Promise<string> {
-    if (!this.isConnected()) {
-      throw new Error('Not connected to Hedera network');
-    }
-
-    try {
-      const hederaAccountId = AccountId.fromString(accountId);
-      const tokenId = TokenId.fromString(assetId);
-      
-      const unfreezeTx = new TokenUnfreezeTransaction()
-        .setAccountId(hederaAccountId)
-        .setTokenId(tokenId)
-        .freezeWith(this.client);
-
-      const unfreezeSign = await unfreezeTx.sign(this.treasuryKey);
-      const unfreezeSubmit = await unfreezeSign.execute(this.client);
-      const unfreezeReceipt = await unfreezeSubmit.getReceipt(this.client);
-      
-      if (unfreezeReceipt.status !== Status.Success) {
-        throw new Error(`Asset unlock failed: ${unfreezeReceipt.status}`);
-      }
-
-      return unfreezeSubmit.transactionId.toString();
-    } catch (error) {
-      this.logger.error('Failed to unlock asset on Hedera:', error);
-      throw error;
-    }
-  }
-
   async getTransaction(txHash: string): Promise<Transaction | null> {
     console.log('getTransaction called with:', txHash, 'connected:', this.isConnected());
     if (!this.isConnected()) {
@@ -463,12 +477,12 @@ export class HederaAdapter implements LedgerAdapter {
     return {
       hash: txHash,
       status: TransactionStatus.CONFIRMED,
-      timestamp: new Date(),
       ledgerId: this.ledgerId,
+      assetId: '',
       from: '',
       to: '',
-      assetId: '',
-      amount: BigInt(0)
+      amount: BigInt(0),
+      timestamp: new Date()
     };
   }
 
@@ -494,6 +508,68 @@ export class HederaAdapter implements LedgerAdapter {
     } catch (error) {
       this.logger.error(`Error fetching transaction status for ${txHash}:`, error);
       return TransactionStatus.FAILED;
+    }
+  }
+
+  async lockAsset(accountId: string, assetId: string, amount: bigint): Promise<string> {
+    if (!this.isConnected()) {
+      throw new Error('Not connected to Hedera network');
+    }
+
+    try {
+      // Generate a unique lock ID
+      const lockId = `${accountId}_${assetId}_${Date.now()}`;
+      this.logger.info(`Locking ${amount} of ${assetId} for account ${accountId} with lockId ${lockId}`);
+      
+      // For Hedera, we could implement this using a smart contract or HCS topic
+      // For now, we'll emit an event and return a transaction ID
+      const txId = `lock_${lockId}_${Date.now()}`;
+      
+      // Emit lock event for cross-chain coordination
+      this.emit('lockAsset', {
+        accountId,
+        assetId,
+        amount: amount.toString(),
+        lockId,
+        txId,
+        timestamp: new Date()
+      });
+      
+      return txId;
+    } catch (error) {
+      this.logger.error(`Failed to lock asset ${assetId} for account ${accountId}:`, error);
+      throw error;
+    }
+  }
+
+  async unlockAsset(accountId: string, assetId: string, amount: bigint): Promise<string> {
+    if (!this.isConnected()) {
+      throw new Error('Not connected to Hedera network');
+    }
+
+    try {
+      // Generate a unique unlock ID
+      const lockId = `${accountId}_${assetId}_${Date.now()}`;
+      this.logger.info(`Unlocking ${amount} of ${assetId} for account ${accountId} with lockId ${lockId}`);
+      
+      // For Hedera, we could implement this using a smart contract or HCS topic
+      // For now, we'll emit an event and return a transaction ID
+      const txId = `unlock_${lockId}_${Date.now()}`;
+      
+      // Emit unlock event for cross-chain coordination
+      this.emit('unlockAsset', {
+        accountId,
+        assetId,
+        amount: amount.toString(),
+        lockId,
+        txId,
+        timestamp: new Date()
+      });
+      
+      return txId;
+    } catch (error) {
+      this.logger.error(`Failed to unlock asset ${assetId} for account ${accountId}:`, error);
+      throw error;
     }
   }
 

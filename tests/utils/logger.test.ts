@@ -276,7 +276,7 @@ describe('Logger', () => {
         c: 'valid'
       });
       
-      expect(processStdoutSpy).toHaveBeenCalled();
+      expect(stdoutSpy).toHaveBeenCalled();
     });
 
     it('should handle very large objects', () => {
@@ -288,7 +288,7 @@ describe('Logger', () => {
       
       logger.info('Large object', { data: largeArray });
       
-      expect(processStdoutSpy).toHaveBeenCalledWith(
+      expect(stdoutSpy).toHaveBeenCalledWith(
         expect.stringContaining('item-0')
       );
     });

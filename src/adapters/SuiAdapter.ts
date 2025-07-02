@@ -5,6 +5,7 @@ import { fromB64, toB64 } from '@mysten/sui/utils';
 import { getFaucetHost, requestSuiFromFaucetV2 } from '@mysten/sui/faucet';
 import { bcs } from '@mysten/bcs';
 import { Logger } from 'winston';
+import { EventEmitter } from 'events';
 import {
   LedgerAdapter,
   LedgerType,
@@ -22,7 +23,7 @@ export interface SuiAdapterConfig {
   packageId?: string; // For deployed FinP2P package
 }
 
-export class SuiAdapter implements LedgerAdapter {
+export class SuiAdapter extends EventEmitter implements LedgerAdapter {
   public readonly ledgerId: string = 'sui';
   public readonly name: string = 'Sui Network';
   public readonly type: LedgerType = LedgerType.SUI;
@@ -40,43 +41,37 @@ export class SuiAdapter implements LedgerAdapter {
   private readonly TRANSFER_MODULE = 'finp2p_transfer';
 
   constructor(config: SuiAdapterConfig, logger: Logger) {
+    super();
     this.config = config;
     this.logger = logger;
-    
-    // Initialize Sui client
-    const rpcUrl = config.rpcUrl || getFullnodeUrl(config.network);
+
+    const rpcUrl = process.env.SUI_RPC_URL || config.rpcUrl || getFullnodeUrl(config.network);
     this.client = new SuiClient({ url: rpcUrl });
-    
-    // Initialize keypair
-    if (config.privateKey) {
-      this.keypair = Ed25519Keypair.fromSecretKey(fromB64(config.privateKey));
+
+    const privateKey = process.env.SUI_PRIVATE_KEY || config.privateKey;
+    if (privateKey) {
+      this.keypair = Ed25519Keypair.fromSecretKey(fromB64(privateKey));
     } else {
       this.keypair = new Ed25519Keypair();
-      this.logger.warn('No private key provided, generated new keypair');
+      this.logger.warn('No SUI_PRIVATE_KEY provided, generated new keypair');
     }
-    
-    this.packageId = config.packageId || '';
+
+    this.packageId = process.env.SUI_PACKAGE_ID || config.packageId || '';
   }
 
   async connect(): Promise<void> {
     try {
-      // Test connection by getting chain identifier
       const chainId = await this.client.getChainIdentifier();
-      this.logger.info(`Connected to Sui network: ${chainId}`);
-      
-      // Get account address
+      this.logger.info(`Connected to Sui testnet: ${chainId}`);
       const address = this.keypair.getPublicKey().toSuiAddress();
       this.logger.info(`Sui adapter address: ${address}`);
-      
-      // Check if FinP2P package is deployed
       if (!this.packageId) {
-        this.logger.warn('No FinP2P package ID provided, some functions may not work');
+        this.logger.warn('No SUI_PACKAGE_ID provided, some functions may not work');
       }
-      
       this.connected = true;
     } catch (error) {
-      this.logger.error('Failed to connect to Sui network:', error);
-      throw error;
+      this.logger.error('Failed to connect to Sui testnet:', error);
+      throw new Error('Failed to connect to Sui testnet');
     }
   }
 
@@ -90,9 +85,8 @@ export class SuiAdapter implements LedgerAdapter {
   }
 
   async createAsset(assetData: Omit<Asset, 'id' | 'createdAt' | 'updatedAt'>): Promise<Asset> {
-    if (!this.connected) {
-      throw new Error('Not connected to Sui network');
-    }
+    if (!this.packageId) throw new Error('Sui package ID not configured');
+    if (!this.connected) throw new Error('Not connected to Sui network');
 
     try {// Prepare transaction
       const tx = new SuiTransaction();
@@ -126,7 +120,6 @@ export class SuiAdapter implements LedgerAdapter {
       const createdObjects = result.objectChanges?.filter(
         (change: any) => change.type === 'created'
       );
-      
       if (!createdObjects || createdObjects.length === 0) {
         throw new Error('No asset object created');
       }
@@ -156,6 +149,83 @@ export class SuiAdapter implements LedgerAdapter {
     } catch (error) {
       this.logger.error('Failed to create asset on Sui:', error);
       throw error;
+    }
+  }
+
+  async transfer(from: string, to: string, assetId: string, amount: bigint): Promise<string> {
+    if (!this.connected) throw new Error('Not connected to Sui network');
+
+    const tx = new SuiTransaction();
+    tx.moveCall({
+      target: `${this.packageId}::${this.TRANSFER_MODULE}::transfer_asset`,
+      arguments: [
+        tx.object(from),
+        tx.object(to),
+        tx.object(assetId),
+        tx.pure(bcs.u64().serialize(amount))
+      ]
+    });
+
+    const result = await this.executeTransaction(tx);
+    return result.digest;
+  }
+
+  async lockAsset(accountId: string, assetId: string, amount: bigint): Promise<string> {
+    if (!this.packageId) throw new Error('Sui package ID not configured');
+    if (!this.connected) throw new Error('Not connected to Sui network');
+
+    const tx = new SuiTransaction();
+    tx.moveCall({
+      target: `${this.packageId}::${this.TRANSFER_MODULE}::lock_asset`,
+      arguments: [
+        tx.object(accountId),
+        tx.object(assetId),
+        tx.pure(bcs.u64().serialize(amount))
+      ]
+    });
+
+    const result = await this.executeTransaction(tx);
+
+    this.emit('AssetLocked', {
+      accountId,
+      assetId,
+      amount: amount.toString(),
+      transactionId: result.digest
+    });
+
+    return result.digest;
+  }
+
+
+
+  async subscribeToEvents(filter: any): Promise<void> {
+    if (!this.connected) throw new Error('Not connected to Sui network');
+
+    this.client.subscribeEvent({
+      filter,
+      onMessage: (event) => {
+        this.emit('event', event);
+      }
+    });
+  }
+
+  private async executeTransaction(tx: SuiTransaction, retries = 3): Promise<any> {
+    for (let i = 0; i < retries; i++) {
+      try {
+        const result = await this.client.signAndExecuteTransaction({
+          signer: this.keypair,
+          transaction: tx,
+          options: { showEffects: true }
+        });
+
+        if (result.effects?.status?.status !== 'success') {
+          throw new Error(`Transaction failed: ${result.effects?.status?.error}`);
+        }
+        return result;
+      } catch (error) {
+        this.logger.error(`Transaction attempt ${i + 1} failed:`, error);
+        if (i === retries - 1) throw error;
+      }
     }
   }
 
@@ -204,6 +274,38 @@ export class SuiAdapter implements LedgerAdapter {
       return asset;
     } catch (error) {
       this.logger.error(`Failed to get asset ${assetId}:`, error);
+      return null;
+    }
+  }
+
+  async getTransaction(transactionId: string): Promise<Transaction | null> {
+    if (!this.connected) throw new Error('Not connected to Sui network');
+
+    try {
+      const tx = await this.client.getTransactionBlock({
+        digest: transactionId,
+        options: {
+          showEffects: true,
+          showInput: true,
+        },
+      });
+
+      if (!tx) return null;
+
+      const status = tx.effects?.status.status === 'success' ? TransactionStatus.CONFIRMED : TransactionStatus.FAILED;
+
+      return {
+        hash: tx.digest,
+        status,
+        ledgerId: this.ledgerId,
+        assetId: '', // You might need to extract this from the transaction
+        from: '', // You might need to extract this from the transaction
+        to: '', // You might need to extract this from the transaction
+        amount: BigInt(0), // You might need to extract this from the transaction
+        timestamp: new Date(parseInt(tx.timestampMs || '0'))
+      };
+    } catch (error) {
+      this.logger.error(`Failed to get transaction ${transactionId} from Sui:`, error);
       return null;
     }
   }
@@ -364,34 +466,22 @@ export class SuiAdapter implements LedgerAdapter {
     }
   }
 
-  async prepareTransfer(transferData: any): Promise<any> {
+  async prepareTransfer(from: string, to: string, assetId: string, amount: bigint): Promise<any> {
     if (!this.connected) {
       throw new Error('Not connected to Sui network');
     }
 
     try {
-      // Validate transfer data
-      const { from, to, assetId, asset, amount } = transferData;
-      const finalAssetId = assetId || asset;
-      if (!from || !to || !finalAssetId || !amount) {
-        throw new Error('Invalid transfer data');
-      }
-
-      // Check balance
-      const balance = await this.getBalance(from, finalAssetId);
-      if (balance < BigInt(amount)) {
-        throw new Error('Insufficient funds');
-      }
-
-      // Prepare transaction
       const tx = new SuiTransaction();
+      const finalAssetId = assetId; // Assuming assetId is the object ID
+
       tx.moveCall({
         target: `${this.packageId}::${this.TRANSFER_MODULE}::transfer`,
         arguments: [
-          tx.pure(from),
-          tx.pure(to),
-          tx.pure(finalAssetId),
-          tx.pure(bcs.u64().serialize(BigInt(amount)))
+          tx.object(from),
+          tx.object(to),
+          tx.object(finalAssetId),
+          tx.pure(bcs.u64().serialize(amount))
         ]
       });
 
@@ -403,79 +493,26 @@ export class SuiAdapter implements LedgerAdapter {
         amount
       };
     } catch (error) {
-      this.logger.error('Failed to prepare transfer on Sui:', error);
+      this.logger.error('Failed to prepare transfer:', error);
       throw error;
     }
   }
 
-  async executeTransfer(transferData: any): Promise<string> {
+  async executeTransfer(preparedTx: any): Promise<string> {
     if (!this.connected) {
       throw new Error('Not connected to Sui network');
     }
 
     try {
-      const prepared = await this.prepareTransfer(transferData);
-      
-      const result = await this.client.signAndExecuteTransaction({
-        signer: this.keypair,
-        transaction: prepared.transaction,
-        options: {
-          showEffects: true
-        }
-      });
-
-      if (result.effects?.status?.status !== 'success') {
-        throw new Error(`Transfer failed: ${result.effects?.status?.error}`);
-      }
-
-      const txHash = result.digest;
-      this.logger.info(`Transfer completed: ${txHash}`);
-      return txHash;
-    } catch (error) {
-      this.logger.error('Failed to execute transfer on Sui:', error);
-      throw error;
-    }
-  }
-
-  async transfer(from: string, to: string, assetId: string, amount: bigint): Promise<string> {
-    return this.executeTransfer({ from, to, assetId, amount });
-  }
-
-  async lockAsset(accountId: string, assetId: string, amount: bigint): Promise<string> {
-    if (!this.connected) {
-      throw new Error('Not connected to Sui network');
-    }
-
-    try {
-      const tx = new SuiTransaction();
-      
-      tx.moveCall({
-        target: `${this.packageId}::${this.TRANSFER_MODULE}::lock_asset`,
-        arguments: [
-          tx.object(accountId),
-          tx.object(assetId),
-          tx.pure(bcs.u64().serialize(amount))
-        ]
-      });
-
-      const result = await this.client.signAndExecuteTransaction({
-        signer: this.keypair,
-        transaction: tx,
-        options: {
-          showEffects: true
-        }
-      });
-
-      if (result.effects?.status?.status !== 'success') {
-        throw new Error(`Asset lock failed: ${result.effects?.status?.error}`);
-      }
-
+      const result = await this.executeTransaction(preparedTx.transaction);
       return result.digest;
     } catch (error) {
-      this.logger.error('Failed to lock asset on Sui:', error);
+      this.logger.error('Failed to execute transfer:', error);
       throw error;
     }
   }
+
+
 
   async unlockAsset(accountId: string, assetId: string, amount: bigint): Promise<string> {
     if (!this.connected) {
@@ -490,7 +527,7 @@ export class SuiAdapter implements LedgerAdapter {
         arguments: [
           tx.object(accountId),
           tx.object(assetId),
-          tx.pure(bcs.u64().serialize(amount).toBytes())
+          tx.pure(bcs.u64().serialize(amount))
         ]
       });
 
@@ -513,46 +550,7 @@ export class SuiAdapter implements LedgerAdapter {
     }
   }
 
-  async getTransaction(txHash: string): Promise<Transaction | null> {
-    if (!this.connected) {
-      throw new Error('Not connected to Sui network');
-    }
 
-    try {
-      const txResponse = await this.client.getTransactionBlock({
-        digest: txHash,
-        options: {
-          showEffects: true,
-          showInput: true,
-          showEvents: true
-        }
-      });
-
-      if (!txResponse) {
-        return null;
-      }
-
-      // Parse transaction details from Sui transaction
-      const transaction: Transaction = {
-        hash: txHash,
-        ledgerId: this.ledgerId,
-        from: '', // Extract from transaction input
-        to: '', // Extract from transaction input
-        assetId: '', // Extract from transaction input
-        amount: BigInt(0), // Extract from transaction input
-        status: txResponse.effects?.status?.status === 'success' 
-          ? TransactionStatus.CONFIRMED 
-          : TransactionStatus.FAILED,
-        timestamp: new Date(parseInt(txResponse.timestampMs || '0')),
-        gasUsed: BigInt(txResponse.effects?.gasUsed?.computationCost || 0)
-      };
-
-      return transaction;
-    } catch (error) {
-      this.logger.error(`Failed to get transaction ${txHash}:`, error);
-      throw error;
-    }
-  }
 
   async getLockedBalance(accountId: string, assetId: string): Promise<bigint> {
     if (!this.connected) {
@@ -635,4 +633,5 @@ export class SuiAdapter implements LedgerAdapter {
   getLedgerType(): LedgerType {
     return LedgerType.SUI;
   }
+
 }

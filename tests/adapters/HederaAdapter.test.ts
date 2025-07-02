@@ -70,7 +70,7 @@ describe('HederaAdapter', () => {
 
   describe('Connection Management', () => {
     it('should handle connection for different networks', async () => {
-      const networks = ['mainnet', 'testnet', 'previewnet'] as const;
+      const networks = ['mainnet', 'testnet'] as const;
       
       for (const network of networks) {
         const config = {

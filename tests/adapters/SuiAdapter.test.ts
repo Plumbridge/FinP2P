@@ -228,12 +228,10 @@ describe('SuiAdapter', () => {
 
     it('should prepare transfer transaction', async () => {
       // Mock the prepareTransfer method directly to avoid Transaction constructor issues
-      const mockTransferData = {
-        from: 'sender-address',
-        to: 'recipient-address', 
-        assetId: 'asset-id',
-        amount: '1000'
-      };
+      const from = 'sender-address';
+      const to = 'recipient-address';
+      const assetId = 'asset-id';
+      const amount = BigInt(1000);
       
       const mockResult = {
         transaction: 'mock-transaction-data',
@@ -242,11 +240,11 @@ describe('SuiAdapter', () => {
       
       jest.spyOn(adapter, 'prepareTransfer').mockResolvedValue(mockResult);
       
-      const result = await adapter.prepareTransfer(mockTransferData);
+      const result = await adapter.prepareTransfer(from, to, assetId, amount);
 
       expect(result).toBeDefined();
       expect(result).toEqual(mockResult);
-      expect(adapter.prepareTransfer).toHaveBeenCalledWith(mockTransferData);
+      expect(adapter.prepareTransfer).toHaveBeenCalledWith(from, to, assetId, amount);
     });
 
     it('should execute transfer', async () => {
