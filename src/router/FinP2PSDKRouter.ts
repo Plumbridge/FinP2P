@@ -57,6 +57,7 @@ export class FinP2PSDKRouter extends EventEmitter {
     // Initialize the official FinP2P SDK
     this.sdk = new Sdk({
       orgId: config.orgId,
+      custodianOrgId: config.custodianOrgId,
       owneraAPIAddress: config.owneraAPIAddress,
       owneraOssURL: config.owneraOssURL,
       owneraFinp2pURL: config.owneraFinp2pURL,

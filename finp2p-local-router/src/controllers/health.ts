@@ -3,7 +3,9 @@
  * Handles health check operations
  */
 
-const getHealth = (req, res) => {
+import { Request, Response } from 'express';
+
+export const getHealth = (req: Request, res: Response) => {
   try {
     const healthResponse = {
       status: 'healthy',
@@ -43,8 +45,4 @@ const getHealth = (req, res) => {
       timestamp: new Date().toISOString()
     });
   }
-};
-
-module.exports = {
-  getHealth
 };

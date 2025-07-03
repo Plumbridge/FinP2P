@@ -12,20 +12,20 @@ sleep 10
 
 echo
 echo "Step 3: Checking Router D status"
-curl -s http://localhost:3004/info | jq .
+curl -s http://localhost:${ROUTER_D_PORT:-3004}/info | jq .
 
 echo
 echo "Step 4: Verifying peer connections on Router D"
-curl -s http://localhost:3004/peers | jq .
+curl -s http://localhost:${ROUTER_D_PORT:-3004}/peers | jq .
 
 echo
 echo "Step 5: Checking that other routers discovered Router D"
 echo "Router A peers:"
-curl -s http://localhost:3001/peers | jq .
+curl -s http://localhost:${ROUTER_A_PORT:-3001}/peers | jq .
 echo "Router B peers:"
-curl -s http://localhost:3002/peers | jq .
+curl -s http://localhost:${ROUTER_B_PORT:-3002}/peers | jq .
 echo "Router C peers:"
-curl -s http://localhost:3003/peers | jq .
+curl -s http://localhost:${ROUTER_C_PORT:-3003}/peers | jq .
 
 echo
 echo "Router D has been successfully added to the network!"

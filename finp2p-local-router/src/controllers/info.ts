@@ -3,7 +3,9 @@
  * Handles router information operations
  */
 
-const getRouterInfo = (req, res) => {
+import { Request, Response } from 'express';
+
+export const getRouterInfo = (req: Request, res: Response) => {
   try {
     const routerInfo = {
       id: process.env.ROUTER_ID || 'local-router-001',
@@ -34,8 +36,4 @@ const getRouterInfo = (req, res) => {
       timestamp: new Date().toISOString()
     });
   }
-};
-
-module.exports = {
-  getRouterInfo
 };

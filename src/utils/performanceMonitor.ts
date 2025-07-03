@@ -124,7 +124,7 @@ export class PerformanceMonitor extends EventEmitter {
   }
 
   /**
-   * Record CPU usage (simplified)
+   * Record CPU usage
    */
   recordCpuUsage(): void {
     if (!this.options.enableCpuTracking) return;

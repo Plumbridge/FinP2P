@@ -1,5 +1,5 @@
 import dotenv from 'dotenv';
-import { FinP2PSDKRouter, FinP2PSDKConfig } from './router/FinP2PSDKRouter';
+import { FinP2PSDKRouter, FinP2PSDKConfig } from './router';
 import { createLogger } from './utils/logger';
 
 // Load environment variables
@@ -14,14 +14,15 @@ function getSDKConfig(): FinP2PSDKConfig {
   
   // Required FinP2P SDK configuration
   const orgId = process.env.FINP2P_ORG_ID;
-  const custodianOrgId = process.env.FINP2P_CUSTODIAN_ORG_ID || orgId;
-  const owneraAPIAddress = process.env.OWNERA_API_ADDRESS;
-  const apiKey = process.env.FINP2P_API_KEY;
-  const privateKey = process.env.FINP2P_PRIVATE_KEY;
   
   if (!orgId) {
     throw new Error('FINP2P_ORG_ID environment variable is required');
   }
+  
+  const custodianOrgId = process.env.FINP2P_CUSTODIAN_ORG_ID || orgId;
+  const owneraAPIAddress = process.env.OWNERA_API_ADDRESS;
+  const apiKey = process.env.FINP2P_API_KEY;
+  const privateKey = process.env.FINP2P_PRIVATE_KEY;
   
   if (!owneraAPIAddress) {
     throw new Error('OWNERA_API_ADDRESS environment variable is required');
@@ -128,4 +129,4 @@ if (require.main === module) {
 export { FinP2PSDKRouter, getSDKConfig };
 export * from './types';
 export * from './utils';
-export * from './router/FinP2PSDKRouter';
+export * from './router';

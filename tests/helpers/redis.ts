@@ -6,14 +6,14 @@ import { getTestRedisConfig } from './test-config';
  */
 export async function createTestRedisClient(): Promise<RedisClientType> {
   const config = await getTestRedisConfig();
-  const client = createClient(config);
+  const client = createClient({ url: config.url });
+  await client.connect();
 
-  client.on('error', (err) => {
+  client.on('error', (err: Error) => {
     console.error('Test Redis Client Error:', err);
   });
 
-  await client.connect();
-  return client as RedisClientType;
+  return client;
 }
 
 /**
@@ -28,12 +28,12 @@ export async function cleanupRedis(existingClient?: RedisClientType): Promise<vo
       client = existingClient;
     } else {
       const config = await getTestRedisConfig();
-      client = createClient(config);
+      client = createClient({ url: config.url });
       await client.connect();
       shouldClose = true;
     }
 
-    await client.flushDb(); // Clear current database
+    await client.flushDb();
 
     if (shouldClose) {
       await client.quit();

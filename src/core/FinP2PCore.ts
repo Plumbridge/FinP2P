@@ -1,6 +1,6 @@
 import { HederaAdapter } from "../adapters/HederaAdapter";
 import { SuiAdapter } from "../adapters/SuiAdapter";
-import type { TransactionRequest, TransactionResponse } from "../types";
+import type { TransactionRequest, TransactionResponse } from "../types/index";
 import { TransactionStatus } from "../types";
 
 /**

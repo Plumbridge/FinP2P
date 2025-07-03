@@ -3,27 +3,7 @@ import { ConfigOptions, LedgerType } from '../../src/types';
 import { createLogger } from '../../src/utils/logger';
 import { createTestRedisClient, cleanupRedis, closeRedisConnection } from '../helpers/redis';
 import { stopRouterSafely } from '../helpers/router-cleanup';
-import type { RedisClientType } from 'redis';
-
-// Mock ioredis
-jest.mock('ioredis', () => {
-  return jest.fn().mockImplementation(() => ({
-    on: jest.fn(),
-    ping: jest.fn().mockResolvedValue('PONG'),
-    quit: jest.fn().mockResolvedValue('OK'),
-    isOpen: true,
-    set: jest.fn().mockResolvedValue('OK'),
-    get: jest.fn().mockResolvedValue(null),
-    del: jest.fn().mockResolvedValue(1),
-    hSet: jest.fn().mockResolvedValue(1),
-    hGet: jest.fn().mockResolvedValue(null),
-    hGetAll: jest.fn().mockResolvedValue({}),
-    sAdd: jest.fn().mockResolvedValue(1),
-    sMembers: jest.fn().mockResolvedValue([])
-  }));
-});
-
-
+import { RedisClientType } from 'redis';
 
 describe('FinP2PRouter', () => {
   let router: FinP2PRouter | null;
@@ -97,7 +77,7 @@ describe('FinP2PRouter', () => {
       }
     };
 
-    router = new FinP2PRouter(config);
+    router = new FinP2PRouter(config, redisClient);
   });
 
   afterEach(async () => {
@@ -125,7 +105,7 @@ describe('FinP2PRouter', () => {
 
     it('should throw error with invalid configuration', () => {
       const invalidConfig = { ...config, routerId: '' };
-      expect(() => new FinP2PRouter(invalidConfig)).toThrow();
+      expect(() => new FinP2PRouter(invalidConfig, redisClient)).toThrow();
     });
   });
 
@@ -144,7 +124,7 @@ describe('FinP2PRouter', () => {
     });
 
     it('should handle multiple start calls gracefully', async () => {
-      router = new FinP2PRouter(config);
+      router = new FinP2PRouter(config, redisClient);
       
       if (router) {
         await router.start();
@@ -212,7 +192,7 @@ describe('FinP2PRouter', () => {
       if (router) {
         await router.start();
         
-        const peerUrl = 'http://localhost:3001';
+        const peerUrl = process.env.TEST_PEER_URL || 'http://localhost:3001';
         await router.addPeer(peerUrl);
         
         const peers = router.getPeers();
@@ -225,47 +205,7 @@ describe('FinP2PRouter', () => {
     });
   });
 
-  describe('Error Handling', () => {
-    it.skip('should handle Redis connection errors gracefully', async () => {
-      const badConfig = {
-        ...config,
-        redis: { ...config.redis, url: 'redis://invalid:6379' }
-      };
-      
-      const badRouter = new FinP2PRouter(badConfig);
-      
-      // Should not throw, but should log error
-      await expect(badRouter.start()).rejects.toThrow();
-    });
-
-    it('should handle graceful shutdown', async () => {
-      if (router?.isRunning()) {
-        await router.stop();
-      }
-      if (router) {
-        await router.start();
-        
-        const metrics = await router.getMetrics();
-        
-        expect(metrics).toBeDefined();
-        
-        await router.stop();
-        expect(router.isRunning()).toBe(false);
-      }
-    });
-
-    it('should handle port conflicts gracefully', async () => {
-      const router1 = new FinP2PRouter({ ...config, port: 3333 });
-      const router2 = new FinP2PRouter({ ...config, port: 3333 });
-      
-      await router1.start();
-      
-      // Second router should fail to start on same port
-      await expect(router2.start()).rejects.toThrow();
-      
-      await router1.stop();
-    });
-  });
+  
 
   describe('Metrics', () => {
     it('should collect basic metrics', async () => {

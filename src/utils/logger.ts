@@ -26,7 +26,7 @@ export function createLogger(config?: LoggingConfig): winston.Logger {
   
   const transports: winston.transport[] = [];
   
-  // Console transport - simplified for tests
+  // Console transport configuration for test environment
   if (isTest) {
     // In test mode, use a custom transport to control output
     // Test spies will capture process.stdout.write calls when needed

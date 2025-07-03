@@ -3,7 +3,7 @@ module.exports = {
   testEnvironment: 'node',
   roots: ['<rootDir>/src', '<rootDir>/tests'],
   testMatch: ['**/*.test.ts', '**/*.test.js'],
-  setupFiles: ['<rootDir>/tests/jest-env-setup.js'],
+
   transform: {
     '^.+\.tsx?$': ['ts-jest', {
       tsconfig: {
@@ -24,5 +24,6 @@ module.exports = {
   bail: false,
   detectOpenHandles: true,
   forceExit: true,
+  setupFiles: ['<rootDir>/tests/jest-env-setup.js'],
   setupFilesAfterEnv: ['<rootDir>/tests/setup.ts'],
 };

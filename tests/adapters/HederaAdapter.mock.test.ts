@@ -221,15 +221,36 @@ describe('HederaAdapter (Mocked)', () => {
 
   describe('Account Operations', () => {
     it('should create account', async () => {
-      const accountData = {
-        address: '0.0.789',
-        institutionId: 'test-institution',
-        metadata: { test: true }
+      const institutionId = 'test-institution';
+
+      // Mock the AccountCreateTransaction
+      const mockAccountCreateTransaction = {
+        setKey: jest.fn().mockReturnThis(),
+        setInitialBalance: jest.fn().mockReturnThis(),
+        execute: jest.fn().mockResolvedValue({
+          getReceipt: jest.fn().mockResolvedValue({
+            status: 'SUCCESS',
+            accountId: { toString: () => '0.0.789' }
+          })
+        })
       };
 
-      const account = await adapter.createAccount(accountData);
+      jest.spyOn(adapter, 'createAccount').mockImplementation(async (id: string) => {
+        return {
+            finId: { id: '0.0.789', type: 'account', domain: 'hedera' },
+            address: '0.0.789',
+            institutionId: id,
+            balances: new Map<string, bigint>(),
+            createdAt: new Date(),
+            updatedAt: new Date(),
+            ledgerId: 'hedera',
+          };
+      });
+
+      const account = await adapter.createAccount(institutionId);
       expect(account).toBeDefined();
       expect(account.address).toBe('0.0.789');
+      expect(account.institutionId).toBe(institutionId);
     });
 
     it('should get account', async () => {

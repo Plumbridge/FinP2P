@@ -248,10 +248,10 @@ This project now includes an implementation using the official FinP2P SDK from O
 
 3. **Access SDK Router Endpoints**
 
-   - Health Check: `http://localhost:3000/health`
-   - Router Info: `http://localhost:3000/info`
-   - User Creation: `POST http://localhost:3000/users`
-   - Asset Creation: `POST http://localhost:3000/assets`
+   - Health Check: `http://localhost:${PORT}/health` (default PORT=3000)
+   - Router Info: `http://localhost:${PORT}/info`
+   - User Creation: `POST http://localhost:${PORT}/users`
+   - Asset Creation: `POST http://localhost:${PORT}/assets`
 
 ### Switching Between Implementations
 
@@ -298,6 +298,11 @@ node scripts/setup-test-redis.js cleanup
 npm run test:teardown
 ```
 ## 🔧 Troubleshooting
+
+### Check for Errors
+```bash
+npx tsc --noEmit
+```
 
 **Complete reset**
 ```bash

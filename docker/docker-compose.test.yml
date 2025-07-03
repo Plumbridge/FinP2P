@@ -1,8 +1,9 @@
 services:
   redis-test:
+    container_name: redis-test
     image: redis:7-alpine
     ports:
-      - "6379:6379"
+      - "${REDIS_TEST_PORT:-6379}:6379"
     command: redis-server --appendonly yes --databases 16
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]

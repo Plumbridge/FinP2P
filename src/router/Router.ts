@@ -3,7 +3,7 @@ import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import { v4 as uuidv4 } from 'uuid';
-// Removed redis import - using ioredis instead
+import { createClient, RedisClientType } from 'redis';
 import { Logger } from 'winston';
 import {
   Router as IRouter,
@@ -29,7 +29,7 @@ import { LedgerManager } from './LedgerManager';
 export class FinP2PRouter extends EventEmitter {
   private app: express.Application;
   private server: any;
-  private redis!: any; // Using ioredis instead of redis
+  private redis!: RedisClientType;
   private logger: Logger;
   private config: ConfigOptions;
   private routingEngine!: RoutingEngine;
@@ -48,13 +48,14 @@ export class FinP2PRouter extends EventEmitter {
   private metrics: PerformanceMetrics;
   private intervals: NodeJS.Timeout[] = [];
 
-  constructor(config: ConfigOptions) {
+  constructor(config: ConfigOptions, redisClient: RedisClientType) {
     super();
-    
+
     // Validate required configuration
     this.validateConfig(config);
-    
+
     this.config = config;
+    this.redis = redisClient;
     this.logger = createLogger({ level: config.monitoring.logLevel });
     this.app = express();
     this.setupExpress();
@@ -156,24 +157,22 @@ export class FinP2PRouter extends EventEmitter {
 
   private async initializeComponents(): Promise<void> {
     try {
-      // Initialize Redis
-      const Redis = require('ioredis');
-      this.redis = new Redis(this.config.redis.url, {
-        retryDelayOnFailover: 100,
-        maxRetriesPerRequest: 1,
-      });
-
-      this.redis.on('error', (err: Error) => {
-        this.logger.error('Redis connection error:', err);
-      });
+      if (!this.redis || !this.redis.isOpen) {
+        this.logger.warn('Redis client not provided or not connected. Attempting to connect.');
+        this.redis = createClient({ url: this.config.redis.url });
+        this.redis.on('error', (err: Error) => {
+          this.logger.error('Redis connection error:', err);
+        });
+        await this.redis.connect();
+      }
 
       // Initialize routing engine
       this.routingEngine = new RoutingEngine(this.redis, this.logger);
-      
+
       // Initialize ledger manager
       this.ledgerManager = new LedgerManager(this.config.ledgers, this.logger);
       await this.ledgerManager.initialize();
-      
+
       this.logger.info('Router components initialized successfully');
     } catch (error) {
       this.logger.error('Failed to initialize router components:', error);
@@ -249,7 +248,7 @@ export class FinP2PRouter extends EventEmitter {
       this.logger.info('Starting FinP2P Router...', { routerId: this.config.routerId });
       
       // Initialize components only if not already initialized
-      if (!this.redis || !this.redis.isOpen) {
+      if (!this.routingEngine) {
         await this.initializeComponents();
       }
       
@@ -303,7 +302,7 @@ export class FinP2PRouter extends EventEmitter {
       
       // Close Redis connection
       if (this.redis && this.redis.isOpen) {
-        await this.redis.quit();
+        await this.redis.disconnect();
       }
       
       // Disconnect ledger manager if exists
@@ -610,7 +609,7 @@ export class FinP2PRouter extends EventEmitter {
         transfer.status = TransferStatus.COMPLETED;
         transfer.completedAt = new Date();
       } else {
-        // Cross-ledger transfer (simplified)
+        // Cross-ledger transfer implementation
         throw new Error('Cross-ledger transfers not yet implemented');
       }
       

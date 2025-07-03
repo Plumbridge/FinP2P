@@ -1,9 +1,10 @@
-const jwt = require('jsonwebtoken');
+import { Request, Response } from 'express';
+import * as jwt from 'jsonwebtoken';
 
 /**
  * @description Authenticate a user and get a token
  */
-exports.login = async (req, res) => {
+export const login = async (req: Request, res: Response) => {
   try {
     const { username, password } = req.body;
     
@@ -50,7 +51,7 @@ exports.login = async (req, res) => {
 /**
  * @description Get a new access token using a refresh token
  */
-exports.refreshToken = async (req, res) => {
+export const refreshToken = async (req: Request, res: Response) => {
   try {
     const { refreshToken } = req.body;
     
@@ -63,7 +64,7 @@ exports.refreshToken = async (req, res) => {
     }
 
     // Verify refresh token
-    const decoded = jwt.verify(refreshToken, process.env.JWT_SECRET || 'default-secret');
+    const decoded = jwt.verify(refreshToken, process.env.JWT_SECRET || 'default-secret') as jwt.JwtPayload;
     
     if (decoded.type !== 'refresh') {
       return res.status(401).json({
@@ -107,7 +108,7 @@ exports.refreshToken = async (req, res) => {
 /**
  * @description Logout a user and invalidate their tokens
  */
-exports.logout = async (req, res) => {
+export const logout = async (req: Request, res: Response) => {
   try {
     // TODO: Implement token blacklisting logic
     // For now, just return success
@@ -128,7 +129,7 @@ exports.logout = async (req, res) => {
 /**
  * @description Verify a token is valid
  */
-exports.verifyToken = async (req, res) => {
+export const verifyToken = async (req: Request, res: Response) => {
   try {
     const token = req.headers.authorization?.replace('Bearer ', '');
     
@@ -140,7 +141,7 @@ exports.verifyToken = async (req, res) => {
       });
     }
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'default-secret');
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'default-secret') as jwt.JwtPayload;
     
     res.status(200).json({
       message: 'Token is valid',

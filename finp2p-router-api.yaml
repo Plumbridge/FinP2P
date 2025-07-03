@@ -12,7 +12,7 @@ info:
 
 servers:
   - url: http://localhost:3000
-    description: Local development server
+    description: Local development server (configurable via PORT environment variable)
   - url: https://api.finp2p.org
     description: Production server
 

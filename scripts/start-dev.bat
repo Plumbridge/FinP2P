@@ -71,8 +71,9 @@ echo 🔍 Checking Redis...
 docker ps | findstr redis >nul
 if errorlevel 1 (
     echo 🚀 Starting Redis container...
-    docker run -d --name finp2p-redis -p 6379:6379 redis:alpine
-    echo ✅ Redis started on port 6379
+    if not defined REDIS_PORT set REDIS_PORT=6379
+    docker run -d --name finp2p-redis -p %REDIS_PORT%:6379 redis:alpine
+    echo ✅ Redis started on port %REDIS_PORT%
 ) else (
     echo ✅ Redis is already running
 )
@@ -97,10 +98,10 @@ echo.
 echo 2. Multi-router network:
 echo    npm run compose:up
 echo    # Access routers at:
-echo    # - Bank A: http://localhost:3001
-echo    # - Bank B: http://localhost:3002
-echo    # - Bank C: http://localhost:3003
-echo    # - Grafana: http://localhost:3000 (admin/admin)
+echo    # - Bank A: http://localhost:%ROUTER_A_PORT% (default: 3001)
+echo    # - Bank B: http://localhost:%ROUTER_B_PORT% (default: 3002)
+echo    # - Bank C: http://localhost:%ROUTER_C_PORT% (default: 3003)
+echo    # - Grafana: http://localhost:%GRAFANA_PORT% (default: 3000) (admin/admin)
 echo.
 echo 3. Run tests:
 echo    npm test

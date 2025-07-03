@@ -712,7 +712,7 @@ export class SuiAdapter extends EventEmitter implements LedgerAdapter {
       return {
         operationId,
         transactionHash: txHash,
-        status: 'completed', // Simplified for demo - in reality would check status
+        status: 'completed', // TODO: Check actual transaction status
         timestamp: new Date().toISOString(),
         ledger: this.ledgerId,
         fromAccount: req.fromAccount,

@@ -1,28 +1,18 @@
 import { SuiAdapter, HederaAdapter, FinP2PRouter } from '../../src/adapters';
 import winston from 'winston';
-import Docker from 'dockerode';
+
 
 describe('Cross-Chain Transfer Integration Test', () => {
   let suiAdapter: SuiAdapter;
   let hederaAdapter: HederaAdapter;
   let router: FinP2PRouter;
-  let docker: Docker;
-  let redisContainer: Docker.Container;
+
 
   const logger = winston.createLogger({
     transports: [new winston.transports.Console()],
   });
 
   beforeAll(async () => {
-    // Start Redis container
-    docker = new Docker();
-    redisContainer = await docker.createContainer({
-      Image: 'redis:latest',
-      HostConfig: { PortBindings: { '6379/tcp': [{ HostPort: '6379' }] } },
-    });
-    await redisContainer.start();
-    await new Promise(resolve => setTimeout(resolve, 5000)); // Wait for Redis to start
-
     // Initialize adapters and router
     const suiConfig = { network: 'testnet' as const, rpcUrl: '', privateKey: '', packageId: '' };
     const hederaConfig = { operatorId: '', operatorKey: '', treasuryId: '', treasuryKey: '', network: 'testnet' as const };
@@ -43,8 +33,6 @@ describe('Cross-Chain Transfer Integration Test', () => {
   }, 60000);
 
   afterAll(async () => {
-    await redisContainer.stop();
-    await redisContainer.remove();
     await suiAdapter.disconnect();
     await hederaAdapter.disconnect();
     await router.disconnect();

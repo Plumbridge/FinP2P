@@ -14,6 +14,7 @@ async function main() {
     // Real FinP2P SDK Configuration
     const sdk = new Sdk({
       orgId: process.env.ROUTER_ID || 'your-org-id',
+      custodianOrgId: process.env.FINP2P_CUSTODIAN_ORG_ID || process.env.ROUTER_ID || 'your-org-id',
       owneraAPIAddress: process.env.OWNERA_API_ADDRESS || 'https://api.finp2p.org',
       authConfig: {
         apiKey: process.env.FINP2P_API_KEY || '',

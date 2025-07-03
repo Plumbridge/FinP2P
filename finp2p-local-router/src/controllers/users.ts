@@ -1,7 +1,9 @@
+import { Request, Response } from 'express';
+
 /**
  * @description Get all users
  */
-exports.getUsers = async (req, res) => {
+export const getUsers = async (req: Request, res: Response) => {
   try {
     // TODO: Implement actual user retrieval logic
     // For now, return mock data
@@ -41,7 +43,7 @@ exports.getUsers = async (req, res) => {
 /**
  * @description Get a user by ID
  */
-exports.getUserById = async (req, res) => {
+export const getUserById = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     
@@ -73,7 +75,7 @@ exports.getUserById = async (req, res) => {
 /**
  * @description Create a new user
  */
-exports.createUser = async (req, res) => {
+export const createUser = async (req: Request, res: Response) => {
   try {
     const { username, email, password, role } = req.body;
     
@@ -113,7 +115,7 @@ exports.createUser = async (req, res) => {
 /**
  * @description Update a user
  */
-exports.updateUser = async (req, res) => {
+export const updateUser = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const { username, email, role } = req.body;
@@ -146,7 +148,7 @@ exports.updateUser = async (req, res) => {
 /**
  * @description Delete a user
  */
-exports.deleteUser = async (req, res) => {
+export const deleteUser = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     

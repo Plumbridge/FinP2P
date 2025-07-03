@@ -3,7 +3,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import swaggerUi from 'swagger-ui-express';
-import YAML from 'yamljs';
+import * as YAML from 'yamljs';
 import path from 'path';
 import dotenv from 'dotenv';
 
@@ -19,6 +19,7 @@ import assetRoutes from './routes/assets';
 import transferRoutes from './routes/transfers';
 import organizationRoutes from './routes/organization';
 import transactionRoutes from './routes/transactions';
+
 
 // Initialize express app
 const app = express();
@@ -44,7 +45,7 @@ app.use('/users', userRoutes);
 app.use('/assets', assetRoutes);
 app.use('/transfers', transferRoutes);
 app.use('/organization', organizationRoutes);
-app.use('/api/transactions', transactionRoutes);
+
 
 // Error handling middleware
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {

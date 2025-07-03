@@ -17,11 +17,18 @@
     "allowSyntheticDefaultImports": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
-    "noEmitOnError": false
+    "noEmitOnError": false,
+    "baseUrl": "../",
+    "paths": {
+      "@/*": ["src/*"],
+      "@types/*": ["src/types/*"],
+      "@adapters/*": ["src/adapters/*"],
+      "@router/*": ["src/router/*"],
+      "@utils/*": ["src/utils/*"]
+    }
   },
   "include": [
-    "src/**/*",
-    "../src/**/*"
+    "src/**/*"
   ],
   "exclude": [
     "node_modules",

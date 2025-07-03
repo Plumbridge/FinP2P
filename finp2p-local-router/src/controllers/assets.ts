@@ -1,7 +1,9 @@
+import { Request, Response } from 'express';
+
 /**
  * @description Get all assets
  */
-exports.getAssets = async (req, res) => {
+export const getAssets = async (req: Request, res: Response) => {
   try {
     // TODO: Implement actual asset retrieval logic
     // For now, return mock data
@@ -45,7 +47,7 @@ exports.getAssets = async (req, res) => {
 /**
  * @description Get an asset by ID
  */
-exports.getAssetById = async (req, res) => {
+export const getAssetById = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     
@@ -80,7 +82,7 @@ exports.getAssetById = async (req, res) => {
 /**
  * @description Create a new asset
  */
-exports.createAsset = async (req, res) => {
+export const createAsset = async (req: Request, res: Response) => {
   try {
     const { symbol, name, network, decimals, totalSupply } = req.body;
     
@@ -123,7 +125,7 @@ exports.createAsset = async (req, res) => {
 /**
  * @description Update an asset
  */
-exports.updateAsset = async (req, res) => {
+export const updateAsset = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const { symbol, name, isActive } = req.body;
@@ -159,7 +161,7 @@ exports.updateAsset = async (req, res) => {
 /**
  * @description Delete an asset
  */
-exports.deleteAsset = async (req, res) => {
+export const deleteAsset = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     

@@ -7,8 +7,8 @@
 
 import http from 'http';
 
-const HEALTH_CHECK_URL = 'http://localhost:3000/health';
-const TIMEOUT = 3000; // 3 seconds
+const HEALTH_CHECK_URL = `http://localhost:${process.env.PORT || 3000}/health`;
+const TIMEOUT = parseInt(process.env.HEALTH_CHECK_TIMEOUT || '3000', 10); // 3 seconds
 
 function performHealthCheck(): Promise<void> {
   return new Promise((resolve, reject) => {

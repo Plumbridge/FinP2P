@@ -1,7 +1,9 @@
+import { Request, Response } from 'express';
+
 /**
  * @description Get all transfers
  */
-exports.getTransfers = async (req, res) => {
+export const getTransfers = async (req: Request, res: Response) => {
   try {
     // TODO: Implement actual transfer retrieval logic
     // For now, return mock data
@@ -46,7 +48,7 @@ exports.getTransfers = async (req, res) => {
 /**
  * @description Get a transfer by ID
  */
-exports.getTransferById = async (req, res) => {
+export const getTransferById = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     
@@ -85,7 +87,7 @@ exports.getTransferById = async (req, res) => {
 /**
  * @description Create a new transfer
  */
-exports.createTransfer = async (req, res) => {
+export const createTransfer = async (req: Request, res: Response) => {
   try {
     const { fromAccount, toAccount, assetId, amount, metadata } = req.body;
     
@@ -128,7 +130,7 @@ exports.createTransfer = async (req, res) => {
 /**
  * @description Update a transfer status
  */
-exports.updateTransfer = async (req, res) => {
+export const updateTransfer = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const { status, transactionHash } = req.body;
@@ -164,7 +166,7 @@ exports.updateTransfer = async (req, res) => {
 /**
  * @description Cancel a transfer
  */
-exports.cancelTransfer = async (req, res) => {
+export const cancelTransfer = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     

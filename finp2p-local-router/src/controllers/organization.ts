@@ -1,7 +1,9 @@
+import { Request, Response } from 'express';
+
 /**
  * @description Get organization information
  */
-exports.getOrganization = async (req, res) => {
+export const getOrganization = async (req: Request, res: Response) => {
   try {
     // TODO: Implement actual organization retrieval logic
     // For now, return mock data
@@ -13,8 +15,8 @@ exports.getOrganization = async (req, res) => {
       status: 'active',
       supportedNetworks: ['hedera', 'sui'],
       endpoints: {
-        api: 'http://localhost:3000',
-        websocket: 'ws://localhost:3000/ws'
+        api: `http://localhost:${process.env.PORT || 3000}`,
+        websocket: `ws://localhost:${process.env.PORT || 3000}/ws`
       },
       createdAt: '2024-01-01T00:00:00Z',
       updatedAt: new Date().toISOString()
@@ -38,7 +40,7 @@ exports.getOrganization = async (req, res) => {
 /**
  * @description Update organization information
  */
-exports.updateOrganization = async (req, res) => {
+export const updateOrganization = async (req: Request, res: Response) => {
   try {
     const { name, description, status } = req.body;
     
@@ -52,8 +54,8 @@ exports.updateOrganization = async (req, res) => {
       status: status || 'active',
       supportedNetworks: ['hedera', 'sui'],
       endpoints: {
-        api: 'http://localhost:3000',
-        websocket: 'ws://localhost:3000/ws'
+        api: `http://localhost:${process.env.PORT || 3000}`,
+        websocket: `ws://localhost:${process.env.PORT || 3000}/ws`
       },
       updatedAt: new Date().toISOString()
     };
@@ -76,7 +78,7 @@ exports.updateOrganization = async (req, res) => {
 /**
  * @description Get organization configuration
  */
-exports.getConfiguration = async (req, res) => {
+export const getConfiguration = async (req: Request, res: Response) => {
   try {
     // TODO: Implement actual configuration retrieval logic
     // For now, return mock data
@@ -124,7 +126,7 @@ exports.getConfiguration = async (req, res) => {
 /**
  * @description Update organization configuration
  */
-exports.updateConfiguration = async (req, res) => {
+export const updateConfiguration = async (req: Request, res: Response) => {
   try {
     const { networks, features, limits } = req.body;
     

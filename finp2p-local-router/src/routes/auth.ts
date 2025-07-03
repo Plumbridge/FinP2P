@@ -1,33 +1,34 @@
-const express = require('express');
-const router = express.Router();
-const authController = require('../controllers/auth');
+import { Router } from 'express';
+import { login, refreshToken, logout, verifyToken } from '../controllers/auth';
+
+const router = Router();
 
 /**
  * @route POST /auth/login
  * @description Authenticate a user and get a token
  * @access Public
  */
-router.post('/login', authController.login);
+router.post('/login', login);
 
 /**
  * @route POST /auth/token
  * @description Get a new access token using a refresh token
  * @access Public
  */
-router.post('/token', authController.refreshToken);
+router.post('/token', refreshToken);
 
 /**
  * @route POST /auth/logout
  * @description Logout a user and invalidate their tokens
  * @access Private
  */
-router.post('/logout', authController.logout);
+router.post('/logout', logout);
 
 /**
  * @route GET /auth/verify
  * @description Verify a token is valid
  * @access Public
  */
-router.get('/verify', authController.verifyToken);
+router.get('/verify', verifyToken);
 
-module.exports = router;
+export default router;

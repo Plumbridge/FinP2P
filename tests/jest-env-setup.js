@@ -36,6 +36,7 @@ function detectRedisContainer() {
       if (portMatch) {
         const port = parseInt(portMatch[1]);
         console.log(`✅ Found Redis test container on port ${port}`);
+        console.log(`Redis container info: ${line}`);
         return {
           url: `redis://localhost:${port}`,
           port: port
