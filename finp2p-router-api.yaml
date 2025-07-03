@@ -1,0 +1,573 @@
+openapi: 3.0.3
+info:
+  title: FinP2P Router API
+  description: API specification for FinP2P Router implementation
+  version: 1.0.0
+  contact:
+    name: FinP2P Router Support
+    email: support@finp2p.org
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: http://localhost:3000
+    description: Local development server
+  - url: https://api.finp2p.org
+    description: Production server
+
+paths:
+  /health:
+    get:
+      tags:
+        - Health
+      summary: Health check endpoint
+      description: Returns the health status of the router
+      responses:
+        '200':
+          description: Router is healthy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+
+  /info:
+    get:
+      tags:
+        - Router
+      summary: Get router information
+      description: Returns information about the router
+      responses:
+        '200':
+          description: Router information
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RouterInfo'
+
+  /auth/token:
+    post:
+      tags:
+        - Authentication
+      summary: Authenticate and get access token
+      description: Authenticate with the router and receive an access token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthRequest'
+      responses:
+        '200':
+          description: Authentication successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '401':
+          description: Authentication failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /users:
+    post:
+      tags:
+        - Users
+      summary: Create a new user
+      description: Create a new user in the FinP2P network
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateUserRequest'
+      responses:
+        '201':
+          description: User created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /users/{userId}:
+    get:
+      tags:
+        - Users
+      summary: Get user by ID
+      description: Retrieve user information by user ID
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The user ID
+      responses:
+        '200':
+          description: User information
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /assets:
+    post:
+      tags:
+        - Assets
+      summary: Create a new asset
+      description: Create a new asset in the FinP2P network
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAssetRequest'
+      responses:
+        '201':
+          description: Asset created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Asset'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /assets/{assetId}:
+    get:
+      tags:
+        - Assets
+      summary: Get asset by ID
+      description: Retrieve asset information by asset ID
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: assetId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The asset ID
+      responses:
+        '200':
+          description: Asset information
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Asset'
+        '404':
+          description: Asset not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /transfers:
+    post:
+      tags:
+        - Transfers
+      summary: Create a new transfer
+      description: Initiate a new transfer between accounts
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTransferRequest'
+      responses:
+        '201':
+          description: Transfer created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Transfer'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    get:
+      tags:
+        - Transfers
+      summary: List transfers
+      description: Get a list of transfers
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [pending, completed, failed, cancelled]
+          description: Filter by transfer status
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+          description: Number of transfers to return
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+          description: Number of transfers to skip
+      responses:
+        '200':
+          description: List of transfers
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransferList'
+
+  /transfers/{transferId}:
+    get:
+      tags:
+        - Transfers
+      summary: Get transfer by ID
+      description: Retrieve transfer information by transfer ID
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: transferId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The transfer ID
+      responses:
+        '200':
+          description: Transfer information
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Transfer'
+        '404':
+          description: Transfer not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /organization:
+    get:
+      tags:
+        - Organization
+      summary: Get organization information
+      description: Retrieve information about the organization
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Organization information
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Organization'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    HealthResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: healthy
+        router:
+          $ref: '#/components/schemas/RouterInfo'
+        uptime:
+          type: number
+          example: 3600.5
+        timestamp:
+          type: string
+          format: date-time
+        sdk:
+          type: object
+          properties:
+            nodeId:
+              type: string
+            custodianOrgId:
+              type: string
+
+    RouterInfo:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        institutionId:
+          type: string
+        endpoint:
+          type: string
+        publicKey:
+          type: string
+        supportedLedgers:
+          type: array
+          items:
+            type: string
+        status:
+          type: string
+          enum: [online, offline, maintenance]
+        lastSeen:
+          type: string
+          format: date-time
+        metadata:
+          type: object
+          properties:
+            version:
+              type: string
+            capabilities:
+              type: array
+              items:
+                type: string
+            institution:
+              type: object
+              properties:
+                name:
+                  type: string
+                country:
+                  type: string
+
+    AuthRequest:
+      type: object
+      required:
+        - apiKey
+        - signature
+      properties:
+        apiKey:
+          type: string
+        signature:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+
+    AuthResponse:
+      type: object
+      properties:
+        token:
+          type: string
+        expiresIn:
+          type: integer
+        tokenType:
+          type: string
+          example: Bearer
+
+    CreateUserRequest:
+      type: object
+      required:
+        - userId
+        - publicKey
+      properties:
+        userId:
+          type: string
+        publicKey:
+          type: string
+        metadata:
+          type: object
+
+    User:
+      type: object
+      properties:
+        userId:
+          type: string
+        publicKey:
+          type: string
+        status:
+          type: string
+          enum: [active, inactive, suspended]
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        metadata:
+          type: object
+
+    CreateAssetRequest:
+      type: object
+      required:
+        - assetId
+        - name
+        - symbol
+        - totalSupply
+      properties:
+        assetId:
+          type: string
+        name:
+          type: string
+        symbol:
+          type: string
+        totalSupply:
+          type: string
+        decimals:
+          type: integer
+          minimum: 0
+          maximum: 18
+          default: 18
+        metadata:
+          type: object
+
+    Asset:
+      type: object
+      properties:
+        assetId:
+          type: string
+        name:
+          type: string
+        symbol:
+          type: string
+        totalSupply:
+          type: string
+        decimals:
+          type: integer
+        status:
+          type: string
+          enum: [active, inactive, frozen]
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        metadata:
+          type: object
+
+    CreateTransferRequest:
+      type: object
+      required:
+        - fromAccount
+        - toAccount
+        - assetId
+        - amount
+      properties:
+        fromAccount:
+          type: string
+        toAccount:
+          type: string
+        assetId:
+          type: string
+        amount:
+          type: string
+        metadata:
+          type: object
+
+    Transfer:
+      type: object
+      properties:
+        id:
+          type: string
+        fromAccount:
+          type: string
+        toAccount:
+          type: string
+        assetId:
+          type: string
+        amount:
+          type: string
+        status:
+          type: string
+          enum: [pending, completed, failed, cancelled]
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        route:
+          type: array
+          items:
+            type: object
+            properties:
+              routerId:
+                type: string
+              timestamp:
+                type: string
+                format: date-time
+        metadata:
+          type: object
+
+    TransferList:
+      type: object
+      properties:
+        transfers:
+          type: array
+          items:
+            $ref: '#/components/schemas/Transfer'
+        total:
+          type: integer
+        limit:
+          type: integer
+        offset:
+          type: integer
+
+    Organization:
+      type: object
+      properties:
+        orgId:
+          type: string
+        name:
+          type: string
+        country:
+          type: string
+        status:
+          type: string
+          enum: [active, inactive, suspended]
+        createdAt:
+          type: string
+          format: date-time
+        metadata:
+          type: object
+
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+        message:
+          type: string
+        code:
+          type: integer
+        timestamp:
+          type: string
+          format: date-time
+
+security:
+  - bearerAuth: []

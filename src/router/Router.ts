@@ -163,7 +163,7 @@ export class FinP2PRouter extends EventEmitter {
         maxRetriesPerRequest: 1,
       });
 
-      this.redis.on('error', (err) => {
+      this.redis.on('error', (err: Error) => {
         this.logger.error('Redis connection error:', err);
       });
 

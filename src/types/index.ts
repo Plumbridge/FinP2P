@@ -268,3 +268,6 @@ export interface ConfigOptions {
     logLevel: string;
   };
 }
+
+// Export transaction types
+export type { TransactionRequest, TransactionResponse, LedgerTransactionResult } from './transactions';

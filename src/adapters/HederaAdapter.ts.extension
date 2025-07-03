@@ -1,0 +1,37 @@
+/**
+ * Creates a transfer transaction and returns a transaction result
+ * This method is used by the FinP2PCore for cross-ledger transfers
+ * 
+ * @param req - The transaction request containing transfer details
+ * @returns Promise resolving to a ledger transaction result
+ */
+async createTransfer(req: TransactionRequest): Promise<LedgerTransactionResult> {
+  if (!this.isConnected()) {
+    throw new Error('Not connected to Hedera network');
+  }
+
+  try {
+    // Generate an operation ID if not provided
+    const operationId = req.operationId || `hedera-${Date.now()}-${Math.random().toString(36).substring(2, 15)}`;
+    this.logger.info(`Creating Hedera transfer with operation ID: ${operationId}`);
+    
+    // Execute the transfer using the existing transfer method
+    const txHash = await this.transfer(req.fromAccount, req.toAccount, req.assetId, req.amount);
+    
+    // Return the transaction result
+    return {
+      operationId,
+      transactionHash: txHash,
+      status: 'completed', // Simplified for demo - in reality would check status
+      timestamp: new Date().toISOString(),
+      ledger: this.ledgerId,
+      fromAccount: req.fromAccount,
+      toAccount: req.toAccount,
+      assetId: req.assetId,
+      amount: req.amount.toString()
+    };
+  } catch (error) {
+    this.logger.error('Failed to create Hedera transfer:', error);
+    throw error;
+  }
+}

@@ -13,6 +13,20 @@ FinP2P is a peer-to-peer routing protocol designed for financial institutions to
 
 ## 🚀 Features
 
+### Two Implementation Options
+
+#### 1. Custom FinP2P Implementation (Original)
+- **Custom Router**: Full custom implementation for research and development
+- **DLT Adapters**: Sui and Hedera adapters with extensible pattern
+- **Network Features**: Multi-router network with peer discovery
+- **Educational**: Perfect for understanding FinP2P internals
+
+#### 2. Official FinP2P SDK Implementation (New)
+- **Official SDK**: Uses `@owneraio/finp2p-sdk-js` for production-ready implementation
+- **Ownera Integration**: Direct integration with Ownera's FinP2P network
+- **Production Ready**: Battle-tested SDK with full FinP2P protocol support
+- **Enterprise Features**: Advanced authentication, custody adapters, and more
+
 ### Core Router Capabilities
 - **Unique FinID Management**: Standardized identity system for entities across networks
 - **Message Routing**: Efficient peer-to-peer communication between routers
@@ -20,7 +34,7 @@ FinP2P is a peer-to-peer routing protocol designed for financial institutions to
 - **Event Emission**: Real-time transfer and state change notifications
 - **Cross-Ledger Transfers**: Seamless asset movement between different DLTs
 
-### DLT Adapters
+### DLT Adapters (Custom Implementation)
 - **Sui Adapter**: Full integration with Sui testnet using Sui SDK
 - **Hedera Adapter**: Complete Hedera testnet integration with HCS support
 - **Extensible Pattern**: Easy addition of new blockchain adapters
@@ -198,7 +212,53 @@ docker ps | grep redis
 
 # Run all tests
 npm test
+```
 
+## 🔄 Using the FinP2P SDK Implementation
+
+This project now includes an implementation using the official FinP2P SDK from Ownera.
+
+### Setup for SDK Implementation
+
+1. **Configure Environment Variables**
+
+   Copy the SDK environment example file and fill in your FinP2P credentials:
+   ```bash
+   cp .env.sdk.example .env
+   ```
+   
+   Required environment variables:
+   - `FINP2P_ORG_ID` - Your organization ID in the FinP2P network
+   - `OWNERA_API_ADDRESS` - Ownera API endpoint
+   - `FINP2P_API_KEY` - Your FinP2P API key
+   - `FINP2P_PRIVATE_KEY` - Your private key for signing transactions
+
+2. **Run the SDK-based Router**
+
+   Development mode:
+   ```bash
+   npm run dev:sdk
+   ```
+   
+   Production mode (after building):
+   ```bash
+   npm run build
+   npm run start:sdk
+   ```
+
+3. **Access SDK Router Endpoints**
+
+   - Health Check: `http://localhost:3000/health`
+   - Router Info: `http://localhost:3000/info`
+   - User Creation: `POST http://localhost:3000/users`
+   - Asset Creation: `POST http://localhost:3000/assets`
+
+### Switching Between Implementations
+
+You can easily switch between the custom implementation and the SDK-based implementation:
+
+- **Custom Implementation**: `npm run dev` or `npm start`
+- **SDK Implementation**: `npm run dev:sdk` or `npm run start:sdk`
 # Or run tests without Docker setup/teardown
 npm run test:no-docker
 ```

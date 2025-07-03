@@ -685,4 +685,44 @@ export class SuiAdapter extends EventEmitter implements LedgerAdapter {
     return LedgerType.SUI;
   }
 
+  /**
+   * Creates a transfer transaction and returns a transaction result
+   * This method is used by the FinP2PCore for cross-ledger transfers
+   * 
+   * @param req - The transaction request containing transfer details
+   * @returns Promise resolving to a ledger transaction result
+   */
+  async createTransfer(req: any): Promise<any> {
+    if (!this.connected) {
+      throw new Error('Not connected to Sui network');
+    }
+
+    try {
+      // Use the operation ID from the request or generate a new one
+      const operationId = req.operationId || `sui-${Date.now()}-${Math.random().toString(36).substring(2, 15)}`;
+      this.logger.info(`Creating Sui transfer with operation ID: ${operationId}`);
+      
+      // Prepare the transfer transaction
+      const prepared = await this.prepareTransfer(req.fromAccount, req.toAccount, req.assetId, req.amount);
+      
+      // Execute the prepared transaction
+      const txHash = await this.executeTransfer(prepared);
+      
+      // Return the transaction result
+      return {
+        operationId,
+        transactionHash: txHash,
+        status: 'completed', // Simplified for demo - in reality would check status
+        timestamp: new Date().toISOString(),
+        ledger: this.ledgerId,
+        fromAccount: req.fromAccount,
+        toAccount: req.toAccount,
+        assetId: req.assetId,
+        amount: req.amount.toString()
+      };
+    } catch (error) {
+      this.logger.error('Failed to create Sui transfer:', error);
+      throw error;
+    }
+  }
 }
