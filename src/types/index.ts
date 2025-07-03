@@ -54,6 +54,7 @@ export interface Account {
   ledgerId: string;
   institutionId: string;
   balances: Map<string, bigint>; // assetId -> balance
+  metadata?: Record<string, any>;
   createdAt: Date;
   updatedAt: Date;
 }

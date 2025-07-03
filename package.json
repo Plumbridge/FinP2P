@@ -34,7 +34,15 @@
     "docs:generate": "typedoc --out docs src",
     "benchmark": "node dist/scripts/benchmark.js",
     "migrate": "node dist/scripts/migrate.js",
-    "seed": "node dist/scripts/seed.js"
+    "seed": "node dist/scripts/seed.js",
+    "test:connection": "node test-testnet-connection.js",
+    "demo:testnet": "node demos/real-blockchain-testnet-demo.js",
+    "verify:testnet": "node verify-testnet-connections.js",
+    "test:adapters": "node test-adapter-connections.js",
+    "test:testnet": "ts-node scripts/test-real-testnet.ts",
+    "test:unit": "jest --testPathPattern=tests/utils --testPathPattern=tests/types",
+    "test:no-integration": "jest --testPathIgnorePatterns=integration --testPathIgnorePatterns=adapters",
+    "build:watch": "tsc --watch"
   },
   "keywords": [
     "finp2p",

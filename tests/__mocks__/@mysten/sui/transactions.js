@@ -38,6 +38,4 @@ const Transaction = jest.fn().mockImplementation(createMockTransaction);
 
 module.exports = {
   Transaction,
-  mockPure,
-  mockObject,
 };

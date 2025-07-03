@@ -14,6 +14,9 @@ module.exports = {
     '^.+\.js$': 'babel-jest',
   },
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
+  moduleNameMapper: {
+    '^@mysten/sui/transactions$': '<rootDir>/tests/__mocks__/@mysten/sui/transactions.js'
+  },
   clearMocks: true,
   restoreMocks: true,
   resetMocks: true,

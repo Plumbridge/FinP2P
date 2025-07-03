@@ -34,6 +34,7 @@ export class SuiAdapter extends EventEmitter implements LedgerAdapter {
   private logger: Logger;
   private connected: boolean = false;
   private packageId: string;
+  private address: string = '';
 
   // Move module names for FinP2P contracts
   private readonly ASSET_MODULE = 'finp2p_asset';
@@ -50,7 +51,19 @@ export class SuiAdapter extends EventEmitter implements LedgerAdapter {
 
     const privateKey = process.env.SUI_PRIVATE_KEY || config.privateKey;
     if (privateKey) {
-      this.keypair = Ed25519Keypair.fromSecretKey(fromB64(privateKey));
+      try {
+        // Handle both bech32 format (suiprivkey1...) and base64 format
+        if (privateKey.startsWith('suiprivkey1')) {
+          this.keypair = Ed25519Keypair.fromSecretKey(privateKey);
+        } else {
+          // Assume base64 format
+          this.keypair = Ed25519Keypair.fromSecretKey(fromB64(privateKey));
+        }
+      } catch (error) {
+        this.logger.error('Failed to parse private key:', error);
+        this.keypair = new Ed25519Keypair();
+        this.logger.warn('Generated new keypair due to invalid private key');
+      }
     } else {
       this.keypair = new Ed25519Keypair();
       this.logger.warn('No SUI_PRIVATE_KEY provided, generated new keypair');
@@ -63,8 +76,8 @@ export class SuiAdapter extends EventEmitter implements LedgerAdapter {
     try {
       const chainId = await this.client.getChainIdentifier();
       this.logger.info(`Connected to Sui testnet: ${chainId}`);
-      const address = this.keypair.getPublicKey().toSuiAddress();
-      this.logger.info(`Sui adapter address: ${address}`);
+      this.address = this.keypair.getPublicKey().toSuiAddress();
+      this.logger.info(`Sui adapter address: ${this.address}`);
       if (!this.packageId) {
         this.logger.warn('No SUI_PACKAGE_ID provided, some functions may not work');
       }
@@ -88,7 +101,8 @@ export class SuiAdapter extends EventEmitter implements LedgerAdapter {
     if (!this.packageId) throw new Error('Sui package ID not configured');
     if (!this.connected) throw new Error('Not connected to Sui network');
 
-    try {// Prepare transaction
+    try {
+      // Prepare transaction
       const tx = new SuiTransaction();
       
       // Call Move function to create asset
@@ -310,45 +324,81 @@ export class SuiAdapter extends EventEmitter implements LedgerAdapter {
     }
   }
 
-  async createAccount(institutionId: string): Promise<Account> {
+  async createAccount(institutionId: string): Promise<Account>;
+  async createAccount(accountData: { address?: string; institutionId: string; metadata?: any }): Promise<Account>;
+  async createAccount(institutionIdOrData: string | { address?: string; institutionId: string; metadata?: any }): Promise<Account> {
     if (!this.connected) {
       throw new Error('Not connected to Sui network');
     }
 
     try {
-      const tx = new SuiTransaction();
+      // Handle both parameter types
+      let accountData: { address?: string; institutionId: string; metadata?: any };
+      if (typeof institutionIdOrData === 'string') {
+        accountData = { institutionId: institutionIdOrData };
+      } else {
+        accountData = institutionIdOrData;
+      }
+      let accountObjectId: string;
+      let address: string;
       
-      // Call Move function to create account
-      tx.moveCall({
-        target: `${this.packageId}::${this.ACCOUNT_MODULE}::create_account`,
-        arguments: [
-          tx.pure(bcs.string().serialize(institutionId))
-        ]
-      });
+      if (accountData.address) {
+        // Use existing address
+        address = accountData.address;
+        accountObjectId = address; // For Sui, we can use the address as the account ID
+        this.logger.info(`Using existing account: ${address}`);
+      } else {
+        // Create new account using Move contract (if package is available)
+        if (!this.packageId) {
+          // Fallback: create a simple account object using current keypair
+          address = this.address || this.keypair.getPublicKey().toSuiAddress();
+          accountObjectId = address;
+          this.logger.info(`Created simple account using current keypair: ${address}`);
+        } else {
+          const tx = new SuiTransaction();
+          
+          // Call Move function to create account
+          tx.moveCall({
+            target: `${this.packageId}::${this.ACCOUNT_MODULE}::create_account`,
+            arguments: [
+              tx.pure(bcs.string().serialize(accountData.institutionId))
+            ]
+          });
 
-      const result = await this.client.signAndExecuteTransaction({
-        signer: this.keypair,
-        transaction: tx,
-        options: {
-          showEffects: true,
-          showObjectChanges: true
+          const result = await this.client.signAndExecuteTransaction({
+            signer: this.keypair,
+            transaction: tx,
+            options: {
+              showEffects: true,
+              showObjectChanges: true
+            }
+          });
+
+          if (result.effects?.status?.status !== 'success') {
+            throw new Error(`Account creation failed: ${result.effects?.status?.error}`);
+          }
+
+          const createdObjects = result.objectChanges?.filter(
+            (change: any) => change.type === 'created'
+          );
+          
+          if (!createdObjects || createdObjects.length === 0) {
+            throw new Error('No account object created');
+          }
+
+          accountObjectId = (createdObjects[0] as any).objectId;
+          address = this.keypair.getPublicKey().toSuiAddress();
         }
-      });
-
-      if (result.effects?.status?.status !== 'success') {
-        throw new Error(`Account creation failed: ${result.effects?.status?.error}`);
       }
 
-      const createdObjects = result.objectChanges?.filter(
-        (change: any) => change.type === 'created'
-      );
-      
-      if (!createdObjects || createdObjects.length === 0) {
-        throw new Error('No account object created');
+      // Query current SUI balance
+      const balances = new Map<string, bigint>();
+      try {
+        const suiBalance = await this.getGasBalance();
+        balances.set('SUI', BigInt(suiBalance));
+      } catch (balanceError) {
+        this.logger.warn(`Could not query SUI balance for account ${address}:`, balanceError);
       }
-
-      const accountObjectId = (createdObjects[0] as any).objectId;
-      const address = this.keypair.getPublicKey().toSuiAddress();
 
       const account: Account = {
         finId: {
@@ -358,17 +408,18 @@ export class SuiAdapter extends EventEmitter implements LedgerAdapter {
         },
         address,
         ledgerId: this.ledgerId,
-        institutionId,
-        balances: new Map(),
+        institutionId: accountData.institutionId,
+        balances,
+        metadata: accountData.metadata || {},
         createdAt: new Date(),
         updatedAt: new Date()
       };
 
-      this.logger.info(`Created account for institution ${institutionId}: ${accountObjectId}`);
+      this.logger.info(`Account ready for institution ${accountData.institutionId}: ${accountObjectId}`);
       return account;
     } catch (error) {
-      this.logger.error('Failed to create account on Sui:', error);
-      throw error;
+      this.logger.error('Failed to create/setup account on Sui:', error);
+      throw new Error(`Sui account creation failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   }
 

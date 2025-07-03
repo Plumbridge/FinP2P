@@ -6,6 +6,9 @@ const fs = require('fs');
 const path = require('path');
 const { execSync } = require('child_process');
 
+// Load environment variables from .env file
+require('dotenv').config({ path: path.join(__dirname, '..', '.env') });
+
 // Read from centralized test config
 const configFile = path.join(__dirname, 'test-config.json');
 
