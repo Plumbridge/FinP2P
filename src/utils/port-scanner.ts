@@ -23,13 +23,13 @@ export async function findAvailablePort(startPort: number = 6380, maxAttempts: n
 export async function isPortAvailable(port: number): Promise<boolean> {
   return new Promise((resolve) => {
     const server = createServer();
-    
+
     server.listen(port, () => {
       server.close(() => {
         resolve(true);
       });
     });
-    
+
     server.on('error', () => {
       resolve(false);
     });
@@ -44,14 +44,14 @@ export async function isPortAvailable(port: number): Promise<boolean> {
  */
 export async function getRandomAvailablePort(min: number = 49152, max: number = 65535): Promise<number> {
   const maxAttempts = 50;
-  
+
   for (let attempt = 0; attempt < maxAttempts; attempt++) {
     const port = Math.floor(Math.random() * (max - min + 1)) + min;
     if (await isPortAvailable(port)) {
       return port;
     }
   }
-  
+
   // Fallback to sequential search if random fails
   return findAvailablePort(min, max - min);
 }

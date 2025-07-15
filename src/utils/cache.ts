@@ -62,10 +62,10 @@ export class CacheManager {
 
   async set<T>(key: string, value: T, ttl?: number): Promise<void> {
     const actualTTL = ttl || this.defaultTTL;
-    
+
     // Set in memory cache
     this.setMemory(key, value, actualTTL);
-    
+
     // Set in Redis cache
     if (this.redis) {
       try {
@@ -74,7 +74,7 @@ export class CacheManager {
         this.logger.warn(`Redis cache set failed for key ${key}:`, error);
       }
     }
-    
+
     this.stats.sets++;
   }
 
@@ -82,7 +82,7 @@ export class CacheManager {
     // Remove from memory cache
     this.memoryCache.delete(key);
     this.accessOrder = this.accessOrder.filter(k => k !== key);
-    
+
     // Remove from Redis cache
     if (this.redis) {
       try {
@@ -96,7 +96,7 @@ export class CacheManager {
   async clear(): Promise<void> {
     this.memoryCache.clear();
     this.accessOrder = [];
-    
+
     if (this.redis) {
       try {
         await this.redis.flushDb();

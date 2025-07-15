@@ -18,7 +18,7 @@ export abstract class FinP2PError extends Error {
     this.code = code;
     this.timestamp = new Date();
     this.context = context;
-    
+
     // Maintains proper stack trace for where our error was thrown
     Error.captureStackTrace(this, this.constructor);
   }
@@ -244,21 +244,21 @@ export function createError(
   context?: Record<string, unknown>
 ): FinP2PError {
   switch (type) {
-    case 'connection':
-      return new ConnectionError(message, context);
-    case 'validation':
-      return new ValidationError(message, context);
-    case 'transfer':
-      return new TransferError(message, context);
-    case 'asset':
-      return new AssetError(message, context);
-    case 'ledger':
-      return new LedgerError(message, context);
-    case 'router':
-      return new RouterError(message, context);
-    case 'crypto':
-      return new CryptoError(message, context);
-    default:
-      throw new Error(`Unknown error type: ${type}`);
+  case 'connection':
+    return new ConnectionError(message, context);
+  case 'validation':
+    return new ValidationError(message, context);
+  case 'transfer':
+    return new TransferError(message, context);
+  case 'asset':
+    return new AssetError(message, context);
+  case 'ledger':
+    return new LedgerError(message, context);
+  case 'router':
+    return new RouterError(message, context);
+  case 'crypto':
+    return new CryptoError(message, context);
+  default:
+    throw new Error(`Unknown error type: ${type}`);
   }
 }

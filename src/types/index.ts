@@ -151,32 +151,32 @@ export interface LedgerAdapter {
   ledgerId: string;
   name: string;
   type: LedgerType;
-  
+
   // Core operations
   connect(): Promise<void>;
   disconnect(): Promise<void>;
   isConnected(): boolean;
-  
+
   // Asset operations
   createAsset(asset: Omit<Asset, 'id' | 'createdAt' | 'updatedAt'>): Promise<Asset>;
   getAsset(assetId: string): Promise<Asset | null>;
-  
+
   // Account operations
   createAccount(institutionId: string): Promise<Account>;
   getAccount(accountId: string): Promise<Account | null>;
   getBalance(accountId: string, assetId: string): Promise<bigint>;
   getLockedBalance(accountId: string, assetId: string): Promise<bigint>;
   getAvailableBalance(accountId: string, assetId: string): Promise<bigint>;
-  
+
   // Transfer operations
   transfer(from: string, to: string, assetId: string, amount: bigint): Promise<string>;
   lockAsset(accountId: string, assetId: string, amount: bigint): Promise<string>;
   unlockAsset(accountId: string, assetId: string, amount: bigint): Promise<string>;
-  
+
   // Query operations
   getTransaction(txHash: string): Promise<Transaction | null>;
   getTransactionStatus(txHash: string): Promise<TransactionStatus>;
-  
+
   // Balance history operations
   getBalanceHistory(accountId: string): Array<{ timestamp: Date; assetId: string; balance: bigint; operation: string }>;
 }

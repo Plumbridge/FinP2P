@@ -118,7 +118,7 @@ export class RequestBatcher<TRequest, TResponse> extends EventEmitter {
     } catch (error) {
       this.stats.errors++;
       this.logger.error('Batch processing failed:', error);
-      
+
       // Reject all requests in the batch
       batch.forEach(batchedRequest => {
         batchedRequest.reject(error as Error);
@@ -128,9 +128,9 @@ export class RequestBatcher<TRequest, TResponse> extends EventEmitter {
 
   private updateAverages(batchSize: number, waitTime: number): void {
     const totalBatches = this.stats.batchesProcessed;
-    this.stats.averageBatchSize = 
+    this.stats.averageBatchSize =
       (this.stats.averageBatchSize * (totalBatches - 1) + batchSize) / totalBatches;
-    this.stats.averageWaitTime = 
+    this.stats.averageWaitTime =
       (this.stats.averageWaitTime * (totalBatches - 1) + waitTime) / totalBatches;
   }
 }
@@ -148,7 +148,7 @@ export class PeerRequestBatcher {
 
   async batchRequest(endpoint: string, path: string, data: any): Promise<any> {
     const batcherKey = `${endpoint}:${path}`;
-    
+
     if (!this.batchers.has(batcherKey)) {
       const batcher = new RequestBatcher(
         (requests) => this.processPeerBatch(endpoint, path, requests),

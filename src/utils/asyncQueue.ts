@@ -126,7 +126,7 @@ export class AsyncQueue<T = any> extends EventEmitter {
 
     const item = this.queue.shift()!;
     this.stats.currentSize = this.queue.length;
-    
+
     const waitTime = Date.now() - item.addedAt;
     this.updateAverageWaitTime(waitTime);
 
@@ -144,10 +144,10 @@ export class AsyncQueue<T = any> extends EventEmitter {
    */
   private async executeItem(item: QueueItem<T>): Promise<void> {
     const startTime = Date.now();
-    
+
     try {
       this.emit('processing', item);
-      
+
       let result: any;
       if (item.timeout) {
         result = await this.withTimeout(item.task(), item.timeout);
@@ -157,26 +157,26 @@ export class AsyncQueue<T = any> extends EventEmitter {
 
       const processTime = Date.now() - startTime;
       this.updateAverageProcessTime(processTime);
-      
+
       item.resolve(result);
       this.stats.totalProcessed++;
       this.emit('completed', item, result);
-      
+
     } catch (error) {
       const processTime = Date.now() - startTime;
       this.updateAverageProcessTime(processTime);
-      
+
       if (item.retries < item.maxRetries) {
         item.retries++;
         this.logger.warn(`Retrying task ${item.id}, attempt ${item.retries}/${item.maxRetries}`);
-        
+
         // Add back to queue with delay
         setTimeout(() => {
           this.queue.unshift(item);
           this.stats.currentSize = this.queue.length;
           this.processNext();
         }, this.calculateRetryDelay(item.retries));
-        
+
         return;
       }
 
@@ -210,11 +210,11 @@ export class AsyncQueue<T = any> extends EventEmitter {
   clear(): void {
     const clearedItems = this.queue.splice(0);
     this.stats.currentSize = 0;
-    
+
     clearedItems.forEach(item => {
       item.reject(new Error('Queue cleared'));
     });
-    
+
     this.emit('cleared', clearedItems.length);
   }
 
@@ -294,7 +294,7 @@ export class AsyncQueue<T = any> extends EventEmitter {
     if (total === 0) {
       this.stats.averageProcessingTime = processTime;
     } else {
-      this.stats.averageProcessingTime = 
+      this.stats.averageProcessingTime =
         (this.stats.averageProcessingTime * total + processTime) / (total + 1);
     }
   }
@@ -312,7 +312,7 @@ export class RouterOperationQueue {
 
   constructor(logger: Logger) {
     this.logger = logger;
-    
+
     // Different concurrency limits for different operation types
     this.transferQueue = new AsyncQueue({ concurrency: 3 }, logger); // Conservative for transfers
     this.assetQueue = new AsyncQueue({ concurrency: 5 }, logger);     // Moderate for assets

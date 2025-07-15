@@ -59,7 +59,7 @@ export class CryptoUtils {
       const sign = crypto.createSign('SHA256');
       sign.update(data);
       sign.end();
-      
+
       const signature = sign.sign(this.privateKey, 'base64');
       return signature;
     } catch (error) {
@@ -73,7 +73,7 @@ export class CryptoUtils {
       const verify = crypto.createVerify('SHA256');
       verify.update(data);
       verify.end();
-      
+
       return verify.verify(keyToUse, signature, 'base64');
     } catch (error) {
       console.error('Signature verification failed:', error);
@@ -97,11 +97,11 @@ export class CryptoUtils {
     const algorithm = 'aes-256-cbc';
     const encryptionKey = key ? crypto.createHash('sha256').update(key).digest() : crypto.randomBytes(32);
     const iv = crypto.randomBytes(16);
-    
+
     const cipher = crypto.createCipheriv(algorithm, encryptionKey, iv);
     let encrypted = cipher.update(data, 'utf8', 'hex');
     encrypted += cipher.final('hex');
-    
+
     return {
       encrypted,
       iv: iv.toString('hex')
@@ -112,11 +112,11 @@ export class CryptoUtils {
     const algorithm = 'aes-256-cbc';
     const encryptionKey = crypto.createHash('sha256').update(key).digest();
     const ivBuffer = Buffer.from(iv, 'hex');
-    
+
     const decipher = crypto.createDecipheriv(algorithm, encryptionKey, ivBuffer);
     let decrypted = decipher.update(encryptedData, 'hex', 'utf8');
     decrypted += decipher.final('utf8');
-    
+
     return decrypted;
   }
 

@@ -207,15 +207,15 @@ export class ConnectionPool<T> extends EventEmitter {
     // Find connections to destroy
     for (let i = this.connections.length - 1; i >= 0; i--) {
       const conn = this.connections[i];
-      
+
       // Skip if in use
       if (conn.inUse) continue;
-      
+
       // Check if idle too long or invalid
       const isIdle = (now - conn.lastUsed) > idleTimeoutMs;
       const isInvalid = !this.validator(conn.connection);
       const canDestroy = this.connections.length > minConnections;
-      
+
       if ((isIdle || isInvalid) && canDestroy) {
         toDestroy.push(conn);
         this.connections.splice(i, 1);
@@ -283,11 +283,11 @@ export class HttpConnectionPool {
       totalPools: this.pools.size,
       pools: {} as Record<string, any>
     };
-    
+
     for (const [endpoint, pool] of this.pools.entries()) {
       stats.pools[endpoint] = pool.getStats();
     }
-    
+
     return stats;
   }
 

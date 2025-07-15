@@ -1,4 +1,2 @@
-export * from './SuiAdapter';
-export * from './HederaAdapter';
-export * from './FinP2PRouter';
-export * from './MockAdapter';
+export * from './FinP2PIntegratedSuiAdapter';
+export * from './FinP2PIntegratedHederaAdapter';

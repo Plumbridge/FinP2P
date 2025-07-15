@@ -69,7 +69,7 @@ async function waitForRedis(port, maxAttempts = 60) {
   for (let i = 1; i <= maxAttempts; i++) {
     try {
       // Use docker exec to ping Redis inside the container
-      const { stdout } = await execAsync('docker exec redis-test redis-cli ping');
+      const { stdout } = await execAsync('docker exec docker-redis-test-1 redis-cli ping');
       
       if (stdout.trim() === 'PONG') {
         console.log('✅ Redis is ready!');
@@ -88,7 +88,7 @@ async function waitForRedis(port, maxAttempts = 60) {
   // If we get here, Redis didn't start properly
   // Get container logs for debugging
   try {
-    const { stdout: logs } = await execAsync('docker logs redis-test --tail 20');
+    const { stdout: logs } = await execAsync('docker logs docker-redis-test-1 --tail 20');
     console.error('Redis container logs:', logs);
   } catch (error) {
     console.error('Could not retrieve logs:', error.message);

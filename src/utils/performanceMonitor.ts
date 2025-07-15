@@ -51,10 +51,10 @@ export class PerformanceMonitor extends EventEmitter {
 
     const endTime = process.hrtime.bigint();
     const duration = Number(endTime - timer.startTime) / 1000000; // Convert to milliseconds
-    
+
     this.recordMetric(timer.name, duration, 'duration', timer.metadata);
     this.timers.delete(timerId);
-    
+
     return duration;
   }
 
@@ -63,7 +63,7 @@ export class PerformanceMonitor extends EventEmitter {
    */
   recordMetric(name: string, value: number, type: MetricType = 'gauge', metadata?: Record<string, any>): void {
     const now = Date.now();
-    
+
     if (!this.metrics.has(name)) {
       this.metrics.set(name, {
         name,
@@ -118,7 +118,7 @@ export class PerformanceMonitor extends EventEmitter {
     this.recordMetric('memory.heapTotal', usage.heapTotal, 'gauge');
     this.recordMetric('memory.external', usage.external, 'gauge');
     this.recordMetric('memory.rss', usage.rss, 'gauge');
-    
+
     const heapDelta = usage.heapUsed - this.memoryBaseline;
     this.recordMetric('memory.heapDelta', heapDelta, 'gauge');
   }
@@ -158,7 +158,7 @@ export class PerformanceMonitor extends EventEmitter {
   getSummary(): PerformanceSummary {
     const metrics = this.getAllMetrics();
     const now = Date.now();
-    
+
     return {
       timestamp: now,
       totalMetrics: this.metrics.size,
@@ -175,7 +175,7 @@ export class PerformanceMonitor extends EventEmitter {
    */
   cleanup(maxAge: number = 3600000): void { // 1 hour default
     const cutoff = Date.now() - maxAge;
-    
+
     this.metrics.forEach((metric, name) => {
       metric.values = metric.values.filter(v => v.timestamp > cutoff);
       if (metric.values.length === 0) {
@@ -285,7 +285,7 @@ export class RouterPerformanceTracker {
   trackOperation(operation: string): OperationTracker {
     const timerId = this.monitor.startTimer(`router.${operation}`);
     this.incrementCounter(`router.${operation}.count`);
-    
+
     return {
       end: () => {
         const duration = this.monitor.endTimer(timerId);

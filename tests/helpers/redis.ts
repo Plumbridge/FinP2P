@@ -4,9 +4,12 @@ import { getTestRedisConfig } from './test-config';
 /**
  * Create a Redis client for testing using centralized configuration
  */
-export async function createTestRedisClient(): Promise<RedisClientType> {
+export async function createTestRedisClient(): Promise<any> {
   const config = await getTestRedisConfig();
-  const client = createClient({ url: config.url });
+  const client = createClient({ 
+    url: config.url,
+    modules: {}
+  });
   await client.connect();
 
   client.on('error', (err: Error) => {
@@ -19,8 +22,8 @@ export async function createTestRedisClient(): Promise<RedisClientType> {
 /**
  * Clean up Redis data for tests
  */
-export async function cleanupRedis(existingClient?: RedisClientType): Promise<void> {
-  let client: RedisClientType;
+export async function cleanupRedis(existingClient?: any): Promise<void> {
+  let client: any;
   let shouldClose = false;
 
   try {
@@ -46,9 +49,12 @@ export async function cleanupRedis(existingClient?: RedisClientType): Promise<vo
 /**
  * Close Redis connection
  */
-export async function closeRedisConnection(client: RedisClientType): Promise<void> {
+export async function closeRedisConnection(client: any): Promise<void> {
   try {
-    await client.quit();
+    // Only attempt to close if the client is still open
+    if (client && client.isOpen) {
+      await client.quit();
+    }
   } catch (error) {
     console.warn('Failed to close Redis connection:', error);
   }

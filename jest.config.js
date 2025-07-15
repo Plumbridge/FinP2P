@@ -5,13 +5,12 @@ module.exports = {
   testMatch: ['**/*.test.ts', '**/*.test.js'],
 
   transform: {
-    '^.+\.tsx?$': ['ts-jest', {
+    '^.+\.[tj]sx?$': ['ts-jest', {
       tsconfig: {
         esModuleInterop: true,
         allowJs: true,
       },
     }],
-    '^.+\.js$': 'babel-jest',
   },
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
   moduleNameMapper: {

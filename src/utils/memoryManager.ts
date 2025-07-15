@@ -1,4 +1,4 @@
-import winston from 'winston';
+import * as winston from 'winston';
 import { PerformanceMonitor } from './performanceMonitor';
 
 export interface MemoryManagerOptions {
@@ -80,7 +80,7 @@ export class MemoryManager {
    */
   registerTransfer(id: string, data: any, status: string = 'pending'): void {
     const memorySize = this.estimateMemorySize(data);
-    
+
     // Check if we're at capacity
     if (this.activeTransfers.size >= this.options.maxActiveTransfers) {
       this.evictOldestTransfer();
@@ -97,7 +97,7 @@ export class MemoryManager {
 
     this.activeTransfers.set(id, entry);
     this.updateStats();
-    
+
     this.logger.debug('Transfer registered for memory management', {
       transferId: id,
       memorySize,
@@ -171,7 +171,7 @@ export class MemoryManager {
       if (shouldCleanup) {
         this.activeTransfers.delete(id);
         cleanedCount++;
-        
+
         this.logger.debug('Transfer cleaned up', {
           transferId: id,
           status: entry.status,
@@ -201,7 +201,7 @@ export class MemoryManager {
    */
   async forceGarbageCollection(): Promise<void> {
     const memoryUsage = this.getCurrentMemoryUsage();
-    
+
     if (memoryUsage.heapUsed > this.options.memoryThresholdMB * 1024 * 1024) {
       this.logger.info('Forcing garbage collection due to high memory usage', {
         heapUsed: memoryUsage.heapUsed / 1024 / 1024,
@@ -212,7 +212,7 @@ export class MemoryManager {
         global.gc();
         this.stats.gcCount++;
         this.stats.lastGC = new Date();
-        
+
         const newMemoryUsage = this.getCurrentMemoryUsage();
         this.logger.info('Garbage collection completed', {
           beforeMB: memoryUsage.heapUsed / 1024 / 1024,
@@ -246,7 +246,7 @@ export class MemoryManager {
   isMemoryHealthy(): boolean {
     const memoryUsage = this.getCurrentMemoryUsage();
     const heapUsedMB = memoryUsage.heapUsed / 1024 / 1024;
-    
+
     return heapUsedMB < this.options.memoryThresholdMB &&
            this.activeTransfers.size < this.options.maxActiveTransfers;
   }
@@ -256,12 +256,12 @@ export class MemoryManager {
    */
   async shutdown(): Promise<void> {
     this.logger.info('Shutting down memory manager...');
-    
+
     if (this.cleanupInterval) {
       clearInterval(this.cleanupInterval);
       this.cleanupInterval = undefined;
     }
-    
+
     if (this.gcInterval) {
       clearInterval(this.gcInterval);
       this.gcInterval = undefined;
@@ -269,7 +269,7 @@ export class MemoryManager {
 
     // Final cleanup
     await this.cleanup(true);
-    
+
     this.logger.info('Memory manager shutdown completed', {
       finalStats: this.getStats()
     });
@@ -365,7 +365,7 @@ export class EnhancedCacheManager {
 
   set(key: string, value: any, ttl: number = 300000): void {
     const size = this.estimateSize(value);
-    
+
     // Evict if necessary
     while (this.memoryUsage + size > this.maxMemoryBytes && this.memoryCache.size > 0) {
       this.evictLRU();
