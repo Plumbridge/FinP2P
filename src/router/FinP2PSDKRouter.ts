@@ -9,7 +9,13 @@ import {
   Transfer,
   TransferStatus,
   RouterStatus,
-  ConfigOptions
+  ConfigOptions,
+  AtomicSwap,
+  AtomicSwapRequest,
+  AtomicSwapResponse,
+  AtomicSwapStatus,
+  AtomicSwapStage,
+  AtomicSwapEvent
 } from '../types';
 import { createLogger } from '../utils/logger';
 
@@ -59,7 +65,9 @@ export class FinP2PSDKRouter extends EventEmitter {
   private mockAssets: Map<string, any> = new Map();
   private mockOwnership: Map<string, any> = new Map();
   private mockWalletMappings: Map<string, Map<string, string>> = new Map(); // finId -> chain -> walletAddress
-  private mockSwaps: Map<string, any> = new Map(); // swapId -> swap data
+  private mockSwaps: Map<string, AtomicSwap> = new Map();
+  private swapTimeouts: Map<string, NodeJS.Timeout> = new Map();
+  private swapMonitoringIntervals: Map<string, NodeJS.Timeout> = new Map(); // swapId -> swap data
 
   constructor(config: FinP2PSDKConfig) {
     super();
@@ -92,6 +100,83 @@ export class FinP2PSDKRouter extends EventEmitter {
     if (config.mockMode) {
       this.initializeMockData();
     }
+
+    // Setup rollback completion listeners
+    this.setupRollbackListeners();
+  }
+
+  /**
+   * Setup listeners for rollback completion events from adapters
+   */
+  private setupRollbackListeners(): void {
+    // Listen for Sui asset unlock confirmations
+    this.on('suiAssetsUnlocked', (unlockData: any) => {
+      this.handleAssetUnlockConfirmation(unlockData);
+    });
+
+    // Listen for Hedera asset unlock confirmations  
+    this.on('hederaAssetsUnlocked', (unlockData: any) => {
+      this.handleAssetUnlockConfirmation(unlockData);
+    });
+  }
+
+  /**
+   * Handle confirmation that assets have been unlocked by an adapter
+   */
+  private handleAssetUnlockConfirmation(unlockData: {
+    swapId: string;
+    chain: string;
+    unlockTxHash: string;
+    timestamp: Date;
+  }): void {
+    const swap = this.mockSwaps.get(unlockData.swapId);
+    if (!swap) {
+      this.logger.warn('Received unlock confirmation for unknown swap:', unlockData.swapId);
+      return;
+    }
+
+    this.logger.info('📝 Processing asset unlock confirmation:', {
+      swapId: unlockData.swapId,
+      chain: unlockData.chain,
+      unlockTxHash: unlockData.unlockTxHash
+    });
+
+    // Mark the specific chain as unlocked
+    if (swap.rollback.assetsToUnlock[unlockData.chain]) {
+      swap.rollback.assetsToUnlock[unlockData.chain].completed = true;
+      swap.rollback.assetsToUnlock[unlockData.chain].txHash = unlockData.unlockTxHash;
+    }
+
+    // Update asset unlock transaction hash
+    if (swap.initiatorAsset.chain === unlockData.chain) {
+      swap.initiatorAsset.unlockTxHash = unlockData.unlockTxHash;
+    } else if (swap.responderAsset.chain === unlockData.chain) {
+      swap.responderAsset.unlockTxHash = unlockData.unlockTxHash;
+    }
+
+    swap.updatedAt = new Date();
+    
+    // Add unlock event
+    swap.events.push({
+      id: `${unlockData.swapId}_unlock_${unlockData.chain}`,
+      swapId: unlockData.swapId,
+      type: 'rollback_completed',
+      chain: unlockData.chain,
+      txHash: unlockData.unlockTxHash,
+      message: `Assets unlocked and returned to original owner on ${unlockData.chain}`,
+      timestamp: unlockData.timestamp
+    });
+
+    // Check if all required unlocks are complete
+    const allUnlocksComplete = Object.values(swap.rollback.assetsToUnlock)
+      .filter(unlock => unlock.required)
+      .every(unlock => unlock.completed);
+
+    if (allUnlocksComplete) {
+      this.completeSwapRollback(unlockData.swapId);
+    }
+
+    this.mockSwaps.set(unlockData.swapId, swap);
   }
 
   /**
@@ -712,58 +797,117 @@ export class FinP2PSDKRouter extends EventEmitter {
   }
 
   /**
-   * Execute atomic swap between two chains
+   * Execute atomic swap between two chains with enhanced timeout and status tracking
    * This coordinates the swap protocol between adapters
    */
-  async executeAtomicSwap(swapRequest: {
-    initiatorFinId: string;
-    responderFinId: string;
-    initiatorAsset: { chain: string; assetId: string; amount: string };
-    responderAsset: { chain: string; assetId: string; amount: string };
-    timeoutBlocks: number;
-  }): Promise<{
-    swapId: string;
-    status: 'pending' | 'locked' | 'completed' | 'failed';
-    lockTxHash?: string;
-    completeTxHash?: string;
-  }> {
+  async executeAtomicSwap(swapRequest: AtomicSwapRequest): Promise<AtomicSwapResponse> {
     const swapId = `atomic_swap_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    const now = new Date();
     
-    this.logger.info('🔄 Initiating atomic swap via FinP2P protocol:', {
+    // Calculate timeout timestamp (use minutes if provided, otherwise estimate from blocks)
+    const timeoutMinutes = swapRequest.timeoutMinutes || Math.max(5, swapRequest.timeoutBlocks * 0.5); // Estimate 30 seconds per block
+    const timeoutTimestamp = new Date(now.getTime() + timeoutMinutes * 60 * 1000);
+    
+    this.logger.info('🔄 Initiating enhanced atomic swap via FinP2P protocol:', {
       swapId,
       initiator: swapRequest.initiatorFinId,
       responder: swapRequest.responderFinId,
       initiatorOffer: swapRequest.initiatorAsset,
-      responderOffer: swapRequest.responderAsset
+      responderOffer: swapRequest.responderAsset,
+      timeoutBlocks: swapRequest.timeoutBlocks,
+      timeoutMinutes,
+      autoRollback: swapRequest.autoRollback ?? true
     });
 
-    // Store swap details
-    this.mockSwaps.set(swapId, {
-      ...swapRequest,
+    // Create comprehensive swap object
+    const swap: AtomicSwap = {
       swapId,
-      status: 'pending',
-      createdAt: new Date().toISOString(),
-      stages: {
-        initiated: true,
-        locked: false,
-        completed: false
-      }
-    });
+      initiatorFinId: swapRequest.initiatorFinId,
+      responderFinId: swapRequest.responderFinId,
+      initiatorAsset: {
+        ...swapRequest.initiatorAsset,
+        requiredConfirmations: swapRequest.requiredConfirmations?.[swapRequest.initiatorAsset.chain] || 3
+      },
+      responderAsset: {
+        ...swapRequest.responderAsset,
+        requiredConfirmations: swapRequest.requiredConfirmations?.[swapRequest.responderAsset.chain] || 3
+      },
+      status: AtomicSwapStatus.PENDING,
+      progress: {
+        stage: AtomicSwapStage.INITIATED,
+        percentage: 10,
+        description: 'Atomic swap initiated - waiting for asset locking to begin',
+        lastUpdated: now,
+        subStages: {
+          'swap_initiated': { completed: true, timestamp: now },
+          'initiator_lock_pending': { completed: false },
+          'responder_lock_pending': { completed: false },
+          'completion_pending': { completed: false },
+          'ownership_transfer_pending': { completed: false }
+        }
+      },
+      timeout: {
+        timeoutBlocks: swapRequest.timeoutBlocks,
+        timeoutTimestamp,
+        isExpired: false,
+        blockchainTimeouts: {
+          [swapRequest.initiatorAsset.chain]: {
+            blocks: Math.floor(swapRequest.timeoutBlocks * 0.6), // 60% of total timeout
+            timestamp: new Date(now.getTime() + timeoutMinutes * 0.6 * 60 * 1000)
+          },
+          [swapRequest.responderAsset.chain]: {
+            blocks: Math.floor(swapRequest.timeoutBlocks * 0.6),
+            timestamp: new Date(now.getTime() + timeoutMinutes * 0.6 * 60 * 1000)
+          }
+        }
+      },
+      rollback: {
+        canRollback: false,
+        assetsToUnlock: {
+          [swapRequest.initiatorAsset.chain]: { required: false, completed: false },
+          [swapRequest.responderAsset.chain]: { required: false, completed: false }
+        }
+      },
+      createdAt: now,
+      updatedAt: now,
+      events: [{
+        id: `${swapId}_initiated`,
+        swapId,
+        type: 'initiated',
+        message: 'Atomic swap initiated and ready for asset locking',
+        timestamp: now,
+        metadata: {
+          initiatorChain: swapRequest.initiatorAsset.chain,
+          responderChain: swapRequest.responderAsset.chain,
+          timeoutBlocks: swapRequest.timeoutBlocks
+        }
+      }]
+    };
+
+    // Store enhanced swap details
+    this.mockSwaps.set(swapId, swap);
+
+    // Start timeout monitoring
+    this.startSwapTimeoutMonitoring(swapId, swapRequest.autoRollback ?? true);
 
     // Emit swap initiated event for adapters to listen
     this.emit('atomicSwapInitiated', {
       swapId,
-      ...swapRequest
+      ...swapRequest,
+      swap
     });
 
     return {
       swapId,
-      status: 'pending'
+      status: AtomicSwapStatus.PENDING,
+      progress: swap.progress,
+      estimatedCompletionTime: new Date(now.getTime() + timeoutMinutes * 0.7 * 60 * 1000), // Estimate 70% of timeout
+      nextAction: 'Waiting for both chains to lock assets'
     };
   }
 
   /**
-   * Lock assets for atomic swap (called by adapters)
+   * Lock assets for atomic swap (called by adapters) - Enhanced Version
    */
   async lockSwapAssets(swapId: string, chain: string, txHash: string): Promise<void> {
     this.logger.info('🔒 Assets locked for atomic swap:', {
@@ -773,22 +917,66 @@ export class FinP2PSDKRouter extends EventEmitter {
     });
 
     const swap = this.mockSwaps.get(swapId);
-    if (swap) {
-      swap.stages.locked = true;
-      swap.lockTxHash = txHash;
-      swap.status = 'locked';
-      this.mockSwaps.set(swapId, swap);
-      this.emit('atomicSwapLocked', {
-        swapId,
-        chain,
-        txHash,
-        swap
-      });
+    if (!swap) {
+      throw new Error(`Swap ${swapId} not found`);
     }
+
+    const now = new Date();
+    
+    // Update asset lock information
+    if (swap.initiatorAsset.chain === chain) {
+      swap.initiatorAsset.lockTxHash = txHash;
+      swap.progress.subStages['initiator_lock_pending'].completed = true;
+      swap.progress.subStages['initiator_lock_pending'].txHash = txHash;
+      swap.progress.subStages['initiator_lock_pending'].timestamp = now;
+    } else if (swap.responderAsset.chain === chain) {
+      swap.responderAsset.lockTxHash = txHash;
+      swap.progress.subStages['responder_lock_pending'].completed = true;
+      swap.progress.subStages['responder_lock_pending'].txHash = txHash;
+      swap.progress.subStages['responder_lock_pending'].timestamp = now;
+    }
+
+    // Check if both assets are locked
+    const bothLocked = swap.initiatorAsset.lockTxHash && swap.responderAsset.lockTxHash;
+    
+    if (bothLocked) {
+      swap.status = AtomicSwapStatus.LOCKED;
+      swap.progress.stage = AtomicSwapStage.ASSETS_LOCKED;
+      swap.progress.percentage = 70;
+      swap.progress.description = 'Both assets locked successfully - ready for completion';
+      swap.rollback.canRollback = true;
+      swap.rollback.assetsToUnlock[chain].required = true;
+    } else {
+      swap.status = swap.initiatorAsset.lockTxHash ? AtomicSwapStatus.LOCKING_RESPONDER : AtomicSwapStatus.LOCKING_INITIATOR;
+      swap.progress.percentage = 40;
+      swap.progress.description = `Asset locked on ${chain} - waiting for counterparty`;
+    }
+
+    swap.updatedAt = now;
+    
+    // Add event
+    swap.events.push({
+      id: `${swapId}_lock_${chain}`,
+      swapId,
+      type: 'lock_completed',
+      chain,
+      txHash,
+      message: `Assets locked on ${chain}`,
+      timestamp: now
+    });
+
+    this.mockSwaps.set(swapId, swap);
+    
+    this.emit('atomicSwapLocked', {
+      swapId,
+      chain,
+      txHash,
+      swap
+    });
   }
 
   /**
-   * Complete atomic swap (called by adapters)
+   * Complete atomic swap (called by adapters) - Enhanced Version
    */
   async completeAtomicSwap(swapId: string, completeTxHash: string): Promise<void> {
     this.logger.info('✅ Atomic swap completed:', {
@@ -797,40 +985,287 @@ export class FinP2PSDKRouter extends EventEmitter {
     });
 
     const swap = this.mockSwaps.get(swapId);
-    if (swap) {
-      swap.stages.completed = true;
-      swap.completeTxHash = completeTxHash;
-      swap.status = 'completed';
-      this.mockSwaps.set(swapId, swap);
-      
-      // Transfer ownership in FinP2P
-      this.transferOwnership(
-        swap.initiatorFinId,
-        swap.responderFinId,
-        swap.initiatorAsset.assetId,
-        swap.initiatorAsset.amount
-      );
-      
-      this.transferOwnership(
-        swap.responderFinId,
-        swap.initiatorFinId,
-        swap.responderAsset.assetId,
-        swap.responderAsset.amount
-      );
-
-      this.emit('atomicSwapCompleted', {
-        swapId,
-        completeTxHash,
-        swap
-      });
+    if (!swap) {
+      throw new Error(`Swap ${swapId} not found`);
     }
+
+    const now = new Date();
+    
+    swap.status = AtomicSwapStatus.COMPLETED;
+    swap.progress.stage = AtomicSwapStage.SWAP_COMPLETED;
+    swap.progress.percentage = 100;
+    swap.progress.description = 'Atomic swap completed successfully - ownership transferred';
+    swap.completedAt = now;
+    swap.updatedAt = now;
+    
+    // Update sub-stages
+    swap.progress.subStages['completion_pending'].completed = true;
+    swap.progress.subStages['completion_pending'].txHash = completeTxHash;
+    swap.progress.subStages['completion_pending'].timestamp = now;
+    swap.progress.subStages['ownership_transfer_pending'].completed = true;
+    swap.progress.subStages['ownership_transfer_pending'].timestamp = now;
+    
+    // Add completion event
+    swap.events.push({
+      id: `${swapId}_completed`,
+      swapId,
+      type: 'completed',
+      txHash: completeTxHash,
+      message: 'Atomic swap completed successfully',
+      timestamp: now
+    });
+
+    // Transfer ownership in FinP2P
+    this.transferOwnership(
+      swap.initiatorFinId,
+      swap.responderFinId,
+      swap.initiatorAsset.assetId,
+      swap.initiatorAsset.amount
+    );
+    
+    this.transferOwnership(
+      swap.responderFinId,
+      swap.initiatorFinId,
+      swap.responderAsset.assetId,
+      swap.responderAsset.amount
+    );
+
+    // Clear timeouts
+    this.clearSwapTimeouts(swapId);
+
+    this.mockSwaps.set(swapId, swap);
+
+    this.emit('atomicSwapCompleted', {
+      swapId,
+      completeTxHash,
+      swap
+    });
   }
 
   /**
-   * Get atomic swap status
+   * Get enhanced atomic swap status
    */
-  async getAtomicSwapStatus(swapId: string): Promise<any> {
-    return this.mockSwaps.get(swapId) || null;
+  async getAtomicSwapStatus(swapId: string): Promise<AtomicSwap | null> {
+    const swap = this.mockSwaps.get(swapId);
+    if (!swap) {
+      return null;
+    }
+
+    // Check if swap has expired
+    if (!swap.timeout.isExpired && new Date() > swap.timeout.timeoutTimestamp) {
+      await this.handleSwapTimeout(swapId, 'timeout');
+    }
+
+    return swap;
+  }
+
+  /**
+   * Start timeout monitoring for atomic swap
+   */
+  private startSwapTimeoutMonitoring(swapId: string, autoRollback: boolean): void {
+    const swap = this.mockSwaps.get(swapId);
+    if (!swap) return;
+
+    // Set main timeout
+    const timeoutMs = swap.timeout.timeoutTimestamp.getTime() - Date.now();
+    if (timeoutMs > 0) {
+      const timeoutHandle = setTimeout(async () => {
+        await this.handleSwapTimeout(swapId, 'timeout');
+      }, timeoutMs);
+      
+      this.swapTimeouts.set(swapId, timeoutHandle);
+    }
+
+    // Set up periodic monitoring (every 30 seconds)
+    const monitoringHandle = setInterval(async () => {
+      const currentSwap = this.mockSwaps.get(swapId);
+      if (!currentSwap || currentSwap.status === AtomicSwapStatus.COMPLETED || currentSwap.status === AtomicSwapStatus.FAILED) {
+        this.clearSwapTimeouts(swapId);
+        return;
+      }
+
+      // Check if swap has expired
+      if (!currentSwap.timeout.isExpired && new Date() > currentSwap.timeout.timeoutTimestamp) {
+        await this.handleSwapTimeout(swapId, 'timeout');
+      }
+    }, 30000);
+
+    this.swapMonitoringIntervals.set(swapId, monitoringHandle);
+  }
+
+  /**
+   * Handle swap timeout and optionally trigger rollback
+   */
+  private async handleSwapTimeout(swapId: string, reason: 'timeout' | 'failure' | 'manual'): Promise<void> {
+    const swap = this.mockSwaps.get(swapId);
+    if (!swap || swap.status === AtomicSwapStatus.COMPLETED) {
+      return;
+    }
+
+    const now = new Date();
+    
+    this.logger.warn('⏰ Atomic swap timeout detected:', {
+      swapId,
+      reason,
+      currentStatus: swap.status,
+      timeoutTimestamp: swap.timeout.timeoutTimestamp,
+      currentTime: now
+    });
+
+    swap.timeout.isExpired = true;
+    swap.status = AtomicSwapStatus.EXPIRED;
+    swap.progress.stage = AtomicSwapStage.EXPIRED;
+    swap.progress.percentage = 0;
+    swap.progress.description = `Swap expired due to ${reason}`;
+    swap.updatedAt = now;
+    swap.failedAt = now;
+
+    // Add timeout event
+    swap.events.push({
+      id: `${swapId}_expired`,
+      swapId,
+      type: 'expired',
+      message: `Swap expired due to ${reason}`,
+      timestamp: now,
+      metadata: { reason }
+    });
+
+    // Check if we need to rollback locked assets
+    const hasLockedAssets = swap.initiatorAsset.lockTxHash || swap.responderAsset.lockTxHash;
+    
+    if (hasLockedAssets) {
+      swap.rollback.canRollback = true;
+      swap.rollback.rollbackReason = reason;
+      swap.rollback.rollbackStarted = now;
+      
+      // Mark assets that need to be unlocked
+      if (swap.initiatorAsset.lockTxHash) {
+        swap.rollback.assetsToUnlock[swap.initiatorAsset.chain].required = true;
+      }
+      if (swap.responderAsset.lockTxHash) {
+        swap.rollback.assetsToUnlock[swap.responderAsset.chain].required = true;
+      }
+
+      // Start rollback process
+      await this.executeSwapRollback(swapId);
+    }
+
+    this.mockSwaps.set(swapId, swap);
+    this.clearSwapTimeouts(swapId);
+
+    this.emit('atomicSwapExpired', {
+      swapId,
+      reason,
+      swap
+    });
+  }
+
+  /**
+   * Execute rollback for failed/expired swap
+   */
+  private async executeSwapRollback(swapId: string): Promise<void> {
+    const swap = this.mockSwaps.get(swapId);
+    if (!swap || !swap.rollback.canRollback) {
+      return;
+    }
+
+    const now = new Date();
+    
+    this.logger.info('🔄 Starting atomic swap rollback:', {
+      swapId,
+      reason: swap.rollback.rollbackReason,
+      assetsToUnlock: swap.rollback.assetsToUnlock
+    });
+
+    swap.status = AtomicSwapStatus.ROLLING_BACK;
+    swap.progress.stage = AtomicSwapStage.ROLLING_BACK;
+    swap.progress.percentage = 20;
+    swap.progress.description = 'Rolling back locked assets...';
+    swap.updatedAt = now;
+
+    // Add rollback event
+    swap.events.push({
+      id: `${swapId}_rollback_started`,
+      swapId,
+      type: 'rollback_started',
+      message: `Rollback started due to ${swap.rollback.rollbackReason}`,
+      timestamp: now
+    });
+
+    // Emit rollback events for adapters to handle
+    this.emit('atomicSwapRollback', {
+      swapId,
+      swap,
+      assetsToUnlock: swap.rollback.assetsToUnlock
+    });
+
+    // In a real implementation, we would wait for adapters to confirm asset unlocking
+    // For now, we'll simulate successful rollback after a short delay
+    setTimeout(() => {
+      this.completeSwapRollback(swapId);
+    }, 2000);
+
+    this.mockSwaps.set(swapId, swap);
+  }
+
+  /**
+   * Complete swap rollback process
+   */
+  private completeSwapRollback(swapId: string): void {
+    const swap = this.mockSwaps.get(swapId);
+    if (!swap) return;
+
+    const now = new Date();
+    
+    swap.status = AtomicSwapStatus.ROLLED_BACK;
+    swap.progress.stage = AtomicSwapStage.ROLLED_BACK;
+    swap.progress.percentage = 100;
+    swap.progress.description = 'Assets successfully rolled back';
+    swap.rollback.rollbackCompleted = now;
+    swap.updatedAt = now;
+
+    // Mark all assets as unlocked (in real implementation, this would be based on actual unlock transactions)
+    Object.keys(swap.rollback.assetsToUnlock).forEach(chain => {
+      swap.rollback.assetsToUnlock[chain].completed = true;
+    });
+
+    // Add rollback completion event
+    swap.events.push({
+      id: `${swapId}_rollback_completed`,
+      swapId,
+      type: 'rollback_completed',
+      message: 'Assets successfully rolled back to original owners',
+      timestamp: now
+    });
+
+    this.mockSwaps.set(swapId, swap);
+
+    this.logger.info('✅ Atomic swap rollback completed:', {
+      swapId,
+      rollbackDuration: now.getTime() - (swap.rollback.rollbackStarted?.getTime() || 0)
+    });
+
+    this.emit('atomicSwapRolledBack', {
+      swapId,
+      swap
+    });
+  }
+
+  /**
+   * Clear all timeouts for a swap
+   */
+  private clearSwapTimeouts(swapId: string): void {
+    const timeout = this.swapTimeouts.get(swapId);
+    if (timeout) {
+      clearTimeout(timeout);
+      this.swapTimeouts.delete(swapId);
+    }
+
+    const interval = this.swapMonitoringIntervals.get(swapId);
+    if (interval) {
+      clearInterval(interval);
+      this.swapMonitoringIntervals.delete(swapId);
+    }
   }
 
   /**

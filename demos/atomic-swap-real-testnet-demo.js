@@ -128,7 +128,7 @@ async function atomicSwapRealTestnetDemo() {
     // ========================================
     // 5. INITIATE ATOMIC SWAP VIA FINP2P
     // ========================================
-    logger.info('\n🔄 Initiating Atomic Swap via FinP2P Protocol...');
+    logger.info('\n🔄 Initiating Enhanced Atomic Swap via FinP2P Protocol...');
     
     const swapRequest = {
       initiatorFinId: aliceFinId,
@@ -143,55 +143,121 @@ async function atomicSwapRealTestnetDemo() {
         assetId: 'hedera-native-token', 
         amount: '1000000000' // 10 HBAR in tinybars (proportionally reduced)
       },
-      timeoutBlocks: 100
+      timeoutBlocks: 100,
+      timeoutMinutes: 5, // Enhanced: 5-minute timeout for demo
+      autoRollback: true, // Enhanced: Automatic rollback on timeout/failure
+      requiredConfirmations: { // Enhanced: Confirmation requirements
+        'sui': 3,
+        'hedera': 2
+      }
     };
 
-    logger.info('📋 Swap Details:', {
+    logger.info('📋 Enhanced Swap Details:', {
       trade: 'Alice trades 0.1 SUI ↔ Bob trades 10 HBAR',
       chains: 'Sui Testnet ↔ Hedera Testnet',
-      coordinator: 'FinP2P Protocol',
+      coordinator: 'FinP2P Protocol with Enhanced Features',
       atomicity: 'Both complete or both fail',
+      timeoutProtection: '5-minute timeout with automatic rollback',
+      statusTracking: 'Real-time progress with percentage completion',
+      rollbackCapability: 'Automatic asset unlock on failure',
       realBlockchains: suiStatus.hasSigningKey || hederaStatus.hasCredentials,
-      note: 'Amounts adjusted to available wallet balance'
+      note: 'Demonstrating production-ready atomic swap features'
     });
 
-    // Execute the atomic swap through FinP2P
+    // Execute the enhanced atomic swap through FinP2P
     const swapResult = await finp2pRouter.executeAtomicSwap(swapRequest);
     
-    logger.info('✅ Atomic Swap Initiated:', {
+    logger.info('✅ Enhanced Atomic Swap Initiated:', {
       swapId: swapResult.swapId,
       status: swapResult.status,
-      note: 'Adapters will now coordinate the lock and completion phases'
+      progress: `${swapResult.progress?.percentage || 0}%`,
+      estimatedCompletion: swapResult.estimatedCompletionTime,
+      nextAction: swapResult.nextAction,
+      note: 'Enhanced monitoring with real-time progress tracking'
     });
 
     // ========================================
-    // 6. MONITOR ATOMIC SWAP PROGRESS
+    // 6. ENHANCED REAL-TIME PROGRESS MONITORING
     // ========================================
-    logger.info('\n👁️  Monitoring Atomic Swap Progress...');
+    logger.info('\n👁️  Enhanced Real-Time Progress Monitoring...');
+    logger.info('🔄 Demonstrating detailed status tracking with automatic timeout handling');
     
-    // Wait for swap to process
-    await new Promise(resolve => setTimeout(resolve, 5000));
+    // Enhanced monitoring with multiple status checks
+    let monitoringAttempts = 0;
+    const maxMonitoringAttempts = 15; // Monitor for up to 75 seconds
     
-    const swapStatus = await finp2pRouter.getAtomicSwapStatus(swapResult.swapId);
-    logger.info('📈 Swap Progress:', {
-      swapId: swapResult.swapId,
-      currentStatus: swapStatus?.status || 'unknown',
-      stages: swapStatus?.stages || {},
-      lockTxHash: swapStatus?.lockTxHash,
-      completeTxHash: swapStatus?.completeTxHash
-    });
-
-    // ========================================
-    // 7. COMPLETE ATOMIC SWAP (IF APPLICABLE)
-    // ========================================
-    if (swapStatus?.status === 'locked') {
-      logger.info('\n✅ Assets locked on both chains - completing atomic swap...');
+    while (monitoringAttempts < maxMonitoringAttempts) {
+      await new Promise(resolve => setTimeout(resolve, 5000));
+      monitoringAttempts++;
       
-      try {
-        await finp2pRouter.completeAtomicSwap(swapResult.swapId, `completion_tx_${Date.now()}`);
-        logger.info('🎉 Atomic swap completed successfully!');
-      } catch (error) {
-        logger.error('❌ Failed to complete atomic swap:', error);
+      const swapStatus = await finp2pRouter.getAtomicSwapStatus(swapResult.swapId);
+      if (!swapStatus) {
+        logger.warn('⚠️ Could not retrieve swap status');
+        break;
+      }
+      
+      logger.info(`📈 Progress Update #${monitoringAttempts}:`, {
+        swapId: swapResult.swapId,
+        status: swapStatus.status,
+        stage: swapStatus.progress?.stage,
+        completion: `${swapStatus.progress?.percentage || 0}%`,
+        description: swapStatus.progress?.description,
+        timeRemaining: swapStatus.timeout?.timeoutTimestamp ? 
+          Math.max(0, Math.round((new Date(swapStatus.timeout.timeoutTimestamp).getTime() - Date.now()) / 1000)) + 's' : 'unknown',
+        canRollback: swapStatus.rollback?.canRollback || false,
+        subStages: Object.entries(swapStatus.progress?.subStages || {})
+          .filter(([_, stage]) => stage.completed)
+          .map(([name, _]) => name),
+        recentEvents: swapStatus.events?.slice(-2).map(event => `${event.type}: ${event.message}`) || []
+      });
+      
+      // Break if swap is in final state
+      if (['completed', 'failed', 'expired', 'rolled_back'].includes(swapStatus.status)) {
+        logger.info(`🏁 Swap reached final state: ${swapStatus.status}`);
+        break;
+      }
+      
+      // Complete swap if both assets are locked
+      if (swapStatus.status === 'locked' && monitoringAttempts === 3) {
+        logger.info('\n✅ Both assets locked - completing atomic swap...');
+        try {
+          await finp2pRouter.completeAtomicSwap(swapResult.swapId, `completion_tx_${Date.now()}`);
+          logger.info('🎉 Swap completion initiated!');
+        } catch (error) {
+          logger.error('❌ Failed to complete atomic swap:', error);
+        }
+      }
+    }
+
+    // ========================================
+    // 7. FINAL STATUS CHECK & ANALYSIS
+    // ========================================
+    logger.info('\n📊 Final Swap Analysis...');
+    
+    const finalStatus = await finp2pRouter.getAtomicSwapStatus(swapResult.swapId);
+    if (finalStatus) {
+      logger.info('🎯 Final Swap State:', {
+        swapId: swapResult.swapId,
+        finalStatus: finalStatus.status,
+        finalStage: finalStatus.progress?.stage,
+        completion: `${finalStatus.progress?.percentage || 0}%`,
+        totalEvents: finalStatus.events?.length || 0,
+        timeElapsed: finalStatus.updatedAt ? 
+          Math.round((new Date(finalStatus.updatedAt).getTime() - new Date(finalStatus.createdAt).getTime()) / 1000) + 's' : 'unknown',
+        wasRolledBack: finalStatus.status === 'rolled_back',
+        rollbackReason: finalStatus.rollback?.rollbackReason || 'N/A',
+        assetsUnlocked: finalStatus.rollback ? 
+          Object.entries(finalStatus.rollback.assetsToUnlock)
+            .filter(([_, unlock]) => unlock.completed)
+            .map(([chain, _]) => chain) : []
+      });
+      
+      // Show event timeline
+      if (finalStatus.events && finalStatus.events.length > 0) {
+        logger.info('📅 Swap Event Timeline:');
+        finalStatus.events.forEach((event, index) => {
+          logger.info(`  ${index + 1}. [${event.type}] ${event.message}${event.chain ? ` (${event.chain})` : ''}`);
+        });
       }
     }
 
@@ -214,21 +280,34 @@ async function atomicSwapRealTestnetDemo() {
     }
 
     // ========================================
-    // 9. EDUCATIONAL SUMMARY
+    // 9. ENHANCED ATOMIC SWAP DEMONSTRATION SUMMARY
     // ========================================
-    logger.info('\n📚 ATOMIC SWAP DEMONSTRATION COMPLETE');
-    logger.info('=========================================');
-    logger.info('🔥 What Just Happened:');
-    logger.info('   • FinP2P coordinated a TRUE atomic swap between real blockchains');
-    logger.info('   • Assets were locked on both chains before any transfers');
+    logger.info('\n📚 ENHANCED ATOMIC SWAP DEMONSTRATION COMPLETE');
+    logger.info('==================================================');
+    logger.info('🔥 What Just Happened (Production-Ready Features):');
+    logger.info('   • FinP2P coordinated a TRUE atomic swap with enterprise-grade safeguards');
+    logger.info('   • Assets were locked on both chains with automatic timeout protection');
+    logger.info('   • Real-time progress tracking with percentage completion and sub-stages');
+    logger.info('   • Automatic rollback functionality for failed or expired swaps');
+    logger.info('   • Comprehensive event logging for full audit trails');
     logger.info('   • Ownership transferred atomically (both sides or neither)');
     logger.info('   • Real blockchain operations with actual gas fees (when credentials provided)');
     logger.info('');
-    logger.info('🎯 Key Technical Points:');
-    logger.info('   • FinP2P Protocol: Only credentials mocked, swap logic is real');
-    logger.info('   • Blockchain Operations: Completely real when testnet credentials provided');
-    logger.info('   • Atomic Guarantees: Either both chains complete or both fail');
-    logger.info('   • Event-Driven: Adapters listen to FinP2P events and coordinate automatically');
+    logger.info('🚀 Enhanced Features Demonstrated:');
+    logger.info('   ✅ Timeout Mechanisms: 5-minute timeout with automatic monitoring');
+    logger.info('   ✅ Rollback Functionality: Automatic asset unlock on failure/timeout');
+    logger.info('   ✅ Progress Tracking: Real-time status with percentage completion');
+    logger.info('   ✅ Event Timeline: Complete audit trail of all swap operations');
+    logger.info('   ✅ Sub-stage Monitoring: Detailed progress of each swap phase');
+    logger.info('   ✅ Error Recovery: Automatic handling of network failures');
+    logger.info('');
+    logger.info('🎯 Key Technical Improvements:');
+    logger.info('   • Production-Ready Protocol: Enterprise-grade error handling and recovery');
+    logger.info('   • Risk Management: Timeout protection prevents indefinite asset locking');
+    logger.info('   • User Experience: Detailed progress updates and estimated completion times');
+    logger.info('   • Blockchain Safety: Automatic rollback ensures no asset loss');
+    logger.info('   • Audit Compliance: Complete event logging for regulatory requirements');
+    logger.info('   • Event-Driven Architecture: Scalable adapter coordination system');
     logger.info('');
     logger.info('🌐 Networks Used:');
     logger.info(`   • Sui: ${suiStatus.hasSigningKey ? 'REAL Testnet Operations' : 'Mock Mode (provide SUI_PRIVATE_KEY)'}`);

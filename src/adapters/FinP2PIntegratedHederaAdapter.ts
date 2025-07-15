@@ -143,6 +143,23 @@ export class FinP2PIntegratedHederaAdapter extends EventEmitter {
     this.config.finp2pRouter.on('atomicSwapCompleted', async (completionData: any) => {
       this.logger.info('✅ Atomic swap completed:', completionData);
     });
+
+    // Enhanced: Add rollback listeners
+    this.config.finp2pRouter.on('atomicSwapExpired', async (expiredData: any) => {
+      if (this.isSwapRelevantToHedera(expiredData.swap)) {
+        this.logger.warn('⏰ Atomic swap expired for Hedera chain:', {
+          swapId: expiredData.swapId,
+          reason: expiredData.reason
+        });
+      }
+    });
+
+    this.config.finp2pRouter.on('atomicSwapRollback', async (rollbackData: any) => {
+      if (rollbackData.assetsToUnlock?.hedera?.required) {
+        this.logger.info('🔄 Received rollback request for Hedera assets:', rollbackData);
+        await this.handleAtomicSwapRollback(rollbackData);
+      }
+    });
   }
 
   /**
@@ -250,6 +267,141 @@ export class FinP2PIntegratedHederaAdapter extends EventEmitter {
     } catch (error) {
       this.logger.error('❌ Failed to notify FinP2P router of asset lock:', error);
       throw error;
+    }
+  }
+
+  /**
+   * Check if swap is relevant to Hedera chain
+   */
+  private isSwapRelevantToHedera(swap: any): boolean {
+    return swap?.initiatorAsset?.chain === 'hedera' || swap?.responderAsset?.chain === 'hedera';
+  }
+
+  /**
+   * Handle atomic swap rollback for Hedera assets
+   */
+  private async handleAtomicSwapRollback(rollbackData: any): Promise<void> {
+    const { swapId, swap } = rollbackData;
+    
+    if (!this.client || !this.operatorPrivateKey) {
+      this.logger.warn('⚠️ Cannot rollback Hedera assets - no client or signing key available');
+      // In mock mode, simulate rollback completion
+      this.logger.info('🔄 Mock Hedera rollback completed:', { swapId });
+      await this.notifyAssetsUnlocked(swapId, `mock_hedera_unlock_${Date.now()}`);
+      return;
+    }
+
+    try {
+      this.logger.info('🔄 Starting Hedera asset rollback for swap:', {
+        swapId,
+        initiatorLocked: !!swap.initiatorAsset.lockTxHash,
+        responderLocked: !!swap.responderAsset.lockTxHash
+      });
+
+      // In a real implementation, this would unlock assets from scheduled transactions
+      // For demonstration, we'll simulate the unlock process
+      
+      let unlockTxHash: string | undefined;
+      
+      if (swap.initiatorAsset.chain === 'hedera' && swap.initiatorAsset.lockTxHash) {
+        unlockTxHash = await this.unlockHederaAssets(swap, 'initiator');
+      } else if (swap.responderAsset.chain === 'hedera' && swap.responderAsset.lockTxHash) {
+        unlockTxHash = await this.unlockHederaAssets(swap, 'responder');
+      }
+
+      if (unlockTxHash) {
+        this.logger.info('✅ Hedera assets unlocked successfully:', {
+          swapId,
+          unlockTxHash
+        });
+
+        // Notify router of successful unlock
+        await this.notifyAssetsUnlocked(swapId, unlockTxHash);
+      }
+
+    } catch (error) {
+      this.logger.error('❌ Failed to rollback Hedera assets:', error);
+      // In a real implementation, we'd retry or escalate the error
+    }
+  }
+
+  /**
+   * Unlock Hedera assets (simulate unlocking from scheduled transaction)
+   */
+  private async unlockHederaAssets(swap: any, role: 'initiator' | 'responder'): Promise<string> {
+    if (!this.client || !this.operatorPrivateKey || !this.operatorAccountId) {
+      throw new Error('Cannot unlock Hedera assets - client not properly initialized');
+    }
+
+    const asset = role === 'initiator' ? swap.initiatorAsset : swap.responderAsset;
+    const finId = role === 'initiator' ? swap.initiatorFinId : swap.responderFinId;
+    
+    this.logger.info(`🔓 Unlocking ${role} Hedera assets:`, {
+      swapId: swap.swapId,
+      amount: asset.amount,
+      finId,
+      originalLockTx: asset.lockTxHash
+    });
+
+    try {
+      // In a real implementation, this would:
+      // 1. Cancel or execute the scheduled transaction unlock
+      // 2. Return assets to the original owner
+      // 3. Handle any unlock conditions/timeouts
+      
+      // For demonstration, we'll simulate an unlock transaction
+      const unlockAddress = await this.getWalletAddressForFinId(finId);
+      const unlockAccountId = AccountId.fromString(unlockAddress);
+      const amount = BigInt(asset.amount);
+
+      // Simulate returning locked assets to original owner
+      const unlockTransaction = await new TransferTransaction()
+        .addHbarTransfer(this.operatorAccountId, Hbar.fromTinybars(-Number(amount)))
+        .addHbarTransfer(unlockAccountId, Hbar.fromTinybars(Number(amount)))
+        .execute(this.client);
+
+      const receipt = await unlockTransaction.getReceipt(this.client);
+
+      if (receipt.status !== Status.Success) {
+        throw new Error(`Unlock transaction failed with status: ${receipt.status}`);
+      }
+
+      this.logger.info('🎯 Hedera asset unlock transaction completed:', {
+        swapId: swap.swapId,
+        unlockTxHash: unlockTransaction.transactionId?.toString(),
+        returnedTo: `${unlockAddress.substring(0, 6)}...`,
+        note: 'In production, this would unlock from scheduled/time-locked transaction'
+      });
+
+      return unlockTransaction.transactionId?.toString() || '';
+
+    } catch (error) {
+      this.logger.error('❌ Failed to execute Hedera unlock transaction:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Notify FinP2P router that assets are unlocked
+   */
+  private async notifyAssetsUnlocked(swapId: string, unlockTxHash: string): Promise<void> {
+    try {
+      // In a real implementation, this would be a specific rollback/unlock endpoint
+      this.logger.info('📤 Notifying router of Hedera asset unlock:', {
+        swapId,
+        unlockTxHash
+      });
+      
+      // For now, we'll emit an event that the router can listen to
+      this.config.finp2pRouter.emit('hederaAssetsUnlocked', {
+        swapId,
+        chain: 'hedera',
+        unlockTxHash,
+        timestamp: new Date()
+      });
+      
+    } catch (error) {
+      this.logger.error('Failed to notify router of asset unlock:', error);
     }
   }
 

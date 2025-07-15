@@ -90,6 +90,23 @@ export class FinP2PIntegratedSuiAdapter extends EventEmitter {
     this.config.finp2pRouter.on('atomicSwapCompleted', async (completionData: any) => {
       this.logger.info('✅ Atomic swap completed:', completionData);
     });
+
+    // Enhanced: Add rollback listeners
+    this.config.finp2pRouter.on('atomicSwapExpired', async (expiredData: any) => {
+      if (this.isSwapRelevantToSui(expiredData.swap)) {
+        this.logger.warn('⏰ Atomic swap expired for Sui chain:', {
+          swapId: expiredData.swapId,
+          reason: expiredData.reason
+        });
+      }
+    });
+
+    this.config.finp2pRouter.on('atomicSwapRollback', async (rollbackData: any) => {
+      if (rollbackData.assetsToUnlock?.sui?.required) {
+        this.logger.info('🔄 Received rollback request for Sui assets:', rollbackData);
+        await this.handleAtomicSwapRollback(rollbackData);
+      }
+    });
   }
 
   /**
@@ -184,6 +201,140 @@ export class FinP2PIntegratedSuiAdapter extends EventEmitter {
     } catch (error) {
       this.logger.error('❌ Failed to notify FinP2P router of asset lock:', error);
       throw error;
+    }
+  }
+
+  /**
+   * Check if swap is relevant to Sui chain
+   */
+  private isSwapRelevantToSui(swap: any): boolean {
+    return swap?.initiatorAsset?.chain === 'sui' || swap?.responderAsset?.chain === 'sui';
+  }
+
+  /**
+   * Handle atomic swap rollback for Sui assets
+   */
+  private async handleAtomicSwapRollback(rollbackData: any): Promise<void> {
+    const { swapId, swap } = rollbackData;
+    
+    if (!this.keypair) {
+      this.logger.warn('⚠️ Cannot rollback Sui assets - no signing key available');
+      return;
+    }
+
+    try {
+      this.logger.info('🔄 Starting Sui asset rollback for swap:', {
+        swapId,
+        initiatorLocked: !!swap.initiatorAsset.lockTxHash,
+        responderLocked: !!swap.responderAsset.lockTxHash
+      });
+
+      // In a real implementation, this would unlock assets from time-locked contracts
+      // For demonstration, we'll simulate the unlock process
+      
+      let unlockTxHash: string | undefined;
+      
+      if (swap.initiatorAsset.chain === 'sui' && swap.initiatorAsset.lockTxHash) {
+        unlockTxHash = await this.unlockSuiAssets(swap, 'initiator');
+      } else if (swap.responderAsset.chain === 'sui' && swap.responderAsset.lockTxHash) {
+        unlockTxHash = await this.unlockSuiAssets(swap, 'responder');
+      }
+
+      if (unlockTxHash) {
+        this.logger.info('✅ Sui assets unlocked successfully:', {
+          swapId,
+          unlockTxHash
+        });
+
+        // Notify router of successful unlock
+        await this.notifyAssetsUnlocked(swapId, unlockTxHash);
+      }
+
+    } catch (error) {
+      this.logger.error('❌ Failed to rollback Sui assets:', error);
+      // In a real implementation, we'd retry or escalate the error
+    }
+  }
+
+  /**
+   * Unlock Sui assets (simulate unlocking from time-locked contract)
+   */
+  private async unlockSuiAssets(swap: any, role: 'initiator' | 'responder'): Promise<string> {
+    if (!this.keypair) {
+      throw new Error('Cannot unlock Sui assets - no signing key available');
+    }
+
+    const asset = role === 'initiator' ? swap.initiatorAsset : swap.responderAsset;
+    const finId = role === 'initiator' ? swap.initiatorFinId : swap.responderFinId;
+    
+    this.logger.info(`🔓 Unlocking ${role} Sui assets:`, {
+      swapId: swap.swapId,
+      amount: asset.amount,
+      finId,
+      originalLockTx: asset.lockTxHash
+    });
+
+    try {
+      // In a real implementation, this would:
+      // 1. Call the time-locked contract's unlock function
+      // 2. Return assets to the original owner
+      // 3. Handle any unlock conditions/timeouts
+      
+      // For demonstration, we'll simulate an unlock transaction
+      const unlockAddress = await this.getWalletAddressForFinId(finId);
+      
+      const unlockTransaction = new Transaction();
+      const amount = BigInt(asset.amount);
+      
+      // Simulate returning locked assets to original owner
+      const [coin] = unlockTransaction.splitCoins(unlockTransaction.gas, [amount]);
+      unlockTransaction.transferObjects([coin], unlockAddress);
+
+      const result = await this.client.signAndExecuteTransaction({
+        transaction: unlockTransaction,
+        signer: this.keypair,
+        options: {
+          showBalanceChanges: true,
+          showEffects: true,
+        },
+      });
+
+      this.logger.info('🎯 Sui asset unlock transaction completed:', {
+        swapId: swap.swapId,
+        unlockTxHash: result.digest,
+        returnedTo: `${unlockAddress.substring(0, 10)}...`,
+        note: 'In production, this would unlock from time-locked smart contract'
+      });
+
+      return result.digest;
+
+    } catch (error) {
+      this.logger.error('❌ Failed to execute Sui unlock transaction:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Notify FinP2P router that assets are unlocked
+   */
+  private async notifyAssetsUnlocked(swapId: string, unlockTxHash: string): Promise<void> {
+    try {
+      // In a real implementation, this would be a specific rollback/unlock endpoint
+      this.logger.info('📤 Notifying router of Sui asset unlock:', {
+        swapId,
+        unlockTxHash
+      });
+      
+      // For now, we'll emit an event that the router can listen to
+      this.config.finp2pRouter.emit('suiAssetsUnlocked', {
+        swapId,
+        chain: 'sui',
+        unlockTxHash,
+        timestamp: new Date()
+      });
+      
+    } catch (error) {
+      this.logger.error('Failed to notify router of asset unlock:', error);
     }
   }
 

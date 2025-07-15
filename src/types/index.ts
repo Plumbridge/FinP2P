@@ -271,3 +271,133 @@ export interface ConfigOptions {
 
 // Export transaction types
 export type { TransactionRequest, TransactionResponse, LedgerTransactionResult } from './transactions';
+
+/**
+ * Enhanced Atomic Swap Types for Production-Ready Implementation
+ */
+
+export enum AtomicSwapStatus {
+  PENDING = 'pending',
+  LOCKING_INITIATOR = 'locking_initiator',
+  LOCKING_RESPONDER = 'locking_responder',
+  LOCKED = 'locked',
+  COMPLETING = 'completing',
+  COMPLETED = 'completed',
+  FAILED = 'failed',
+  EXPIRED = 'expired',
+  ROLLING_BACK = 'rolling_back',
+  ROLLED_BACK = 'rolled_back'
+}
+
+export enum AtomicSwapStage {
+  INITIATED = 'initiated',
+  LOCKING_ASSETS = 'locking_assets',
+  ASSETS_LOCKED = 'assets_locked',
+  COMPLETING_SWAP = 'completing_swap',
+  SWAP_COMPLETED = 'swap_completed',
+  FAILED = 'failed',
+  EXPIRED = 'expired',
+  ROLLING_BACK = 'rolling_back',
+  ROLLED_BACK = 'rolled_back'
+}
+
+export interface AtomicSwapAsset {
+  chain: string;
+  assetId: string;
+  amount: string;
+  lockTxHash?: string;
+  unlockTxHash?: string;
+  lockConfirmations?: number;
+  requiredConfirmations?: number;
+}
+
+export interface AtomicSwapProgress {
+  stage: AtomicSwapStage;
+  percentage: number;
+  description: string;
+  estimatedCompletionTime?: Date;
+  lastUpdated: Date;
+  subStages: {
+    [key: string]: {
+      completed: boolean;
+      txHash?: string;
+      confirmations?: number;
+      timestamp?: Date;
+    };
+  };
+}
+
+export interface AtomicSwapTimeout {
+  timeoutBlocks: number;
+  timeoutTimestamp: Date;
+  isExpired: boolean;
+  blockchainTimeouts: {
+    [chain: string]: {
+      blocks: number;
+      timestamp: Date;
+    };
+  };
+}
+
+export interface AtomicSwapRollback {
+  canRollback: boolean;
+  rollbackReason?: 'timeout' | 'failure' | 'manual';
+  rollbackStarted?: Date;
+  rollbackCompleted?: Date;
+  assetsToUnlock: {
+    [chain: string]: {
+      required: boolean;
+      txHash?: string;
+      completed: boolean;
+    };
+  };
+}
+
+export interface AtomicSwap {
+  swapId: string;
+  initiatorFinId: string;
+  responderFinId: string;
+  initiatorAsset: AtomicSwapAsset;
+  responderAsset: AtomicSwapAsset;
+  status: AtomicSwapStatus;
+  progress: AtomicSwapProgress;
+  timeout: AtomicSwapTimeout;
+  rollback: AtomicSwapRollback;
+  createdAt: Date;
+  updatedAt: Date;
+  completedAt?: Date;
+  failedAt?: Date;
+  events: AtomicSwapEvent[];
+}
+
+export interface AtomicSwapEvent {
+  id: string;
+  swapId: string;
+  type: 'initiated' | 'lock_started' | 'lock_completed' | 'completion_started' | 'completed' | 'failed' | 'expired' | 'rollback_started' | 'rollback_completed';
+  chain?: string;
+  txHash?: string;
+  message: string;
+  timestamp: Date;
+  metadata?: Record<string, any>;
+}
+
+export interface AtomicSwapRequest {
+  initiatorFinId: string;
+  responderFinId: string;
+  initiatorAsset: { chain: string; assetId: string; amount: string };
+  responderAsset: { chain: string; assetId: string; amount: string };
+  timeoutBlocks: number;
+  timeoutMinutes?: number; // Alternative timeout in minutes
+  autoRollback?: boolean;
+  requiredConfirmations?: { [chain: string]: number };
+}
+
+export interface AtomicSwapResponse {
+  swapId: string;
+  status: AtomicSwapStatus;
+  progress: AtomicSwapProgress;
+  estimatedCompletionTime?: Date;
+  nextAction?: string;
+  lockTxHash?: string;
+  completeTxHash?: string;
+}
