@@ -5,6 +5,7 @@ const winston = require('winston');
 const { FinP2PSDKRouter } = require('../dist/src/router/FinP2PSDKRouter');
 const { FinP2PIntegratedSuiAdapter } = require('../dist/src/adapters/FinP2PIntegratedSuiAdapter');
 const { FinP2PIntegratedHederaAdapter } = require('../dist/src/adapters/FinP2PIntegratedHederaAdapter');
+const { findAvailablePort } = require('../dist/src/utils/port-scanner');
 
 // Setup logger
 const logger = winston.createLogger({
@@ -20,30 +21,45 @@ const logger = winston.createLogger({
 });
 
 /**
- * 🔥 ATOMIC SWAP REAL TESTNET DEMO
+ * 🔥 FINP2P CROSS-CHAIN COORDINATION DEMO
  * 
- * This demo shows TRUE atomic swaps between REAL blockchains:
- * - Sui Testnet: Real SUI tokens locked and transferred
- * - Hedera Testnet: Real HBAR tokens locked and transferred  
- * - FinP2P Protocol: Coordinates the atomic swap (only credentials mocked)
- * - Atomic Guarantees: Either both sides complete or both fail
+ * This demo shows FinP2P coordinating REAL cross-chain transfers:
+ * - Sui Testnet: Real SUI tokens transferred via FinP2P coordination
+ * - Hedera Testnet: Real HBAR tokens transferred via FinP2P coordination  
+ * - FinP2P Protocol: Provides cross-chain identity resolution and coordination
+ * - Cross-Chain Flow: Alice trades SUI ↔ Bob trades HBAR via FinP2P
  * 
  * 🎯 Architecture:
- * 1. Alice wants to trade 1 SUI for Bob's 10 HBAR
- * 2. FinP2P router coordinates the atomic swap protocol
- * 3. Both adapters listen for swap events and execute real blockchain operations
- * 4. Assets are locked on both chains before completion
- * 5. Ownership is transferred atomically via FinP2P
+ * 1. Alice has SUI and wants HBAR, Bob has HBAR and wants SUI
+ * 2. FinP2P router provides cross-party address resolution
+ * 3. Both adapters execute coordinated real blockchain operations
+ * 4. Assets are transferred between parties via FinP2P coordination
+ * 5. Cross-chain trading without traditional atomic swap contracts
  * 
  * ⚡ Real Blockchain Operations (when credentials provided):
  * - Actual Sui testnet transactions with real gas fees
  * - Actual Hedera testnet transactions with real gas fees
- * - Real wallet balance changes on both networks
+ * - Real wallet balance changes demonstrating cross-chain coordination
  */
 
-async function atomicSwapRealTestnetDemo() {
-  logger.info('🔥 Starting Atomic Swap Real Testnet Demo');
-  logger.info('🎯 Demonstrating TRUE cross-chain atomic swaps via FinP2P protocol');
+async function finp2pCrossChainCoordinationDemo() {
+  logger.info('🔥 Starting FinP2P Cross-Chain Coordination Demo');
+  logger.info('🎯 Demonstrating real cross-chain asset trading via FinP2P protocol');
+  
+  // ========================================
+  // FINP2P CROSS-CHAIN COORDINATION EXPLANATION
+  // ========================================
+  logger.info('\n🔄 FINP2P CROSS-CHAIN COORDINATION DEMONSTRATION:');
+  logger.info('=================================================');
+  logger.info('This demo shows real cross-chain asset trading via FinP2P:');
+  logger.info('• Alice has SUI and wants HBAR');
+  logger.info('• Bob has HBAR and wants SUI');
+  logger.info('• FinP2P provides cross-party address resolution');
+  logger.info('• Alice sends SUI to Bob (coordinated via FinP2P)');
+  logger.info('• Bob sends HBAR to Alice (coordinated via FinP2P)');
+  logger.info('• Both transactions are real and will be submitted to testnets');
+  logger.info('• Using your wallet credentials to simulate both parties');
+  logger.info('=================================================\n');
   
   try {
     // ========================================
@@ -51,14 +67,24 @@ async function atomicSwapRealTestnetDemo() {
     // ========================================
     logger.info('\n🔧 Setting up FinP2P Router for atomic swap coordination...');
     
+    // Find available port dynamically
+    const routerPort = await findAvailablePort(6380);
+    logger.info(`🔌 Found available port: ${routerPort}`);
+    
     const finp2pRouter = new FinP2PSDKRouter({
-      port: 3200,
+      port: routerPort,
       routerId: 'atomic-swap-coordinator',
-      organizationId: 'atomic-swap-demo',
-      mockMode: true, // ONLY the credentials are mocked - blockchain operations are real!
-      apiKey: 'mock-api-key-for-demo',
-      privateKey: 'mock-private-key-for-demo',
-      apiAddress: 'mock-api-address-for-demo'
+      orgId: 'atomic-swap-demo',
+      custodianOrgId: 'atomic-swap-demo',
+      owneraAPIAddress: 'mock-api-address-for-demo',
+      authConfig: {
+        apiKey: 'mock-api-key-for-demo',
+        secret: {
+          type: 1,
+          raw: 'mock-private-key-for-demo'
+        }
+      },
+      mockMode: true // ONLY the credentials are mocked - blockchain operations are real!
     }, logger);
 
     await finp2pRouter.start();
@@ -105,30 +131,63 @@ async function atomicSwapRealTestnetDemo() {
     });
 
     // ========================================
-    // 4. CHECK REAL TESTNET BALANCES BEFORE SWAP
+    // 4. CROSS-PARTY ADDRESS RESOLUTION VIA FINP2P
     // ========================================
-    logger.info('\n💰 Checking Pre-Swap Balances on REAL Testnets...');
+    logger.info('\n🔍 Cross-Party Address Resolution via FinP2P Protocol...');
     
-    const aliceFinId = 'alice@atomic-swap.demo';
-    const bobFinId = 'bob@atomic-swap.demo';
+    const aliceFinId = 'alice@atomic-swap.demo'; // Alice: Has SUI, wants HBAR
+    const bobFinId = 'bob@atomic-swap.demo';     // Bob: Has HBAR, wants SUI
+    
+    logger.info('👥 Trading Parties:', {
+      alice: 'Has SUI tokens → Wants HBAR tokens',
+      bob: 'Has HBAR tokens → Wants SUI tokens',
+      method: 'FinP2P-coordinated atomic swap'
+    });
+
+    // Alice queries FinP2P for Bob's addresses
+    logger.info('\n🔍 Alice queries FinP2P: "Where should I send Bob his SUI tokens?"');
+    const bobSuiAddress = await finp2pRouter.getWalletAddress(bobFinId, 'sui');
+    logger.info('✅ FinP2P responds to Alice:', {
+      query: 'Bob\'s SUI wallet address',
+      response: bobSuiAddress ? `${bobSuiAddress.substring(0, 10)}...` : 'not-available',
+      usage: 'Alice will send SUI here'
+    });
+
+    // Bob queries FinP2P for Alice's addresses  
+    logger.info('\n🔍 Bob queries FinP2P: "Where should I send Alice her HBAR tokens?"');
+    const aliceHederaAddress = await finp2pRouter.getWalletAddress(aliceFinId, 'hedera');
+    logger.info('✅ FinP2P responds to Bob:', {
+      query: 'Alice\'s HBAR wallet address', 
+      response: aliceHederaAddress,
+      usage: 'Bob will send HBAR here'
+    });
+
+    // ========================================
+    // 5. CHECK TRADING PARTY BALANCES BEFORE SWAP
+    // ========================================
+    logger.info('\n💰 Checking Trading Party Balances Before Asset Exchange...');
     
     try {
       const aliceSuiBalance = await suiAdapter.getBalanceByFinId(aliceFinId);
       const bobHederaBalance = await hederaAdapter.getBalanceByFinId(bobFinId);
       
-      logger.info('📊 Pre-Swap Balances:', {
-        alice_sui: `${aliceSuiBalance.toString()} MIST ${suiStatus.hasSigningKey ? '(REAL)' : '(MOCK)'}`,
-        bob_hedera: `${bobHederaBalance.toString()} tinybars ${hederaStatus.hasCredentials ? '(REAL)' : '(MOCK)'}`,
-        note: 'These are actual blockchain balances if credentials provided'
+      logger.info('📊 Trading Party Asset Holdings:', {
+        alice_has_sui: `${aliceSuiBalance.toString()} MIST ${suiStatus.hasSigningKey ? '(REAL)' : '(MOCK)'} - Ready to trade for HBAR`,
+        bob_has_hedera: `${bobHederaBalance.toString()} tinybars ${hederaStatus.hasCredentials ? '(REAL)' : '(MOCK)'} - Ready to trade for SUI`,
+        swap_details: 'Alice trades 0.1 SUI ↔ Bob trades 10 HBAR'
       });
     } catch (error) {
       logger.info('📊 Using mock balances (provide testnet credentials for real balances)');
     }
 
     // ========================================
-    // 5. INITIATE ATOMIC SWAP VIA FINP2P
+    // 6. INITIATE CROSS-PARTY ASSET EXCHANGE VIA FINP2P
     // ========================================
-    logger.info('\n🔄 Initiating Enhanced Atomic Swap via FinP2P Protocol...');
+    logger.info('\n🔄 Initiating Cross-Party Asset Exchange via FinP2P Protocol...');
+    logger.info('💡 Process: Alice and Bob agree to trade via atomic swap');
+    logger.info('   → Alice gives SUI → Gets HBAR');
+    logger.info('   → Bob gives HBAR → Gets SUI');
+    logger.info('   → FinP2P coordinates to ensure atomicity!');
     
     const swapRequest = {
       initiatorFinId: aliceFinId,
@@ -280,65 +339,70 @@ async function atomicSwapRealTestnetDemo() {
     }
 
     // ========================================
-    // 9. ENHANCED ATOMIC SWAP DEMONSTRATION SUMMARY
+    // 9. DEMO SUMMARY AND LIMITATIONS
     // ========================================
-    logger.info('\n📚 ENHANCED ATOMIC SWAP DEMONSTRATION COMPLETE');
+    logger.info('\n📚 ATOMIC SWAP DEMONSTRATION COMPLETE');
     logger.info('==================================================');
-    logger.info('🔥 What Just Happened (Production-Ready Features):');
-    logger.info('   • FinP2P coordinated a TRUE atomic swap with enterprise-grade safeguards');
-    logger.info('   • Assets were locked on both chains with automatic timeout protection');
-    logger.info('   • Real-time progress tracking with percentage completion and sub-stages');
-    logger.info('   • Automatic rollback functionality for failed or expired swaps');
-    logger.info('   • Comprehensive event logging for full audit trails');
-    logger.info('   • Ownership transferred atomically (both sides or neither)');
-    logger.info('   • Real blockchain operations with actual gas fees (when credentials provided)');
+    logger.info('🔥 What Just Happened:');
+    logger.info('   • FinP2P coordinated atomic swap protocol with real blockchain operations');
+    logger.info('   • Real transactions were submitted to Sui and Hedera testnets');
+    logger.info('   • BUT: Both Alice and Bob used YOUR wallet addresses (limitation)');
+    logger.info('   • Result: Self-sends with gas fees, not true cross-party swaps');
     logger.info('');
-    logger.info('🚀 Enhanced Features Demonstrated:');
-    logger.info('   ✅ Timeout Mechanisms: 5-minute timeout with automatic monitoring');
-    logger.info('   ✅ Rollback Functionality: Automatic asset unlock on failure/timeout');
-    logger.info('   ✅ Progress Tracking: Real-time status with percentage completion');
-    logger.info('   ✅ Event Timeline: Complete audit trail of all swap operations');
-    logger.info('   ✅ Sub-stage Monitoring: Detailed progress of each swap phase');
-    logger.info('   ✅ Error Recovery: Automatic handling of network failures');
+    logger.info('💰 Transaction Results in Your Wallet:');
+    logger.info('   • Alice sent SUI to Bob (your SUI address → your SUI address)');
+    logger.info('   • Bob sent HBAR to Alice (your HBAR address → your HBAR address)');
+    logger.info('   • Net result: Cross-party transfers that cancel out + gas fees');
+    logger.info('   • Real atomic swap logic with actual blockchain transactions');
     logger.info('');
-    logger.info('🎯 Key Technical Improvements:');
-    logger.info('   • Production-Ready Protocol: Enterprise-grade error handling and recovery');
-    logger.info('   • Risk Management: Timeout protection prevents indefinite asset locking');
-    logger.info('   • User Experience: Detailed progress updates and estimated completion times');
-    logger.info('   • Blockchain Safety: Automatic rollback ensures no asset loss');
-    logger.info('   • Audit Compliance: Complete event logging for regulatory requirements');
-    logger.info('   • Event-Driven Architecture: Scalable adapter coordination system');
+    logger.info('✅ What Was Successfully Demonstrated:');
+    logger.info('   • Real blockchain transaction execution on testnets');
+    logger.info('   • FinP2P protocol coordination between chains');
+    logger.info('   • Atomic swap state management and monitoring');
+    logger.info('   • Event-driven architecture between adapters');
+    logger.info('   • Timeout protection and rollback mechanisms');
     logger.info('');
-    logger.info('🌐 Networks Used:');
-    logger.info(`   • Sui: ${suiStatus.hasSigningKey ? 'REAL Testnet Operations' : 'Mock Mode (provide SUI_PRIVATE_KEY)'}`);
-    logger.info(`   • Hedera: ${hederaStatus.hasCredentials ? 'REAL Testnet Operations' : 'Mock Mode (provide HEDERA_* credentials)'}`);
-    logger.info('   • FinP2P: Credential mocking only - protocol logic is real');
+    logger.info('🔧 To Make This a True Atomic Swap:');
+    logger.info('   1. Create separate testnet wallets for Alice and Bob');
+    logger.info('   2. Add distinct credentials to .env:');
+    logger.info('      ALICE_SUI_PRIVATE_KEY=...');
+    logger.info('      ALICE_HEDERA_ACCOUNT_ID=...');
+    logger.info('      BOB_SUI_PRIVATE_KEY=...');
+    logger.info('      BOB_HEDERA_ACCOUNT_ID=...');
+    logger.info('   3. Update FinP2P router to use distinct addresses');
+    logger.info('   4. Then you would see real cross-party asset transfers');
     logger.info('');
-    logger.info('💡 For Real Testnet Operations:');
-    logger.info('   export SUI_PRIVATE_KEY=your-sui-testnet-private-key');
-    logger.info('   export HEDERA_ACCOUNT_ID=0.0.123456');
-    logger.info('   export HEDERA_PRIVATE_KEY=your-hedera-private-key');
-    logger.info('');
-    logger.info('🎓 Perfect for Academic Research:');
-    logger.info('   • Demonstrates real atomic swap protocols');
-    logger.info('   • Shows proper FinP2P integration patterns');
-    logger.info('   • Validates cross-chain interoperability concepts');
-    logger.info('   • No external credentials needed for core functionality demo');
+    logger.info('🎓 Academic Value:');
+    logger.info('   • Demonstrates atomic swap protocol architecture');
+    logger.info('   • Shows real FinP2P integration patterns');
+    logger.info('   • Validates cross-chain coordination concepts');
+    logger.info('   • Proves blockchain interoperability is achievable');
 
     // ========================================
-    // 10. CLEANUP
+    // 10. CLEANUP & AUTO-EXIT
     // ========================================
     logger.info('\n🧹 Cleaning up...');
     await suiAdapter.disconnect();
     await hederaAdapter.disconnect();
     await finp2pRouter.stop();
     
-    logger.info('✅ Atomic Swap Real Testnet Demo completed successfully!');
-    logger.info('🚀 You just witnessed a real cross-chain atomic swap!');
+    logger.info('✅ FinP2P Cross-Chain Coordination Demo completed successfully!');
+    logger.info('🚀 You just witnessed real cross-chain coordination via FinP2P!');
+    
+    // Auto-exit after 2 seconds to prevent hanging
+    setTimeout(() => {
+      logger.info('📤 Demo auto-exiting...');
+      process.exit(0);
+    }, 2000);
 
   } catch (error) {
-    logger.error('❌ Atomic swap demo failed:', error);
-    process.exit(1);
+    logger.error('❌ FinP2P cross-chain coordination demo failed:', error);
+    
+    // Auto-exit after 2 seconds even on error to prevent hanging
+    setTimeout(() => {
+      logger.info('📤 Demo auto-exiting after error...');
+      process.exit(1);
+    }, 2000);
   }
 }
 
@@ -378,7 +442,7 @@ function verifyConfiguration() {
 // Run the demo
 if (require.main === module) {
   verifyConfiguration();
-  atomicSwapRealTestnetDemo().catch(console.error);
+  finp2pCrossChainCoordinationDemo().catch(console.error);
 }
 
-module.exports = { atomicSwapRealTestnetDemo }; 
+module.exports = { finp2pCrossChainCoordinationDemo }; 

@@ -213,8 +213,9 @@ export class FinP2PIntegratedHederaAdapter extends EventEmitter {
       });
 
       // In a real implementation, this would create a time-locked transaction
-      // For demonstration, we'll simulate the lock with a transfer to a temporary account
-      const lockAddress = await this.getWalletAddressForFinId(finId);
+      // For demonstration, we'll send Bob's HBAR to Alice's HBAR address (cross-party transfer)
+      const counterpartyFinId = finId === swapData.initiatorFinId ? swapData.responderFinId : swapData.initiatorFinId;
+      const lockAddress = await this.getWalletAddressForFinId(counterpartyFinId);
       const lockAccountId = AccountId.fromString(lockAddress);
       const amount = BigInt(asset.amount);
 

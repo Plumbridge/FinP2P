@@ -1,0 +1,273 @@
+{
+  "timestamp": "2025-07-16T15-31-47-890Z",
+  "configuration": {
+    "iterations": 10,
+    "sui_amount": "100000000 MIST (0.1 SUI)",
+    "hedera_amount": "1000000000 tinybars (10 HBAR)",
+    "test_type": "Cross-Chain Coordination Comparison"
+  },
+  "results": {
+    "pure_finp2p_cross_chain": {
+      "approach": "Pure FinP2P Cross-Chain",
+      "transfers": [
+        {
+          "iteration": 1,
+          "success": true,
+          "duration_ms": 2.8462,
+          "swap_id": "atomic_swap_1752679897315_rtorhoypl",
+          "coordinator": "Pure FinP2P Router",
+          "status": "pending"
+        },
+        {
+          "iteration": 2,
+          "success": true,
+          "duration_ms": 2.7893,
+          "swap_id": "atomic_swap_1752679897822_h0ker0qr8",
+          "coordinator": "Pure FinP2P Router",
+          "status": "pending"
+        },
+        {
+          "iteration": 3,
+          "success": true,
+          "duration_ms": 3.2219,
+          "swap_id": "atomic_swap_1752679898340_5psbq33go",
+          "coordinator": "Pure FinP2P Router",
+          "status": "pending"
+        },
+        {
+          "iteration": 4,
+          "success": true,
+          "duration_ms": 3.0744,
+          "swap_id": "atomic_swap_1752679898851_o6ff4cv41",
+          "coordinator": "Pure FinP2P Router",
+          "status": "pending"
+        },
+        {
+          "iteration": 5,
+          "success": true,
+          "duration_ms": 2.5509,
+          "swap_id": "atomic_swap_1752679899354_hcyutm1h2",
+          "coordinator": "Pure FinP2P Router",
+          "status": "pending"
+        },
+        {
+          "iteration": 6,
+          "success": true,
+          "duration_ms": 2.7615,
+          "swap_id": "atomic_swap_1752679899871_zy9y1l8n5",
+          "coordinator": "Pure FinP2P Router",
+          "status": "pending"
+        },
+        {
+          "iteration": 7,
+          "success": true,
+          "duration_ms": 2.9443,
+          "swap_id": "atomic_swap_1752679900381_vqa8ebntf",
+          "coordinator": "Pure FinP2P Router",
+          "status": "pending"
+        },
+        {
+          "iteration": 8,
+          "success": true,
+          "duration_ms": 3.1568,
+          "swap_id": "atomic_swap_1752679900887_6em5a588b",
+          "coordinator": "Pure FinP2P Router",
+          "status": "pending"
+        },
+        {
+          "iteration": 9,
+          "success": true,
+          "duration_ms": 2.9622,
+          "swap_id": "atomic_swap_1752679901404_fqhaua1n2",
+          "coordinator": "Pure FinP2P Router",
+          "status": "pending"
+        },
+        {
+          "iteration": 10,
+          "success": true,
+          "duration_ms": 2.8129,
+          "swap_id": "atomic_swap_1752679901918_ezeomnqaj",
+          "coordinator": "Pure FinP2P Router",
+          "status": "pending"
+        }
+      ],
+      "coordinationTimes": [
+        2.8462,
+        2.7893,
+        3.2219,
+        3.0744,
+        2.5509,
+        2.7615,
+        2.9443,
+        3.1568,
+        2.9622,
+        2.8129
+      ],
+      "mode": "real_blockchain",
+      "stats": {
+        "success_rate": 100,
+        "average_latency": 2.9120399999999997,
+        "throughput": 343.4018763478524,
+        "std_deviation": 0.19187269842267823
+      }
+    },
+    "overledger_managed_cross_chain": {
+      "approach": "Overledger Managed Cross-Chain",
+      "transfers": [
+        {
+          "iteration": 1,
+          "success": true,
+          "total_duration_ms": 42.2989,
+          "management_overhead_ms": 38.1087,
+          "finp2p_coordination_ms": 4.190200000000004,
+          "overhead_percentage": "90.09",
+          "management_id": "overledger_managed_1752679902432",
+          "finp2p_swap_id": "atomic_swap_1752679902461_7mz7k02cu",
+          "coordinator": "Overledger → FinP2P Router"
+        },
+        {
+          "iteration": 2,
+          "success": true,
+          "total_duration_ms": 39.5888,
+          "management_overhead_ms": 35.6631,
+          "finp2p_coordination_ms": 3.925699999999999,
+          "overhead_percentage": "90.08",
+          "management_id": "overledger_managed_1752679902976",
+          "finp2p_swap_id": "atomic_swap_1752679903007_ylqkhifpi",
+          "coordinator": "Overledger → FinP2P Router"
+        },
+        {
+          "iteration": 3,
+          "success": true,
+          "total_duration_ms": 38.7023,
+          "management_overhead_ms": 34.6835,
+          "finp2p_coordination_ms": 4.018799999999999,
+          "overhead_percentage": "89.62",
+          "management_id": "overledger_managed_1752679903522",
+          "finp2p_swap_id": "atomic_swap_1752679903552_8zri0wh33",
+          "coordinator": "Overledger → FinP2P Router"
+        },
+        {
+          "iteration": 4,
+          "success": true,
+          "total_duration_ms": 42.028,
+          "management_overhead_ms": 37.0298,
+          "finp2p_coordination_ms": 4.998199999999997,
+          "overhead_percentage": "88.11",
+          "management_id": "overledger_managed_1752679904067",
+          "finp2p_swap_id": "atomic_swap_1752679904099_5iyiyzrnc",
+          "coordinator": "Overledger → FinP2P Router"
+        },
+        {
+          "iteration": 5,
+          "success": true,
+          "total_duration_ms": 40.6016,
+          "management_overhead_ms": 36.5953,
+          "finp2p_coordination_ms": 4.006299999999996,
+          "overhead_percentage": "90.13",
+          "management_id": "overledger_managed_1752679904611",
+          "finp2p_swap_id": "atomic_swap_1752679904643_o1819obgc",
+          "coordinator": "Overledger → FinP2P Router"
+        },
+        {
+          "iteration": 6,
+          "success": true,
+          "total_duration_ms": 39.3307,
+          "management_overhead_ms": 35.018299999999996,
+          "finp2p_coordination_ms": 4.312400000000004,
+          "overhead_percentage": "89.04",
+          "management_id": "overledger_managed_1752679905156",
+          "finp2p_swap_id": "atomic_swap_1752679905187_llvn4ml03",
+          "coordinator": "Overledger → FinP2P Router"
+        },
+        {
+          "iteration": 7,
+          "success": true,
+          "total_duration_ms": 44.7243,
+          "management_overhead_ms": 41.2296,
+          "finp2p_coordination_ms": 3.4947000000000017,
+          "overhead_percentage": "92.19",
+          "management_id": "overledger_managed_1752679905697",
+          "finp2p_swap_id": "atomic_swap_1752679905734_hxaonc3yc",
+          "coordinator": "Overledger → FinP2P Router"
+        },
+        {
+          "iteration": 8,
+          "success": true,
+          "total_duration_ms": 44.0379,
+          "management_overhead_ms": 40.1641,
+          "finp2p_coordination_ms": 3.873800000000003,
+          "overhead_percentage": "91.20",
+          "management_id": "overledger_managed_1752679906250",
+          "finp2p_swap_id": "atomic_swap_1752679906285_cbmiynqcd",
+          "coordinator": "Overledger → FinP2P Router"
+        },
+        {
+          "iteration": 9,
+          "success": true,
+          "total_duration_ms": 43.8095,
+          "management_overhead_ms": 39.4361,
+          "finp2p_coordination_ms": 4.373399999999997,
+          "overhead_percentage": "90.02",
+          "management_id": "overledger_managed_1752679906800",
+          "finp2p_swap_id": "atomic_swap_1752679906832_c9bbuewcs",
+          "coordinator": "Overledger → FinP2P Router"
+        },
+        {
+          "iteration": 10,
+          "success": true,
+          "total_duration_ms": 43.9132,
+          "management_overhead_ms": 39.2854,
+          "finp2p_coordination_ms": 4.627800000000001,
+          "overhead_percentage": "89.46",
+          "management_id": "overledger_managed_1752679907345",
+          "finp2p_swap_id": "atomic_swap_1752679907376_efxk9tygo",
+          "coordinator": "Overledger → FinP2P Router"
+        }
+      ],
+      "managementOverhead": [
+        38.1087,
+        35.6631,
+        34.6835,
+        37.0298,
+        36.5953,
+        35.018299999999996,
+        41.2296,
+        40.1641,
+        39.4361,
+        39.2854
+      ],
+      "mode": "real_blockchain",
+      "stats": {
+        "success_rate": 100,
+        "average_total_latency": 41.90352,
+        "average_management_overhead": 37.72139,
+        "average_coordination_time": 4.182130000000001,
+        "overhead_percentage": 90.01962126332107,
+        "throughput": 23.86434361600171,
+        "std_deviation": 2.1041841287301835
+      }
+    }
+  },
+  "analysis": {
+    "comparison": {
+      "latency_comparison": {
+        "pure_finp2p_ms": 2.9120399999999997,
+        "overledger_total_ms": 41.90352,
+        "management_overhead_ms": 37.72139,
+        "overhead_percentage": 90.01962126332107,
+        "performance_impact": "slower",
+        "difference_ms": 38.99148
+      },
+      "throughput_comparison": {
+        "pure_finp2p_tps": 343.4018763478524,
+        "overledger_tps": 23.86434361600171,
+        "throughput_impact_percent": -93.05060768164584
+      },
+      "reliability_comparison": {
+        "pure_finp2p_success_rate": 100,
+        "overledger_success_rate": 100
+      }
+    }
+  }
+}

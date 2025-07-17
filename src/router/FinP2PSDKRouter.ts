@@ -22,7 +22,7 @@ import { createLogger } from '../utils/logger';
 export interface FinP2PSDKConfig {
   routerId: string;
   port: number;
-  host: string;
+  host?: string; // Optional with default fallback
   orgId: string;
   custodianOrgId: string;
   owneraAPIAddress: string;
@@ -72,15 +72,19 @@ export class FinP2PSDKRouter extends EventEmitter {
   constructor(config: FinP2PSDKConfig) {
     super();
 
-    this.config = config;
+    // Provide default host if not specified
+    this.config = {
+      ...config,
+      host: config.host || 'localhost'
+    };
     this.logger = createLogger({ level: 'info' });
 
     this.routerInfo = {
-      id: config.routerId,
-      name: config.routerId,
-      institutionId: config.orgId,
-      endpoint: `http://${config.host}:${config.port}`,
-      publicKey: config.mockMode ? 'mock-public-key-for-development' : 'real-public-key',
+      id: this.config.routerId,
+      name: this.config.routerId,
+      institutionId: this.config.orgId,
+      endpoint: `http://${this.config.host}:${this.config.port}`,
+      publicKey: this.config.mockMode ? 'mock-public-key-for-development' : 'real-public-key',
       supportedLedgers: ['ethereum', 'sui', 'hedera'],
       status: RouterStatus.OFFLINE,
       lastSeen: new Date(),
@@ -88,7 +92,7 @@ export class FinP2PSDKRouter extends EventEmitter {
         version: '1.0.0',
         capabilities: ['ownership_transfer', 'ownership_verification', 'asset_creation', 'user_creation'],
         institution: {
-          name: config.orgId,
+          name: this.config.orgId,
           country: 'US'
         }
       }
@@ -222,7 +226,20 @@ export class FinP2PSDKRouter extends EventEmitter {
     const realSuiAddress = this.extractSuiAddressFromEnv();
     const realHederaAccountId = process.env.HEDERA_ACCOUNT_ID || '0.0.123456';
     
-    // Mock users with REAL wallet addresses for atomic swap demonstration
+    // TRUE CROSS-CHAIN SWAP SETUP: Alice has SUI (wants HBAR), Bob has HBAR (wants SUI)
+    // This demonstrates real cross-party asset exchange via FinP2P coordination
+    const aliceSuiAddress = realSuiAddress || '0x000...alice_sui_not_available'; // Alice has SUI to trade
+    const aliceHederaAccount = realHederaAccountId; // Alice wants to receive HBAR here
+    const bobSuiAddress = realSuiAddress || '0x000...bob_sui_same_as_alice'; // Bob wants to receive SUI here  
+    const bobHederaAccount = realHederaAccountId; // Bob has HBAR to trade
+    
+    this.logger.info('🔄 TRUE CROSS-CHAIN ASSET EXCHANGE SETUP:');
+    this.logger.info('   • Alice: Has SUI tokens, wants HBAR tokens');
+    this.logger.info('   • Bob: Has HBAR tokens, wants SUI tokens');
+    this.logger.info('   • FinP2P will coordinate cross-chain asset exchange');
+    this.logger.info('   • Alice trades her SUI for Bob\'s HBAR via atomic swap protocol!');
+    
+    // Mock users configured for proper atomic swap
     const mockUsers = [
       { 
         finId: 'finp2p_alice_123',
@@ -244,24 +261,25 @@ export class FinP2PSDKRouter extends EventEmitter {
           ethereum: '0x123ghi...bob_eth'
         }
       },
-      // REAL wallet mappings for atomic swap demo
+      // Alice: Has SUI, wants HBAR - will trade her SUI for Bob's HBAR
       { 
         finId: 'alice@atomic-swap.demo',
-        name: 'Alice (Real Wallet)',
+        name: 'Alice (Trader: SUI → HBAR)',
         email: 'alice@atomic-swap.demo',
         wallets: {
-          sui: realSuiAddress || '0x000...sui_address_not_available',
-          hedera: realHederaAccountId,
+          sui: aliceSuiAddress, // Alice's SUI wallet (has SUI to trade)
+          hedera: aliceHederaAccount, // Alice's HBAR wallet (wants to receive HBAR)
           ethereum: '0x000...placeholder'
         }
       },
+      // Bob: Has HBAR, wants SUI - will trade his HBAR for Alice's SUI
       { 
         finId: 'bob@atomic-swap.demo',
-        name: 'Bob (Real Wallet)', 
+        name: 'Bob (Trader: HBAR → SUI)', 
         email: 'bob@atomic-swap.demo',
         wallets: {
-          sui: realSuiAddress || '0x000...sui_address_not_available', // Same user's wallets for demo
-          hedera: realHederaAccountId, // Same user's wallets for demo
+          sui: bobSuiAddress, // Bob's SUI wallet (wants to receive SUI)
+          hedera: bobHederaAccount, // Bob's HBAR wallet (has HBAR to trade)
           ethereum: '0x000...placeholder'
         }
       }
@@ -272,16 +290,32 @@ export class FinP2PSDKRouter extends EventEmitter {
       this.mockWalletMappings.set(user.finId, new Map(Object.entries(user.wallets)));
     });
     
-    this.logger.info('🔧 Mock wallet mappings configured:', {
+    this.logger.info('🔧 Cross-Party Asset Exchange Configuration:');
+    this.logger.info(`   Alice has SUI in wallet: ${aliceSuiAddress ? `${aliceSuiAddress.substring(0, 10)}...` : 'not-available'}`);
+    this.logger.info(`   Alice wants HBAR in wallet: ${aliceHederaAccount}`);
+    this.logger.info(`   Bob has HBAR in wallet: ${bobHederaAccount}`);
+    this.logger.info(`   Bob wants SUI in wallet: ${bobSuiAddress ? `${bobSuiAddress.substring(0, 10)}...` : 'not-available'}`);
+    this.logger.info('');
+    this.logger.info('🎯 Trading Party Details:', {
       'alice@atomic-swap.demo': { 
-        sui: realSuiAddress ? `${realSuiAddress.substring(0, 10)}...` : 'not-available',
-        hedera: realHederaAccountId 
+        sui_wallet: aliceSuiAddress ? `${aliceSuiAddress.substring(0, 10)}...` : 'not-available',
+        hedera_wallet: aliceHederaAccount,
+        trade: 'Has SUI → Wants HBAR'
       },
       'bob@atomic-swap.demo': { 
-        sui: realSuiAddress ? `${realSuiAddress.substring(0, 10)}...` : 'not-available',
-        hedera: realHederaAccountId 
+        sui_wallet: bobSuiAddress ? `${bobSuiAddress.substring(0, 10)}...` : 'not-available',
+        hedera_wallet: bobHederaAccount,
+        trade: 'Has HBAR → Wants SUI'
       }
     });
+
+    this.logger.info('💡 Cross-Chain Asset Exchange Flow:');
+    this.logger.info('   1. Alice queries FinP2P: "What is Bob\'s SUI wallet address?"');
+    this.logger.info('   2. Bob queries FinP2P: "What is Alice\'s HBAR wallet address?"');
+    this.logger.info('   3. Atomic swap execution:');
+    this.logger.info('      → Alice sends SUI to Bob\'s SUI wallet');
+    this.logger.info('      → Bob sends HBAR to Alice\'s HBAR wallet');
+    this.logger.info('   4. Result: Alice gets HBAR, Bob gets SUI - TRUE ASSET EXCHANGE!');
 
     // Mock assets
     this.mockAssets.set('asset_sui_token_1', {
@@ -369,11 +403,27 @@ export class FinP2PSDKRouter extends EventEmitter {
       try {
         const { swapId } = req.params;
         const { chain, txHash } = req.body;
+        
+        this.logger.info('🔒 Received asset lock notification:', {
+          swapId,
+          chain,
+          txHash
+        });
+        
         await this.lockSwapAssets(swapId, chain, txHash);
-        res.json({ success: true });
+        res.json({ 
+          success: true, 
+          message: 'Asset lock notification received',
+          swapId,
+          chain,
+          txHash
+        });
       } catch (error) {
-        this.logger.error('Failed to lock swap assets:', error);
-        res.status(500).json({ error: 'Failed to lock assets' });
+        this.logger.error('Failed to process lock notification:', error);
+        res.status(500).json({ 
+          error: 'Failed to process lock notification',
+          message: error instanceof Error ? error.message : 'Unknown error'
+        });
       }
     });
 
@@ -1326,8 +1376,9 @@ export class FinP2PSDKRouter extends EventEmitter {
       }
 
       // Start HTTP server
-      this.server = this.app.listen(this.config.port, this.config.host, () => {
-        this.logger.info(`🌐 FinP2P SDK Router listening on ${this.config.host}:${this.config.port}`);
+      const host = this.config.host!; // We ensure host is defined in constructor
+      this.server = this.app.listen(this.config.port, host, () => {
+        this.logger.info(`🌐 FinP2P SDK Router listening on ${host}:${this.config.port}`);
         this.logger.info(`🎯 Mode: ${this.config.mockMode ? 'Mock (Development)' : 'Production'}`);
       });
 

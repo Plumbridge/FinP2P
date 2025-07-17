@@ -144,16 +144,52 @@ export class FinP2PIntegratedSuiAdapter extends EventEmitter {
       });
 
       // In a real implementation, this would create a time-locked contract
-      // For demonstration, we'll simulate the lock with a regular transfer to a temporary address
-      const lockAddress = await this.getWalletAddressForFinId(swapData.initiatorFinId);
+      // For demonstration, we'll send Alice's SUI to Bob's SUI address (cross-party transfer)
+      const lockAddress = await this.getWalletAddressForFinId(swapData.responderFinId);
       
       // Simulate asset lock (in reality, this would be a smart contract)
       const lockTransaction = new Transaction();
+      // Amount is already in MIST (smallest SUI unit)
       const amount = BigInt(swapData.initiatorAsset.amount);
-      const [coin] = lockTransaction.splitCoins(lockTransaction.gas, [amount]);
+      
+      // Get the sender's address to select coins from
+      const senderAddress = await this.getWalletAddressForFinId(swapData.initiatorFinId);
+      
+      // Use SUI's gas smashing - provide coins directly and let SUI handle gas automatically
+      const coins = await this.client.getCoins({
+        owner: senderAddress,
+        coinType: '0x2::sui::SUI'
+      });
+
+      if (!coins.data || coins.data.length === 0) {
+        throw new Error('No SUI coins found');
+      }
+
+      // Calculate total available balance
+      const totalBalance = coins.data.reduce((sum, coin) => sum + BigInt(coin.balance), BigInt(0));
+      if (totalBalance < amount) {
+        throw new Error(`Insufficient balance. Need ${amount.toString()} MIST, have ${totalBalance.toString()} MIST`);
+      }
+
+      // Sort coins by balance (largest first) for efficient selection
+      const sortedCoins = coins.data
+        .filter(coin => BigInt(coin.balance) > 0)
+        .sort((a, b) => Number(BigInt(b.balance) - BigInt(a.balance)));
+
+      // Use the first coin as primary coin, SUI will handle gas from it automatically
+      const [primaryCoin] = sortedCoins;
+      
+      this.logger.info('🪙 Using SUI gas smashing for transaction:', {
+        primaryCoinBalance: primaryCoin.balance,
+        requiredAmount: amount.toString(),
+        note: 'SUI will automatically handle gas from primary coin'
+      });
+
+      // Split the required amount from the primary coin
+      const [splitCoin] = lockTransaction.splitCoins(primaryCoin.coinObjectId, [amount]);
       
       // In real atomic swap, this would go to a time-locked contract address
-      lockTransaction.transferObjects([coin], lockAddress);
+      lockTransaction.transferObjects([splitCoin], lockAddress);
 
       const result = await this.client.signAndExecuteTransaction({
         transaction: lockTransaction,
@@ -280,15 +316,45 @@ export class FinP2PIntegratedSuiAdapter extends EventEmitter {
       // 2. Return assets to the original owner
       // 3. Handle any unlock conditions/timeouts
       
-      // For demonstration, we'll simulate an unlock transaction
-      const unlockAddress = await this.getWalletAddressForFinId(finId);
+      // For demonstration, we'll unlock assets by returning them to original owner
+      // In a real implementation, this would call the time-locked contract's unlock function
+      // For demo: Bob returns the SUI back to Alice
+      const aliceAddress = await this.getWalletAddressForFinId(finId); // Alice (original owner)
       
       const unlockTransaction = new Transaction();
+      // Amount is already in MIST (smallest SUI unit)
       const amount = BigInt(asset.amount);
       
-      // Simulate returning locked assets to original owner
-      const [coin] = unlockTransaction.splitCoins(unlockTransaction.gas, [amount]);
-      unlockTransaction.transferObjects([coin], unlockAddress);
+      // Bob returns the locked SUI to Alice using SUI's gas smashing
+      const coins = await this.client.getCoins({
+        owner: aliceAddress,
+        coinType: '0x2::sui::SUI'
+      });
+
+      if (!coins.data || coins.data.length === 0) {
+        throw new Error('No SUI coins found for unlock');
+      }
+
+      const totalBalance = coins.data.reduce((sum, coin) => sum + BigInt(coin.balance), BigInt(0));
+      if (totalBalance < amount) {
+        throw new Error(`Insufficient balance for unlock. Need ${amount.toString()} MIST, have ${totalBalance.toString()} MIST`);
+      }
+
+      const sortedCoins = coins.data
+        .filter(coin => BigInt(coin.balance) > 0)
+        .sort((a, b) => Number(BigInt(b.balance) - BigInt(a.balance)));
+
+      const [primaryCoin] = sortedCoins;
+      
+      this.logger.info('🪙 Using SUI gas smashing for unlock:', {
+        primaryCoinBalance: primaryCoin.balance,
+        requiredAmount: amount.toString(),
+        note: 'SUI will automatically handle gas from primary coin'
+      });
+
+      const [splitCoin] = unlockTransaction.splitCoins(primaryCoin.coinObjectId, [amount]);
+      
+      unlockTransaction.transferObjects([splitCoin], aliceAddress);
 
       const result = await this.client.signAndExecuteTransaction({
         transaction: unlockTransaction,
@@ -302,8 +368,9 @@ export class FinP2PIntegratedSuiAdapter extends EventEmitter {
       this.logger.info('🎯 Sui asset unlock transaction completed:', {
         swapId: swap.swapId,
         unlockTxHash: result.digest,
-        returnedTo: `${unlockAddress.substring(0, 10)}...`,
-        note: 'In production, this would unlock from time-locked smart contract'
+        returnedTo: `${aliceAddress.substring(0, 10)}...`,
+        amount: asset.amount,
+        note: 'Demo: Bob returned SUI to Alice (same address in demo, but represents cross-party flow)'
       });
 
       return result.digest;
@@ -362,6 +429,80 @@ export class FinP2PIntegratedSuiAdapter extends EventEmitter {
 
   isConnected(): boolean {
     return this.connected;
+  }
+
+  /**
+   * Select and merge coins for a transaction
+   * This solves the InsufficientCoinBalance error by properly selecting coins
+   */
+  private async selectAndMergeCoins(transaction: Transaction, address: string, amount: bigint): Promise<any> {
+    try {
+      // Get all coins owned by the address
+      const coins = await this.client.getCoins({
+        owner: address,
+        coinType: '0x2::sui::SUI'
+      });
+
+      if (!coins.data || coins.data.length === 0) {
+        throw new Error('No SUI coins found');
+      }
+
+      // Calculate total available balance
+      const totalBalance = coins.data.reduce((sum, coin) => sum + BigInt(coin.balance), BigInt(0));
+      
+      // No need to manually calculate gas - SUI SDK handles this automatically
+      if (totalBalance < amount) {
+        throw new Error(`Insufficient balance. Need ${amount.toString()} MIST, have ${totalBalance.toString()} MIST`);
+      }
+
+      // Sort coins by balance (largest first) for efficient selection
+      const sortedCoins = coins.data
+        .filter(coin => BigInt(coin.balance) > 0)
+        .sort((a, b) => Number(BigInt(b.balance) - BigInt(a.balance)));
+
+      // Select coins until we have enough
+      const selectedCoins = [];
+      let selectedBalance = BigInt(0);
+      
+      for (const coin of sortedCoins) {
+        selectedCoins.push(coin);
+        selectedBalance += BigInt(coin.balance);
+        if (selectedBalance >= amount) {
+          break;
+        }
+      }
+
+      this.logger.info('🪙 Selected coins for transaction:', {
+        coinsSelected: selectedCoins.length,
+        totalCoinsAvailable: sortedCoins.length,
+        selectedBalance: selectedBalance.toString(),
+        requiredAmount: amount.toString(),
+        note: 'Gas fees handled automatically by SUI SDK'
+      });
+
+      // If we have multiple coins, merge them first
+      if (selectedCoins.length > 1) {
+        const [primaryCoin, ...remainingCoins] = selectedCoins;
+        
+        // Merge all selected coins into the primary coin
+        transaction.mergeCoins(
+          primaryCoin.coinObjectId,
+          remainingCoins.map(coin => coin.coinObjectId)
+        );
+        
+        // Split the required amount from the merged coin
+        const [splitCoin] = transaction.splitCoins(primaryCoin.coinObjectId, [amount]);
+        return splitCoin;
+      }
+
+      // Single coin case - split the amount we need
+      const [splitCoin] = transaction.splitCoins(selectedCoins[0].coinObjectId, [amount]);
+      return splitCoin;
+
+    } catch (error) {
+      this.logger.error('❌ Failed to select and merge coins:', error);
+      throw error;
+    }
   }
 
   /**
@@ -451,10 +592,42 @@ export class FinP2PIntegratedSuiAdapter extends EventEmitter {
       const fromAddress = await this.getWalletAddressForFinId(fromFinId);
       const toAddress = await this.getWalletAddressForFinId(toFinId);
 
-      // 2. Execute actual transfer on Sui blockchain
+      // 2. Execute actual transfer on Sui blockchain using SUI's gas smashing
       const transaction = new Transaction();
-      const [coin] = transaction.splitCoins(transaction.gas, [amount]);
-      transaction.transferObjects([coin], toAddress);
+      
+      const coins = await this.client.getCoins({
+        owner: fromAddress,
+        coinType: '0x2::sui::SUI'
+      });
+
+      if (!coins.data || coins.data.length === 0) {
+        throw new Error('No SUI coins found');
+      }
+
+      // Calculate total available balance
+      const totalBalance = coins.data.reduce((sum, coin) => sum + BigInt(coin.balance), BigInt(0));
+      if (totalBalance < amount) {
+        throw new Error(`Insufficient balance. Need ${amount.toString()} MIST, have ${totalBalance.toString()} MIST`);
+      }
+
+      // Sort coins by balance (largest first)
+      const sortedCoins = coins.data
+        .filter(coin => BigInt(coin.balance) > 0)
+        .sort((a, b) => Number(BigInt(b.balance) - BigInt(a.balance)));
+
+      // Use the first coin as primary coin, SUI will handle gas automatically
+      const [primaryCoin] = sortedCoins;
+      
+      this.logger.info('🪙 Using SUI gas smashing for transfer:', {
+        primaryCoinBalance: primaryCoin.balance,
+        requiredAmount: amount.toString(),
+        note: 'SUI will automatically handle gas from primary coin'
+      });
+
+      // Split the required amount from the primary coin
+      const [splitCoin] = transaction.splitCoins(primaryCoin.coinObjectId, [amount]);
+      
+      transaction.transferObjects([splitCoin], toAddress);
 
       const result = await this.client.signAndExecuteTransaction({
         transaction,

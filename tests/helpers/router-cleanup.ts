@@ -3,21 +3,21 @@
  * Ensures proper shutdown of router instances to prevent hanging tests
  */
 
-import { FinP2PRouter } from '../../src/router/Router';
+import { FinP2PSDKRouter } from '../../src/router/FinP2PSDKRouter';
 
 /**
  * Safely stop a router instance with timeout
  * @param router - The router instance to stop
  * @param timeoutMs - Timeout in milliseconds (default: 5000)
  */
-export async function stopRouterSafely(router: FinP2PRouter | null, timeoutMs: number = 5000): Promise<void> {
+export async function stopRouterSafely(router: FinP2PSDKRouter | null, timeoutMs: number = 5000): Promise<void> {
   if (!router) {
     return;
   }
 
   try {
     // Check if router is running before attempting to stop
-    if (router.isRunning && router.isRunning()) {
+    if (router.isRunning) {
       let timeoutId: NodeJS.Timeout;
 
       // Create a timeout promise that resolves instead of rejecting
@@ -33,7 +33,7 @@ export async function stopRouterSafely(router: FinP2PRouter | null, timeoutMs: n
         router.stop().then(() => {
           if (timeoutId) clearTimeout(timeoutId);
           return 'success';
-        }).catch(err => {
+        }).catch((err: any) => {
           if (timeoutId) clearTimeout(timeoutId);
           console.warn('Router stop error:', err);
           return 'error';
@@ -56,7 +56,7 @@ export async function stopRouterSafely(router: FinP2PRouter | null, timeoutMs: n
  * @param routers - Array of router instances to stop
  * @param timeoutMs - Timeout in milliseconds (default: 5000)
  */
-export async function stopRoutersSafely(routers: (FinP2PRouter | null)[], timeoutMs: number = 5000): Promise<void> {
+export async function stopRoutersSafely(routers: (FinP2PSDKRouter | null)[], timeoutMs: number = 5000): Promise<void> {
   const stopPromises = routers.map(router => stopRouterSafely(router, timeoutMs));
   await Promise.allSettled(stopPromises);
 }
@@ -66,7 +66,7 @@ export async function stopRoutersSafely(routers: (FinP2PRouter | null)[], timeou
  * @param getRouter - Function that returns the router instance
  * @param timeoutMs - Timeout in milliseconds (default: 5000)
  */
-export function createRouterCleanup(getRouter: () => FinP2PRouter | null, timeoutMs: number = 5000) {
+export function createRouterCleanup(getRouter: () => FinP2PSDKRouter | null, timeoutMs: number = 5000) {
   return async () => {
     await stopRouterSafely(getRouter(), timeoutMs);
   };
@@ -77,7 +77,7 @@ export function createRouterCleanup(getRouter: () => FinP2PRouter | null, timeou
  * @param getRouters - Function that returns array of router instances
  * @param timeoutMs - Timeout in milliseconds (default: 5000)
  */
-export function createRoutersCleanup(getRouters: () => (FinP2PRouter | null)[], timeoutMs: number = 5000) {
+export function createRoutersCleanup(getRouters: () => (FinP2PSDKRouter | null)[], timeoutMs: number = 5000) {
   return async () => {
     await stopRoutersSafely(getRouters(), timeoutMs);
   };
