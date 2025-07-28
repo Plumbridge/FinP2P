@@ -129,10 +129,10 @@ class UnifiedBenchmark {
     }
 
     async benchmarkPureFinP2PCrossChain() {
-        console.log('\n🔄 Benchmarking Pure FinP2P Cross-Chain Coordination...');
+        console.log('\n🔄 Benchmarking Pure FinP2P Atomic Swap Coordination...');
         
         const results = {
-            approach: 'Pure FinP2P Cross-Chain',
+            approach: 'Pure FinP2P Atomic Swap',
             transfers: [],
             coordinationTimes: []
         };
@@ -147,15 +147,15 @@ class UnifiedBenchmark {
         console.log(`  🔧 Mode: ${results.mode}`);
         console.log(`    - SUI: ${hasRealSuiCredentials ? 'Real' : 'Mock'}`);
         console.log(`    - Hedera: ${hasRealHederaCredentials ? 'Real' : 'Mock'}`);
-        console.log(`    - Coordination: Direct FinP2P cross-chain atomic swap`);
+        console.log(`    - Coordination: Direct FinP2P atomic swap`);
         
         for (let i = 0; i < this.testParams.iterations; i++) {
             const overallStart = process.hrtime.bigint();
             
             try {
-                console.log(`  Cross-Chain ${i + 1}/${this.testParams.iterations}...`);
+                console.log(`  Atomic Swap ${i + 1}/${this.testParams.iterations}...`);
                 
-                // Direct FinP2P cross-chain atomic swap (same operation as Overledger will manage)
+                // Direct FinP2P atomic swap (same operation as Overledger will manage)
                 const swapResult = await this.router.executeAtomicSwap({
                     initiatorFinId: 'alice@atomic-swap.demo',
                     responderFinId: 'bob@atomic-swap.demo',
@@ -210,10 +210,10 @@ class UnifiedBenchmark {
     }
 
     async benchmarkOverledgerManagedCrossChain() {
-        console.log('\n🎯 Benchmarking Overledger Managed Cross-Chain Coordination...');
+        console.log('\n🎯 Benchmarking Overledger Managed Atomic Swap Coordination...');
         
         const results = {
-            approach: 'Overledger Managed Cross-Chain',
+            approach: 'Overledger Managed Atomic Swap',
             transfers: [],
             managementOverhead: []
         };
@@ -228,7 +228,7 @@ class UnifiedBenchmark {
         console.log(`  🔧 Mode: ${results.mode}`);
         console.log(`    - SUI: ${hasRealSuiCredentials ? 'Real' : 'Mock'}`);
         console.log(`    - Hedera: ${hasRealHederaCredentials ? 'Real' : 'Mock'}`);
-        console.log(`    - Management: Overledger coordinates same FinP2P cross-chain swap`);
+        console.log(`    - Management: Overledger coordinates same FinP2P atomic swap`);
         
         for (let i = 0; i < this.testParams.iterations; i++) {
             const overallStart = process.hrtime.bigint();
@@ -364,11 +364,11 @@ class UnifiedBenchmark {
                 iterations: this.testParams.iterations,
                 sui_amount: this.testParams.suiAmount + ' MIST (0.1 SUI)',
                 hedera_amount: this.testParams.hederaAmount + ' tinybars (10 HBAR)',
-                test_type: 'Cross-Chain Coordination Comparison'
+                test_type: 'Atomic Swap Coordination Comparison'
             },
             results: {
-                pure_finp2p_cross_chain: pureFinP2PResults,
-                overledger_managed_cross_chain: overledgerResults
+                pure_finp2p_atomic_swap: pureFinP2PResults,
+                overledger_managed_atomic_swap: overledgerResults
             },
             analysis: {
                 comparison: this.compareResults(pureFinP2PResults, overledgerResults)
@@ -415,17 +415,17 @@ class UnifiedBenchmark {
             await fs.mkdir(resultsDir, { recursive: true });
             
             // Save JSON report
-            const jsonPath = path.join(resultsDir, `cross-chain-benchmark-${timestamp}.json`);
+            const jsonPath = path.join(resultsDir, `atomic-swap-benchmark-${timestamp}.json`);
             await fs.writeFile(jsonPath, JSON.stringify(report, null, 2));
             
             // Generate and save markdown report
             const markdownReport = this.generateMarkdownReport(report);
-            const mdPath = path.join(resultsDir, `cross-chain-benchmark-report-${timestamp}.md`);
+            const mdPath = path.join(resultsDir, `atomic-swap-benchmark-report-${timestamp}.md`);
             await fs.writeFile(mdPath, markdownReport);
             
             // Generate and save CSV summary
             const csvSummary = this.generateCSVSummary(report);
-            const csvPath = path.join(resultsDir, `cross-chain-benchmark-summary-${timestamp}.csv`);
+            const csvPath = path.join(resultsDir, `atomic-swap-benchmark-summary-${timestamp}.csv`);
             await fs.writeFile(csvPath, csvSummary);
             
             return { jsonPath, mdPath, csvPath };
@@ -436,11 +436,11 @@ class UnifiedBenchmark {
     }
 
     generateMarkdownReport(report) {
-        const pure = report.results.pure_finp2p_cross_chain;
-        const overledger = report.results.overledger_managed_cross_chain;
+        const pure = report.results.pure_finp2p_atomic_swap;
+        const overledger = report.results.overledger_managed_atomic_swap;
         const analysis = report.analysis.comparison;
         
-        return `# Cross-Chain Coordination Performance Benchmark Report
+        return `# Atomic Swap Coordination Performance Benchmark Report
 
 ## Test Configuration
 - **Timestamp**: ${report.timestamp}
@@ -456,14 +456,14 @@ class UnifiedBenchmark {
 - **Performance Impact**: ${analysis.latency_comparison?.performance_impact || 'Unknown'}
 - **Latency Difference**: ${analysis.latency_comparison?.difference_ms?.toFixed(2) || 'N/A'}ms
 
-### 📊 Pure FinP2P Cross-Chain Coordination
+### 📊 Pure FinP2P Atomic Swap Coordination
 - **Mode**: ${pure.mode} ${pure.mode === 'real_blockchain' ? '🔥 REAL CROSS-CHAIN' : '🎭 MOCK'}
 - **Success Rate**: ${pure.stats?.success_rate?.toFixed(2) || 'N/A'}%
 - **Average Latency**: ${pure.stats?.average_latency?.toFixed(2) || 'N/A'}ms
 - **Throughput**: ${pure.stats?.throughput?.toFixed(2) || 'N/A'} TPS
 - **Standard Deviation**: ${pure.stats?.std_deviation?.toFixed(2) || 'N/A'}ms
 
-### 📊 Overledger Managed Cross-Chain Coordination
+### 📊 Overledger Managed Atomic Swap Coordination
 - **Mode**: ${overledger.mode} ${overledger.mode === 'real_blockchain' ? '🔥 REAL CROSS-CHAIN' : '🎭 MOCK'}
 - **Success Rate**: ${overledger.stats?.success_rate?.toFixed(2) || 'N/A'}%
 - **Average Total Latency**: ${overledger.stats?.average_total_latency?.toFixed(2) || 'N/A'}ms
@@ -493,12 +493,12 @@ class UnifiedBenchmark {
     }
 
     generateCSVSummary(report) {
-        const pure = report.results.pure_finp2p_cross_chain;
-        const overledger = report.results.overledger_managed_cross_chain;
+        const pure = report.results.pure_finp2p_atomic_swap;
+        const overledger = report.results.overledger_managed_atomic_swap;
         
         return `Approach,Mode,Success_Rate_%,Avg_Latency_ms,Throughput_TPS,Management_Overhead_ms,Overhead_Percentage_%
-Pure_FinP2P_Cross_Chain,${pure.mode},${pure.stats?.success_rate?.toFixed(2) || 'N/A'},${pure.stats?.average_latency?.toFixed(2) || 'N/A'},${pure.stats?.throughput?.toFixed(2) || 'N/A'},0,0
-Overledger_Managed_Cross_Chain,${overledger.mode},${overledger.stats?.success_rate?.toFixed(2) || 'N/A'},${overledger.stats?.average_total_latency?.toFixed(2) || 'N/A'},${overledger.stats?.throughput?.toFixed(2) || 'N/A'},${overledger.stats?.average_management_overhead?.toFixed(2) || 'N/A'},${overledger.stats?.overhead_percentage?.toFixed(2) || 'N/A'}`;
+Pure_FinP2P_Atomic_Swap,${pure.mode},${pure.stats?.success_rate?.toFixed(2) || 'N/A'},${pure.stats?.average_latency?.toFixed(2) || 'N/A'},${pure.stats?.throughput?.toFixed(2) || 'N/A'},0,0
+Overledger_Managed_Atomic_Swap,${overledger.mode},${overledger.stats?.success_rate?.toFixed(2) || 'N/A'},${overledger.stats?.average_total_latency?.toFixed(2) || 'N/A'},${overledger.stats?.throughput?.toFixed(2) || 'N/A'},${overledger.stats?.average_management_overhead?.toFixed(2) || 'N/A'},${overledger.stats?.overhead_percentage?.toFixed(2) || 'N/A'}`;
     }
 
     async cleanup() {
@@ -528,8 +528,8 @@ Overledger_Managed_Cross_Chain,${overledger.mode},${overledger.stats?.success_ra
     }
 
     async run() {
-        console.log('🚀 Starting Cross-Chain Coordination Benchmark');
-        console.log(`📊 Comparing Pure FinP2P vs Overledger Managed Cross-Chain Coordination`);
+        console.log('🚀 Starting Atomic Swap Coordination Benchmark');
+        console.log(`📊 Comparing Pure FinP2P vs Overledger Managed Atomic Swap Coordination`);
         console.log(`🔄 Running ${this.testParams.iterations} iterations per approach`);
         console.log(`💰 Test amounts: 0.1 SUI, 10 HBAR (cross-chain atomic swap)`);
         

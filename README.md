@@ -1,25 +1,27 @@
-# FinP2P Cross-Chain Atomic Swap System
+# FinP2P Atomic Swap System
 
-A comprehensive **cross-chain atomic swap implementation** featuring FinP2P protocol coordination, enterprise Overledger management integration, and performance benchmarking. This project demonstrates real blockchain interoperability between Sui and Hedera networks with quantitative research data.
+> **Note:** This project implements atomic swaps between Sui and Hedera using the FinP2P protocol. While the swaps occur between different blockchains, FinP2P does not provide general cross-chain interoperability—only atomic swaps (both transfers succeed or both fail).
+
+A comprehensive **atomic swap implementation** featuring FinP2P protocol coordination, enterprise Overledger management integration, and performance benchmarking. This project demonstrates real atomic swaps between Sui and Hedera networks with quantitative research data.
 
 ## 🎯 What This System Demonstrates
 
 ### **Two Complete Integration Patterns + Performance Analysis:**
 
-1. **🔄 Direct FinP2P Cross-Chain Coordination**
-   - Alice trades SUI tokens → Bob trades HBAR tokens (SUI→Hedera atomic swap)
-   - FinP2P Router handles all cross-chain coordination logic
+1. **🔄 Direct FinP2P Atomic Swap Coordination**
+   - Alice trades SUI tokens → Bob trades HBAR tokens (SUI↔Hedera atomic swap)
+   - FinP2P Router handles all atomic swap coordination logic
    - Real blockchain operations on Sui and Hedera testnets
    - FinID resolution abstracts complex wallet addresses
 
-2. **🌐 Overledger-Managed Cross-Chain Operations**
+2. **🌐 Overledger-Managed Atomic Swap Operations**
    - Overledger API acts as enterprise management layer
    - Authentication, authorization, and access control through Overledger
-   - **FinP2P Router still handles cross-chain coordination** (same SUI→Hedera atomic swap)
+   - **FinP2P Router still handles atomic swap coordination** (same SUI↔Hedera atomic swap)
    - Enterprise gateway pattern with Overledger managing access to FinP2P capabilities
 
 3. **📊 Performance Research & Benchmarking**
-   - **Proper comparison**: Pure FinP2P vs Overledger-managed FinP2P (both doing identical work)
+   - **Proper comparison**: Pure FinP2P vs Overledger-managed FinP2P (both doing identical atomic swaps)
    - Quantitative analysis measuring Overledger's management overhead
    - Statistical data for academic research and dissertation work
    - Realistic performance measurement (1-5% overhead, not artificial delays)
@@ -29,19 +31,19 @@ A comprehensive **cross-chain atomic swap implementation** featuring FinP2P prot
 ### **Corrected Architecture Flow**
 
 ```
-User Request → Overledger Account (Auth/Management) → FinP2P Router (Coordination) → SUI/Hedera Networks
+User Request → Overledger Account (Auth/Management) → FinP2P Router (Atomic Swap Coordination) → SUI/Hedera Networks
 ```
 
 **Key Roles:**
 - **Overledger**: Enterprise management layer (authentication, authorization, access control)
-- **FinP2P Router**: Cross-chain coordination engine (atomic swaps, blockchain transactions)  
+- **FinP2P Router**: Atomic swap coordination engine (atomic swaps, blockchain transactions)  
 - **Networks**: SUI and Hedera blockchain execution
 
 ### Core Components
 
 1. **FinP2PSDKRouter** (`src/router/FinP2PSDKRouter.ts`)
    - **Primary coordinator** for all atomic swaps between blockchain adapters
-   - Cross-chain coordination logic and atomic guarantees
+   - Atomic swap coordination logic and atomic guarantees
    - FinID to wallet address resolution system
    - Event-driven architecture with timeout protection
 
@@ -51,8 +53,8 @@ User Request → Overledger Account (Auth/Management) → FinP2P Router (Coordin
    - **FinP2PIntegratedOverledgerAdapter**: Enterprise management layer (delegates to FinP2P Router)
 
 3. **Benchmarking & Demos**
-   - **Unified Benchmark**: Compares Pure FinP2P vs Overledger-managed performance
-   - **Real Testnet Demos**: Working examples with actual blockchain transactions
+   - **Unified Benchmark**: Compares Pure FinP2P vs Overledger-managed atomic swap performance
+   - **Real Testnet Demos**: Working examples with actual atomic swaps
    - **Performance Analysis**: Statistical overhead measurement
 
 ### FinP2P Identity Resolution Flow
@@ -112,7 +114,7 @@ finp2p-cross-chain-system/
 npm install && npm run build
 
 # Try all three use cases:
-npm run demo:cross-chain        # 🔄 FinP2P atomic swaps
+npm run demo:atomic-swap        # 🔄 FinP2P atomic swaps
 npm run demo:overledger         # 🌐 Enterprise coordination
 npm run benchmark               # 📊 Performance analysis
 ```
@@ -157,7 +159,10 @@ OVERLEDGER_BASE_URL=https://api.overledger.dev
 
 #### **1. 🔄 Basic FinP2P Atomic Swaps**
 ```bash
-npm run demo:cross-chain
+npm run demo:atomic-swap
+
+# Alternatively for a front end view
+node server.js
 ```
 - **Shows:** Direct Sui ↔ Hedera atomic swaps via FinP2P
 - **Features:** FinID resolution, atomic guarantees, real blockchain ops
