@@ -9,20 +9,18 @@ import { FinP2PSDKRouter } from '../router/FinP2PSDKRouter';
 export interface FinP2PIntegratedSuiConfig {
   network: 'testnet' | 'devnet' | 'localnet';
   rpcUrl?: string;
-  privateKey?: string; // Optional - for operations requiring signing
-  finp2pRouter: FinP2PSDKRouter; // FinP2P integration
+  privateKey?: string;
+  finp2pRouter: FinP2PSDKRouter;
 }
 
 /**
  * Sui Adapter Integrated with FinP2P
  * 
- * This adapter demonstrates the CORRECT integration pattern:
+ * Provides Sui blockchain integration with FinP2P identity resolution:
  * - Uses FinP2P for identity resolution (FinID -> wallet address)
- * - Performs actual blockchain operations on Sui
- * - Assets stay on Sui permanently
- * - FinP2P tracks ownership changes
- * 
- * Perfect example of how FinP2P should integrate with blockchains!
+ * - Performs blockchain operations on Sui network
+ * - Supports both FinID-based and direct address transfers
+ * - Integrates with FinP2P atomic swap coordination
  */
 export class FinP2PIntegratedSuiAdapter extends EventEmitter {
   private client: SuiClient;
@@ -53,7 +51,7 @@ export class FinP2PIntegratedSuiAdapter extends EventEmitter {
         }
         this.logger.info('✅ Sui keypair initialized for signing operations');
       } catch (error) {
-        this.logger.warn('⚠️  Invalid Sui private key provided, signing operations will not be available');
+        this.logger.warn('⚠️ Invalid Sui private key provided, signing operations will not be available');
         this.logger.warn('💡 Expected format: suiprivkey1... (from Sui wallet) or base64 encoded');
       }
     }
@@ -91,7 +89,6 @@ export class FinP2PIntegratedSuiAdapter extends EventEmitter {
       this.logger.info('✅ Atomic swap completed:', completionData);
     });
 
-    // Enhanced: Add rollback listeners
     this.config.finp2pRouter.on('atomicSwapExpired', async (expiredData: any) => {
       if (this.isSwapRelevantToSui(expiredData.swap)) {
         this.logger.warn('⏰ Atomic swap expired for Sui chain:', {
@@ -685,6 +682,71 @@ export class FinP2PIntegratedSuiAdapter extends EventEmitter {
 
     } catch (error) {
       this.logger.error('❌ Failed to transfer by FinID:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Direct SUI transfer using addresses (not FinIDs)
+   */
+  async transfer(fromAddress: string, toAddress: string, amount: bigint, assetType: string): Promise<{ txHash: string }> {
+    if (!this.connected) throw new Error('Not connected to Sui network');
+    if (!this.keypair) throw new Error('No signing key available - cannot execute transfers');
+    if (assetType !== 'SUI') throw new Error('Only native SUI transfers are supported');
+
+    this.logger.info('🔄 Starting Sui direct transfer:', { fromAddress, toAddress, amount: amount.toString() });
+
+    try {
+      // Get coins for the fromAddress
+      this.logger.info('🔍 Querying coins for address:', fromAddress);
+      const coins = await this.client.getCoins({ owner: fromAddress, coinType: '0x2::sui::SUI' });
+      
+      if (!coins.data || coins.data.length === 0) {
+        this.logger.error('❌ No SUI coins found for address:', fromAddress);
+        throw new Error('No SUI coins found');
+      }
+      
+      this.logger.info('✅ Found coins:', { coinCount: coins.data.length });
+      
+      const totalBalance = coins.data.reduce((sum, coin) => sum + BigInt(coin.balance), BigInt(0));
+      this.logger.info('💰 Total balance:', { totalBalance: totalBalance.toString(), requiredAmount: amount.toString() });
+      
+      if (totalBalance < amount) {
+        this.logger.error('❌ Insufficient balance:', { 
+          required: amount.toString(), 
+          available: totalBalance.toString() 
+        });
+        throw new Error(`Insufficient balance. Need ${amount.toString()} MIST, have ${totalBalance.toString()} MIST`);
+      }
+      
+      const sortedCoins = coins.data.filter(coin => BigInt(coin.balance) > 0).sort((a, b) => Number(BigInt(b.balance) - BigInt(a.balance)));
+      const [primaryCoin] = sortedCoins;
+      
+      this.logger.info('🔧 Creating transaction with primary coin:', { 
+        coinObjectId: primaryCoin.coinObjectId,
+        coinBalance: primaryCoin.balance 
+      });
+      
+      const transaction = new Transaction();
+      const [splitCoin] = transaction.splitCoins(primaryCoin.coinObjectId, [amount]);
+      transaction.transferObjects([splitCoin], toAddress);
+      
+      this.logger.info('📝 Executing transaction...');
+      const result = await this.client.signAndExecuteTransaction({
+        transaction,
+        signer: this.keypair,
+        options: { showBalanceChanges: true, showEffects: true }
+      });
+      
+      this.logger.info('✅ Sui direct/native transfer completed:', { 
+        txHash: result.digest, 
+        fromAddress, 
+        toAddress, 
+        amount: amount.toString() 
+      });
+      return { txHash: result.digest };
+    } catch (error) {
+      this.logger.error('❌ Sui direct transfer failed:', error);
       throw error;
     }
   }

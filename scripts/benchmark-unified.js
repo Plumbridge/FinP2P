@@ -1,13 +1,12 @@
 #!/usr/bin/env node
 
-// Load environment variables from .env file (MUST BE FIRST!)
+// Load environment variables from .env file
 require('dotenv').config();
 
 const { 
     FinP2PSDKRouter,
     FinP2PIntegratedSuiAdapter,
-    FinP2PIntegratedHederaAdapter,
-    FinP2PIntegratedOverledgerAdapter
+    FinP2PIntegratedHederaAdapter
 } = require('../dist/src/index');
 const { createLogger } = require('../dist/src/utils/logger');
 const fs = require('fs').promises;
@@ -35,26 +34,25 @@ async function findAvailablePort(startPort = 6380) {
 }
 
 /**
- * Unified Blockchain Performance Benchmark
+ * Adapter Performance Benchmark
  * 
- * Proper comparison:
- * 1. Pure FinP2P Cross-Chain: Direct SUI→Hedera atomic swap via FinP2P router
- * 2. Overledger Managed Cross-Chain: Same SUI→Hedera swap but managed through Overledger
+ * Compares two approaches:
+ * 1. FinP2P Adapter Mode: Using FinID resolution + transfer (transferByFinId)
+ * 2. Direct Adapter Mode: Using direct wallet addresses (transfer)
  * 
- * Both tests do the SAME underlying work, measuring the management overhead of Overledger
+ * This measures the overhead of FinP2P ID resolution vs direct blockchain access
  */
-class UnifiedBenchmark {
+class AdapterBenchmark {
     constructor(iterations = 10) {
         this.testParams = {
             iterations,
-            suiAmount: '100000000', // 0.1 SUI in MIST (BigInt compatible)
-            hederaAmount: '1000000000' // 10 HBAR in tinybars (BigInt compatible)
+            suiAmount: BigInt(1000000), // 0.001 SUI in MIST
+            hederaAmount: BigInt(100000000) // 0.1 HBAR in tinybars
         };
         
         this.router = null;
         this.suiAdapter = null;
         this.hederaAdapter = null;
-        this.overledgerAdapter = null;
         
         this.logger = createLogger({ level: 'info' });
     }
@@ -69,7 +67,7 @@ class UnifiedBenchmark {
             
             // Initialize router first with proper configuration
             this.router = new FinP2PSDKRouter({
-                routerId: 'unified-benchmark-router',
+                routerId: 'adapter-benchmark-router',
                 port: routerPort,
                 host: 'localhost',
                 orgId: 'benchmark-org',
@@ -82,7 +80,7 @@ class UnifiedBenchmark {
                         raw: 'mock-private-key-for-benchmark'
                     }
                 },
-                mockMode: true // Enable mock mode for benchmark
+                mockMode: true
             });
             await this.router.start();
             
@@ -98,43 +96,30 @@ class UnifiedBenchmark {
             // Initialize Hedera adapter  
             this.hederaAdapter = new FinP2PIntegratedHederaAdapter({
                 network: 'testnet',
-                accountId: process.env.HEDERA_ACCOUNT_ID,
+                accountId: process.env.HEDERA_ACCOUNT_ID || '0.0.123456',
                 privateKey: process.env.HEDERA_PRIVATE_KEY,
                 finp2pRouter: this.router
             }, this.logger);
             await this.hederaAdapter.connect();
             
-            // Initialize Overledger management layer with network adapters
-            this.overledgerAdapter = new FinP2PIntegratedOverledgerAdapter({
-                environment: process.env.OVERLEDGER_ENVIRONMENT || 'sandbox',
-                baseUrl: process.env.OVERLEDGER_BASE_URL,
-                clientId: process.env.OVERLEDGER_CLIENT_ID || '',
-                clientSecret: process.env.OVERLEDGER_CLIENT_SECRET || '',
-                transactionSigningKeyId: process.env.OVERLEDGER_TRANSACTION_SIGNING_KEY_ID || '',
-                transactionSigningKeyPublic: process.env.OVERLEDGER_TRANSACTION_SIGNING_KEY_PUBLIC || '',
-                finp2pRouter: this.router
-            }, this.logger);
-            
-            // Configure managed network adapters for Overledger coordination
-            this.overledgerAdapter.setNetworkAdapters(this.suiAdapter, this.hederaAdapter);
-            
-            await this.overledgerAdapter.connect();
-            
             console.log('✅ All adapters initialized successfully');
             
         } catch (error) {
-            console.error('❌ Failed to initialize adapters:', error);
+            console.error('❌ Failed to initialize adapters:', error.message);
             throw error;
         }
     }
 
-    async benchmarkPureFinP2PCrossChain() {
-        console.log('\n🔄 Benchmarking Pure FinP2P Atomic Swap Coordination...');
+    async benchmarkFinP2PAdapterMode() {
+        console.log('\n🔄 Benchmarking FinP2P Adapter Mode (FinID Resolution + Transfer)...');
         
         const results = {
-            approach: 'Pure FinP2P Atomic Swap',
+            approach: 'FinP2P Adapter Mode',
+            description: 'Using FinID resolution + transfer (transferByFinId)',
             transfers: [],
-            coordinationTimes: []
+            resolutionTimes: [],
+            transferTimes: [],
+            totalTimes: []
         };
         
         // Check credentials
@@ -147,75 +132,90 @@ class UnifiedBenchmark {
         console.log(`  🔧 Mode: ${results.mode}`);
         console.log(`    - SUI: ${hasRealSuiCredentials ? 'Real' : 'Mock'}`);
         console.log(`    - Hedera: ${hasRealHederaCredentials ? 'Real' : 'Mock'}`);
-        console.log(`    - Coordination: Direct FinP2P atomic swap`);
+        console.log(`    - Approach: FinID resolution + blockchain transfer`);
         
         for (let i = 0; i < this.testParams.iterations; i++) {
             const overallStart = process.hrtime.bigint();
             
             try {
-                console.log(`  Atomic Swap ${i + 1}/${this.testParams.iterations}...`);
+                console.log(`  FinP2P Transfer ${i + 1}/${this.testParams.iterations}...`);
                 
-                // Direct FinP2P atomic swap (same operation as Overledger will manage)
-                const swapResult = await this.router.executeAtomicSwap({
-                    initiatorFinId: 'alice@atomic-swap.demo',
-                    responderFinId: 'bob@atomic-swap.demo',
-                    initiatorAsset: { 
-                        chain: 'sui', 
-                        assetId: 'sui-native-token', 
-                        amount: this.testParams.suiAmount 
-                    },
-                    responderAsset: { 
-                        chain: 'hedera', 
-                        assetId: 'hedera-native-token', 
-                        amount: this.testParams.hederaAmount 
-                    },
-                    timeoutBlocks: 100
-                });
+                // Measure FinID resolution time
+                const resolutionStart = process.hrtime.bigint();
+                
+                // Resolve FinIDs to addresses
+                const aliceSuiAddress = await this.router.getWalletAddress('alice@atomic-swap.demo', 'sui');
+                const bobSuiAddress = await this.router.getWalletAddress('bob@atomic-swap.demo', 'sui');
+                
+                const resolutionEnd = process.hrtime.bigint();
+                const resolutionTime = Number(resolutionEnd - resolutionStart) / 1000000;
+                
+                // Measure transfer time
+                const transferStart = process.hrtime.bigint();
+                
+                // Execute transfer using FinP2P adapter mode
+                const transferResult = await this.suiAdapter.transferByFinId(
+                    'alice@atomic-swap.demo',
+                    'bob@atomic-swap.demo',
+                    this.testParams.suiAmount,
+                    true
+                );
+                
+                const transferEnd = process.hrtime.bigint();
+                const transferTime = Number(transferEnd - transferStart) / 1000000;
                 
                 const overallEnd = process.hrtime.bigint();
-                const totalDuration = Number(overallEnd - overallStart) / 1000000;
+                const totalTime = Number(overallEnd - overallStart) / 1000000;
                 
                 results.transfers.push({
                     iteration: i + 1,
                     success: true,
-                    duration_ms: totalDuration,
-                    swap_id: swapResult.swapId,
-                    coordinator: 'Pure FinP2P Router',
-                    status: swapResult.status
+                    resolution_time_ms: resolutionTime,
+                    transfer_time_ms: transferTime,
+                    total_time_ms: totalTime,
+                    tx_hash: transferResult.txHash,
+                    from_finid: 'alice@atomic-swap.demo',
+                    to_finid: 'bob@atomic-swap.demo',
+                    from_address: aliceSuiAddress,
+                    to_address: bobSuiAddress,
+                    amount: this.testParams.suiAmount.toString()
                 });
                 
-                results.coordinationTimes.push(totalDuration);
+                results.resolutionTimes.push(resolutionTime);
+                results.transferTimes.push(transferTime);
+                results.totalTimes.push(totalTime);
                 
-                console.log(`    ✅ Success in ${totalDuration.toFixed(2)}ms (swap: ${swapResult.swapId})`);
+                console.log(`    ✅ Success in ${totalTime.toFixed(2)}ms (resolution: ${resolutionTime.toFixed(2)}ms, transfer: ${transferTime.toFixed(2)}ms)`);
                 
             } catch (error) {
                 const overallEnd = process.hrtime.bigint();
-                const totalDuration = Number(overallEnd - overallStart) / 1000000;
+                const totalTime = Number(overallEnd - overallStart) / 1000000;
                 
                 results.transfers.push({
                     iteration: i + 1,
                     success: false,
-                    duration_ms: totalDuration,
+                    total_time_ms: totalTime,
                     error: error.message
                 });
                 
-                console.log(`    ❌ Failed in ${totalDuration.toFixed(2)}ms: ${error.message}`);
+                console.log(`    ❌ Failed in ${totalTime.toFixed(2)}ms: ${error.message}`);
             }
             
-            await new Promise(resolve => setTimeout(resolve, 500));
+            await this.delay(1000);
         }
         
         this.calculateStats(results);
         return results;
     }
 
-    async benchmarkOverledgerManagedCrossChain() {
-        console.log('\n🎯 Benchmarking Overledger Managed Atomic Swap Coordination...');
+    async benchmarkDirectAdapterMode() {
+        console.log('\n🎯 Benchmarking Direct Adapter Mode (Direct Wallet Address Transfer)...');
         
         const results = {
-            approach: 'Overledger Managed Atomic Swap',
+            approach: 'Direct Adapter Mode',
+            description: 'Using direct wallet addresses (transfer)',
             transfers: [],
-            managementOverhead: []
+            transferTimes: []
         };
         
         // Check credentials
@@ -228,60 +228,61 @@ class UnifiedBenchmark {
         console.log(`  🔧 Mode: ${results.mode}`);
         console.log(`    - SUI: ${hasRealSuiCredentials ? 'Real' : 'Mock'}`);
         console.log(`    - Hedera: ${hasRealHederaCredentials ? 'Real' : 'Mock'}`);
-        console.log(`    - Management: Overledger coordinates same FinP2P atomic swap`);
+        console.log(`    - Approach: Direct blockchain transfer (no FinID resolution)`);
+        
+        // Get addresses for direct transfer
+        const fromAddress = process.env.SUI_ADDRESS || '0x1234567890abcdef';
+        const toAddress = process.env.SUI_ADDRESS_2 || '0xabcdef1234567890';
         
         for (let i = 0; i < this.testParams.iterations; i++) {
             const overallStart = process.hrtime.bigint();
             
             try {
-                console.log(`  Managed ${i + 1}/${this.testParams.iterations}...`);
+                console.log(`  Direct Transfer ${i + 1}/${this.testParams.iterations}...`);
                 
-                // SAME cross-chain operation but managed through Overledger
-                const managedResult = await this.overledgerAdapter.managedCrossChainTransfer({
-                    overledgerAccountId: 'benchmark-enterprise-account',
-                    fromFinId: 'alice@atomic-swap.demo',
-                    toFinId: 'bob@atomic-swap.demo',
-                    fromAsset: { chain: 'SUI', amount: this.testParams.suiAmount },
-                    toAsset: { chain: 'Hedera', amount: this.testParams.hederaAmount }
-                });
+                // Execute transfer using direct adapter mode
+                const transferResult = await this.suiAdapter.transfer(
+                    fromAddress,
+                    toAddress,
+                    this.testParams.suiAmount,
+                    'SUI'
+                );
                 
                 const overallEnd = process.hrtime.bigint();
-                const totalDuration = Number(overallEnd - overallStart) / 1000000;
+                const totalTime = Number(overallEnd - overallStart) / 1000000;
                 
                 results.transfers.push({
                     iteration: i + 1,
                     success: true,
-                    total_duration_ms: totalDuration,
-                    management_overhead_ms: managedResult.managementOverhead,
-                    finp2p_coordination_ms: totalDuration - managedResult.managementOverhead,
-                    overhead_percentage: (managedResult.managementOverhead / totalDuration * 100).toFixed(2),
-                    management_id: managedResult.managementId,
-                    finp2p_swap_id: managedResult.finp2pSwapId,
-                    coordinator: 'Overledger → FinP2P Router'
+                    transfer_time_ms: totalTime,
+                    tx_hash: transferResult.txHash,
+                    from_address: fromAddress,
+                    to_address: toAddress,
+                    amount: this.testParams.suiAmount.toString()
                 });
                 
-                results.managementOverhead.push(managedResult.managementOverhead);
+                results.transferTimes.push(totalTime);
                 
-                console.log(`    ✅ Success in ${totalDuration.toFixed(2)}ms (${managedResult.managementOverhead.toFixed(2)}ms management overhead)`);
+                console.log(`    ✅ Success in ${totalTime.toFixed(2)}ms`);
                 
             } catch (error) {
                 const overallEnd = process.hrtime.bigint();
-                const totalDuration = Number(overallEnd - overallStart) / 1000000;
+                const totalTime = Number(overallEnd - overallStart) / 1000000;
                 
                 results.transfers.push({
                     iteration: i + 1,
                     success: false,
-                    total_duration_ms: totalDuration,
+                    transfer_time_ms: totalTime,
                     error: error.message
                 });
                 
-                console.log(`    ❌ Failed in ${totalDuration.toFixed(2)}ms: ${error.message}`);
+                console.log(`    ❌ Failed in ${totalTime.toFixed(2)}ms: ${error.message}`);
             }
             
-            await new Promise(resolve => setTimeout(resolve, 500));
+            await this.delay(1000);
         }
         
-        this.calculateOverledgerStats(results);
+        this.calculateStats(results);
         return results;
     }
 
@@ -290,303 +291,270 @@ class UnifiedBenchmark {
     }
 
     calculateStats(results) {
-        const successful = results.transfers.filter(t => t.success);
-        const durations = successful.map(t => t.duration_ms);
-        
-        if (durations.length === 0) {
+        if (results.totalTimes && results.totalTimes.length > 0) {
+            const times = results.totalTimes;
             results.stats = {
-                success_rate: 0,
-                average_latency: 0,
-                throughput: 0,
-                std_deviation: 0
+                count: times.length,
+                mean: times.reduce((a, b) => a + b, 0) / times.length,
+                median: times.sort((a, b) => a - b)[Math.floor(times.length / 2)],
+                min: Math.min(...times),
+                max: Math.max(...times),
+                stdDev: Math.sqrt(times.reduce((sq, n) => sq + Math.pow(n - times.reduce((a, b) => a + b, 0) / times.length, 2), 0) / times.length)
             };
-            return;
+        } else if (results.transferTimes && results.transferTimes.length > 0) {
+            const times = results.transferTimes;
+            results.stats = {
+                count: times.length,
+                mean: times.reduce((a, b) => a + b, 0) / times.length,
+                median: times.sort((a, b) => a - b)[Math.floor(times.length / 2)],
+                min: Math.min(...times),
+                max: Math.max(...times),
+                stdDev: Math.sqrt(times.reduce((sq, n) => sq + Math.pow(n - times.reduce((a, b) => a + b, 0) / times.length, 2), 0) / times.length)
+            };
         }
-        
-        const sum = durations.reduce((a, b) => a + b, 0);
-        const average = sum / durations.length;
-        const variance = durations.reduce((a, b) => a + Math.pow(b - average, 2), 0) / durations.length;
-        const stdDev = Math.sqrt(variance);
-        
-        results.stats = {
-            success_rate: (successful.length / results.transfers.length) * 100,
-            average_latency: average,
-            throughput: 1000 / average, // TPS
-            std_deviation: stdDev
-        };
     }
 
-    calculateOverledgerStats(results) {
-        const successful = results.transfers.filter(t => t.success);
-        const totalDurations = successful.map(t => t.total_duration_ms);
-        const overheadDurations = successful.map(t => t.management_overhead_ms);
-        
-        if (totalDurations.length === 0) {
-            results.stats = {
-                success_rate: 0,
-                average_total_latency: 0,
-                average_management_overhead: 0,
-                average_coordination_time: 0,
-                overhead_percentage: 0,
-                throughput: 0,
-                std_deviation: 0
-            };
-            return;
-        }
-        
-        const totalSum = totalDurations.reduce((a, b) => a + b, 0);
-        const overheadSum = overheadDurations.reduce((a, b) => a + b, 0);
-        const avgTotal = totalSum / totalDurations.length;
-        const avgOverhead = overheadSum / overheadDurations.length;
-        const avgCoordination = avgTotal - avgOverhead;
-        
-        const variance = totalDurations.reduce((a, b) => a + Math.pow(b - avgTotal, 2), 0) / totalDurations.length;
-        const stdDev = Math.sqrt(variance);
-        
-        results.stats = {
-            success_rate: (successful.length / results.transfers.length) * 100,
-            average_total_latency: avgTotal,
-            average_management_overhead: avgOverhead,
-            average_coordination_time: avgCoordination,
-            overhead_percentage: (avgOverhead / avgTotal) * 100,
-            throughput: 1000 / avgTotal,
-            std_deviation: stdDev
-        };
-    }
-
-    generateReport(pureFinP2PResults, overledgerResults) {
+    generateReport(finp2pResults, directResults) {
         const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
         
-        // Generate comprehensive report
         const report = {
             timestamp,
-            configuration: {
-                iterations: this.testParams.iterations,
-                sui_amount: this.testParams.suiAmount + ' MIST (0.1 SUI)',
-                hedera_amount: this.testParams.hederaAmount + ' tinybars (10 HBAR)',
-                test_type: 'Atomic Swap Coordination Comparison'
+            summary: {
+                finp2p_mode: {
+                    approach: finp2pResults.approach,
+                    description: finp2pResults.description,
+                    mode: finp2pResults.mode,
+                    total_transfers: finp2pResults.transfers.length,
+                    successful_transfers: finp2pResults.transfers.filter(t => t.success).length,
+                    success_rate: (finp2pResults.transfers.filter(t => t.success).length / finp2pResults.transfers.length * 100).toFixed(2) + '%',
+                    stats: finp2pResults.stats
+                },
+                direct_mode: {
+                    approach: directResults.approach,
+                    description: directResults.description,
+                    mode: directResults.mode,
+                    total_transfers: directResults.transfers.length,
+                    successful_transfers: directResults.transfers.filter(t => t.success).length,
+                    success_rate: (directResults.transfers.filter(t => t.success).length / directResults.transfers.length * 100).toFixed(2) + '%',
+                    stats: directResults.stats
+                }
             },
-            results: {
-                pure_finp2p_atomic_swap: pureFinP2PResults,
-                overledger_managed_atomic_swap: overledgerResults
-            },
-            analysis: {
-                comparison: this.compareResults(pureFinP2PResults, overledgerResults)
+            comparison: this.compareResults(finp2pResults, directResults),
+            detailed_results: {
+                finp2p: finp2pResults,
+                direct: directResults
             }
         };
         
-        return { report, timestamp };
+        return report;
     }
 
-    compareResults(pureFinP2P, overledger) {
-        if (!pureFinP2P.stats || !overledger.stats) {
-            return { error: 'Insufficient data for comparison' };
-        }
-        
-        const pureLatency = pureFinP2P.stats.average_latency;
-        const overledgerLatency = overledger.stats.average_total_latency;
-        const managementOverhead = overledger.stats.average_management_overhead;
+    compareResults(finp2p, direct) {
+        const finp2pMean = finp2p.stats?.mean || 0;
+        const directMean = direct.stats?.mean || 0;
+        const overhead = finp2pMean - directMean;
+        const overheadPercentage = directMean > 0 ? (overhead / directMean * 100) : 0;
         
         return {
-            latency_comparison: {
-                pure_finp2p_ms: pureLatency,
-                overledger_total_ms: overledgerLatency,
-                management_overhead_ms: managementOverhead,
-                overhead_percentage: overledger.stats.overhead_percentage,
-                performance_impact: overledgerLatency > pureLatency ? 'slower' : 'faster',
-                difference_ms: overledgerLatency - pureLatency
+            performance_overhead: {
+                absolute_ms: overhead.toFixed(2),
+                percentage: overheadPercentage.toFixed(2) + '%',
+                description: overhead > 0 ? 'FinP2P mode is slower' : 'FinP2P mode is faster'
             },
-            throughput_comparison: {
-                pure_finp2p_tps: pureFinP2P.stats.throughput,
-                overledger_tps: overledger.stats.throughput,
-                throughput_impact_percent: ((overledger.stats.throughput - pureFinP2P.stats.throughput) / pureFinP2P.stats.throughput) * 100
+            efficiency_comparison: {
+                finp2p_mean_ms: finp2pMean.toFixed(2),
+                direct_mean_ms: directMean.toFixed(2),
+                ratio: directMean > 0 ? (finp2pMean / directMean).toFixed(2) : 'N/A'
             },
-            reliability_comparison: {
-                pure_finp2p_success_rate: pureFinP2P.stats.success_rate,
-                overledger_success_rate: overledger.stats.success_rate
+            success_rate_comparison: {
+                finp2p_success_rate: finp2p.transfers.filter(t => t.success).length / finp2p.transfers.length * 100,
+                direct_success_rate: direct.transfers.filter(t => t.success).length / direct.transfers.length * 100
             }
         };
     }
 
     async saveResults(report, timestamp) {
-        const resultsDir = './benchmark-results';
+        const resultsDir = path.join(__dirname, '../benchmark-results');
         
         try {
             await fs.mkdir(resultsDir, { recursive: true });
-            
-            // Save JSON report
-            const jsonPath = path.join(resultsDir, `atomic-swap-benchmark-${timestamp}.json`);
-            await fs.writeFile(jsonPath, JSON.stringify(report, null, 2));
-            
-            // Generate and save markdown report
-            const markdownReport = this.generateMarkdownReport(report);
-            const mdPath = path.join(resultsDir, `atomic-swap-benchmark-report-${timestamp}.md`);
-            await fs.writeFile(mdPath, markdownReport);
-            
-            // Generate and save CSV summary
-            const csvSummary = this.generateCSVSummary(report);
-            const csvPath = path.join(resultsDir, `atomic-swap-benchmark-summary-${timestamp}.csv`);
-            await fs.writeFile(csvPath, csvSummary);
-            
-            return { jsonPath, mdPath, csvPath };
         } catch (error) {
-            console.error('❌ Failed to save results:', error);
-            throw error;
+            // Directory might already exist
         }
+        
+        // Save JSON report
+        const jsonPath = path.join(resultsDir, `adapter-benchmark-${timestamp}.json`);
+        await fs.writeFile(jsonPath, JSON.stringify(report, null, 2));
+        
+        // Save Markdown report
+        const markdownPath = path.join(resultsDir, `adapter-benchmark-report-${timestamp}.md`);
+        const markdownContent = this.generateMarkdownReport(report);
+        await fs.writeFile(markdownPath, markdownContent);
+        
+        // Save CSV summary
+        const csvPath = path.join(resultsDir, `adapter-benchmark-summary-${timestamp}.csv`);
+        const csvContent = this.generateCSVSummary(report);
+        await fs.writeFile(csvPath, csvContent);
+        
+        console.log(`\n📊 Results saved:`);
+        console.log(`  📄 JSON: ${jsonPath}`);
+        console.log(`  📝 Markdown: ${markdownPath}`);
+        console.log(`  📊 CSV: ${csvPath}`);
     }
 
     generateMarkdownReport(report) {
-        const pure = report.results.pure_finp2p_atomic_swap;
-        const overledger = report.results.overledger_managed_atomic_swap;
-        const analysis = report.analysis.comparison;
-        
-        return `# Atomic Swap Coordination Performance Benchmark Report
+        return `# Adapter Performance Benchmark Report
 
-## Test Configuration
-- **Timestamp**: ${report.timestamp}
-- **Test Type**: ${report.configuration.test_type}
-- **Iterations**: ${report.configuration.iterations} per approach
-- **SUI Amount**: ${report.configuration.sui_amount}
-- **Hedera Amount**: ${report.configuration.hedera_amount}
+**Generated:** ${new Date(report.timestamp.replace(/-/g, ':')).toLocaleString()}
 
-## Performance Summary
+## Executive Summary
 
-### 🏆 Results Overview
-- **Management Overhead**: ${analysis.latency_comparison?.overhead_percentage?.toFixed(2) || 'N/A'}%
-- **Performance Impact**: ${analysis.latency_comparison?.performance_impact || 'Unknown'}
-- **Latency Difference**: ${analysis.latency_comparison?.difference_ms?.toFixed(2) || 'N/A'}ms
+This benchmark compares two adapter usage modes:
+1. **FinP2P Adapter Mode**: Using FinID resolution + transfer
+2. **Direct Adapter Mode**: Using direct wallet addresses
 
-### 📊 Pure FinP2P Atomic Swap Coordination
-- **Mode**: ${pure.mode} ${pure.mode === 'real_blockchain' ? '🔥 REAL CROSS-CHAIN' : '🎭 MOCK'}
-- **Success Rate**: ${pure.stats?.success_rate?.toFixed(2) || 'N/A'}%
-- **Average Latency**: ${pure.stats?.average_latency?.toFixed(2) || 'N/A'}ms
-- **Throughput**: ${pure.stats?.throughput?.toFixed(2) || 'N/A'} TPS
-- **Standard Deviation**: ${pure.stats?.std_deviation?.toFixed(2) || 'N/A'}ms
+## Performance Comparison
 
-### 📊 Overledger Managed Atomic Swap Coordination
-- **Mode**: ${overledger.mode} ${overledger.mode === 'real_blockchain' ? '🔥 REAL CROSS-CHAIN' : '🎭 MOCK'}
-- **Success Rate**: ${overledger.stats?.success_rate?.toFixed(2) || 'N/A'}%
-- **Average Total Latency**: ${overledger.stats?.average_total_latency?.toFixed(2) || 'N/A'}ms
-- **Management Overhead**: ${overledger.stats?.average_management_overhead?.toFixed(2) || 'N/A'}ms (${overledger.stats?.overhead_percentage?.toFixed(2) || 'N/A'}%)
-- **FinP2P Coordination**: ${overledger.stats?.average_coordination_time?.toFixed(2) || 'N/A'}ms
-- **Throughput**: ${overledger.stats?.throughput?.toFixed(2) || 'N/A'} TPS
+### FinP2P Adapter Mode
+- **Approach**: ${report.summary.finp2p_mode.approach}
+- **Description**: ${report.summary.finp2p_mode.description}
+- **Mode**: ${report.summary.finp2p_mode.mode}
+- **Success Rate**: ${report.summary.finp2p_mode.success_rate}
+- **Mean Time**: ${report.summary.finp2p_mode.stats?.mean?.toFixed(2)}ms
+- **Median Time**: ${report.summary.finp2p_mode.stats?.median?.toFixed(2)}ms
 
-## Impact Analysis
+### Direct Adapter Mode
+- **Approach**: ${report.summary.direct_mode.approach}
+- **Description**: ${report.summary.direct_mode.description}
+- **Mode**: ${report.summary.direct_mode.mode}
+- **Success Rate**: ${report.summary.direct_mode.success_rate}
+- **Mean Time**: ${report.summary.direct_mode.stats?.mean?.toFixed(2)}ms
+- **Median Time**: ${report.summary.direct_mode.stats?.median?.toFixed(2)}ms
 
-### Performance Impact
-- **Pure FinP2P**: ${pure.stats?.average_latency?.toFixed(2) || 'N/A'}ms average
-- **Overledger Managed**: ${overledger.stats?.average_total_latency?.toFixed(2) || 'N/A'}ms average
-- **Management Overhead**: ${analysis.latency_comparison?.management_overhead_ms?.toFixed(2) || 'N/A'}ms additional
+## Key Findings
 
-### Throughput Impact
-- **Pure FinP2P**: ${pure.stats?.throughput?.toFixed(2) || 'N/A'} TPS
-- **Overledger Managed**: ${overledger.stats?.throughput?.toFixed(2) || 'N/A'} TPS
-- **Throughput Change**: ${analysis.throughput_comparison?.throughput_impact_percent?.toFixed(2) || 'N/A'}%
+### Performance Overhead
+- **Absolute Overhead**: ${report.comparison.performance_overhead.absolute_ms}ms
+- **Percentage Overhead**: ${report.comparison.performance_overhead.percentage}
+- **Description**: ${report.comparison.performance_overhead.description}
 
-## Recommendations
+### Efficiency Ratio
+- **FinP2P Mean**: ${report.comparison.efficiency_comparison.finp2p_mean_ms}ms
+- **Direct Mean**: ${report.comparison.efficiency_comparison.direct_mean_ms}ms
+- **Ratio**: ${report.comparison.efficiency_comparison.ratio}
 
-- **For Pure Cross-Chain**: Use direct FinP2P coordination for minimal latency
-- **For Enterprise Management**: Overledger adds ${analysis.latency_comparison?.overhead_percentage?.toFixed(2) || 'N/A'}% overhead but provides enterprise features
-- **Trade-off**: ${analysis.latency_comparison?.management_overhead_ms?.toFixed(2) || 'N/A'}ms additional latency for enterprise management capabilities
+### Success Rates
+- **FinP2P Success Rate**: ${report.comparison.success_rate_comparison.finp2p_success_rate.toFixed(2)}%
+- **Direct Success Rate**: ${report.comparison.success_rate_comparison.direct_success_rate.toFixed(2)}%
 
+## Detailed Results
+
+### FinP2P Adapter Mode Statistics
+- **Total Transfers**: ${report.summary.finp2p_mode.total_transfers}
+- **Successful Transfers**: ${report.summary.finp2p_mode.successful_transfers}
+- **Minimum Time**: ${report.summary.finp2p_mode.stats?.min?.toFixed(2)}ms
+- **Maximum Time**: ${report.summary.finp2p_mode.stats?.max?.toFixed(2)}ms
+- **Standard Deviation**: ${report.summary.finp2p_mode.stats?.stdDev?.toFixed(2)}ms
+
+### Direct Adapter Mode Statistics
+- **Total Transfers**: ${report.summary.direct_mode.total_transfers}
+- **Successful Transfers**: ${report.summary.direct_mode.successful_transfers}
+- **Minimum Time**: ${report.summary.direct_mode.stats?.min?.toFixed(2)}ms
+- **Maximum Time**: ${report.summary.direct_mode.stats?.max?.toFixed(2)}ms
+- **Standard Deviation**: ${report.summary.direct_mode.stats?.stdDev?.toFixed(2)}ms
+
+## Conclusion
+
+${report.comparison.performance_overhead.description}. The FinP2P adapter mode adds ${report.comparison.performance_overhead.percentage} overhead compared to direct mode, primarily due to FinID resolution and FinP2P coordination.
+
+This overhead represents the cost of the additional abstraction layer that FinP2P provides, enabling user-friendly FinID-based transfers at the expense of some performance.
 `;
     }
 
     generateCSVSummary(report) {
-        const pure = report.results.pure_finp2p_atomic_swap;
-        const overledger = report.results.overledger_managed_atomic_swap;
-        
-        return `Approach,Mode,Success_Rate_%,Avg_Latency_ms,Throughput_TPS,Management_Overhead_ms,Overhead_Percentage_%
-Pure_FinP2P_Atomic_Swap,${pure.mode},${pure.stats?.success_rate?.toFixed(2) || 'N/A'},${pure.stats?.average_latency?.toFixed(2) || 'N/A'},${pure.stats?.throughput?.toFixed(2) || 'N/A'},0,0
-Overledger_Managed_Atomic_Swap,${overledger.mode},${overledger.stats?.success_rate?.toFixed(2) || 'N/A'},${overledger.stats?.average_total_latency?.toFixed(2) || 'N/A'},${overledger.stats?.throughput?.toFixed(2) || 'N/A'},${overledger.stats?.average_management_overhead?.toFixed(2) || 'N/A'},${overledger.stats?.overhead_percentage?.toFixed(2) || 'N/A'}`;
+        return `Approach,Mode,Total Transfers,Successful Transfers,Success Rate,Mean Time (ms),Median Time (ms),Min Time (ms),Max Time (ms),Std Dev (ms)
+${report.summary.finp2p_mode.approach},${report.summary.finp2p_mode.mode},${report.summary.finp2p_mode.total_transfers},${report.summary.finp2p_mode.successful_transfers},${report.summary.finp2p_mode.success_rate},${report.summary.finp2p_mode.stats?.mean?.toFixed(2)},${report.summary.finp2p_mode.stats?.median?.toFixed(2)},${report.summary.finp2p_mode.stats?.min?.toFixed(2)},${report.summary.finp2p_mode.stats?.max?.toFixed(2)},${report.summary.finp2p_mode.stats?.stdDev?.toFixed(2)}
+${report.summary.direct_mode.approach},${report.summary.direct_mode.mode},${report.summary.direct_mode.total_transfers},${report.summary.direct_mode.successful_transfers},${report.summary.direct_mode.success_rate},${report.summary.direct_mode.stats?.mean?.toFixed(2)},${report.summary.direct_mode.stats?.median?.toFixed(2)},${report.summary.direct_mode.stats?.min?.toFixed(2)},${report.summary.direct_mode.stats?.max?.toFixed(2)},${report.summary.direct_mode.stats?.stdDev?.toFixed(2)}`;
     }
 
     async cleanup() {
+        console.log('\n🧹 Cleaning up...');
+        
         try {
-            console.log('🧹 Cleaning up adapters...');
-            
             if (this.suiAdapter) {
                 await this.suiAdapter.disconnect();
+                console.log('✅ Sui adapter disconnected');
             }
             
             if (this.hederaAdapter) {
                 await this.hederaAdapter.disconnect();
-            }
-            
-            if (this.overledgerAdapter) {
-                await this.overledgerAdapter.disconnect();
+                console.log('✅ Hedera adapter disconnected');
             }
             
             if (this.router) {
                 await this.router.stop();
+                console.log('✅ Router stopped');
             }
             
-            console.log('✅ Cleanup completed');
         } catch (error) {
-            console.error('⚠️ Cleanup error:', error);
+            console.warn('⚠️ Cleanup warning:', error.message);
         }
     }
 
     async run() {
-        console.log('🚀 Starting Atomic Swap Coordination Benchmark');
-        console.log(`📊 Comparing Pure FinP2P vs Overledger Managed Atomic Swap Coordination`);
-        console.log(`🔄 Running ${this.testParams.iterations} iterations per approach`);
-        console.log(`💰 Test amounts: 0.1 SUI, 10 HBAR (cross-chain atomic swap)`);
+        const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
         
         try {
+            console.log('🚀 Starting Adapter Performance Benchmark');
+            console.log('=' .repeat(60));
+            console.log(`📅 Timestamp: ${new Date().toLocaleString()}`);
+            console.log(`🔄 Iterations: ${this.testParams.iterations}`);
+            console.log(`💰 SUI Amount: ${this.testParams.suiAmount} MIST`);
+            console.log(`💰 Hedera Amount: ${this.testParams.hederaAmount} tinybars`);
+            console.log('=' .repeat(60));
+            
+            // Initialize adapters
             await this.initializeAdapters();
             
-            console.log('\n📈 Starting benchmark runs...');
+            // Run benchmarks
+            const finp2pResults = await this.benchmarkFinP2PAdapterMode();
+            const directResults = await this.benchmarkDirectAdapterMode();
             
-            // Run the proper comparison benchmarks
-            const pureFinP2PResults = await this.benchmarkPureFinP2PCrossChain();
-            const overledgerResults = await this.benchmarkOverledgerManagedCrossChain();
+            // Generate and save report
+            const report = this.generateReport(finp2pResults, directResults);
+            await this.saveResults(report, timestamp);
             
-            console.log('\n📊 Generating reports...');
-            const { report, timestamp } = this.generateReport(pureFinP2PResults, overledgerResults);
-            const savedPaths = await this.saveResults(report, timestamp);
-            
-            console.log('\n📄 Reports generated:');
-            console.log(`  📊 JSON: ${savedPaths.jsonPath}`);
-            console.log(`  📝 Markdown: ${savedPaths.mdPath}`);
-            console.log(`  📈 CSV: ${savedPaths.csvPath}`);
-            
-            // Print summary
-            console.log('\n🏁 Benchmark Complete!');
-            console.log('========================');
-            
-            const analysis = report.analysis.comparison;
-            if (analysis && analysis.latency_comparison) {
-                console.log(`🏆 Pure FinP2P: ${analysis.latency_comparison.pure_finp2p_ms?.toFixed(2)}ms`);
-                console.log(`🎯 Overledger: ${analysis.latency_comparison.overledger_total_ms?.toFixed(2)}ms`);
-                console.log(`📈 Management Overhead: ${analysis.latency_comparison.overhead_percentage?.toFixed(2)}%`);
-            }
-            
-            // Auto-exit after a delay
-            setTimeout(() => {
-                console.log('📤 Benchmark auto-exiting...');
-                process.exit(0);
-            }, 2000);
+            // Display summary
+            console.log('\n📊 Benchmark Summary:');
+            console.log('=' .repeat(60));
+            console.log(`FinP2P Mode: ${finp2pResults.stats?.mean?.toFixed(2)}ms mean (${finp2pResults.transfers.filter(t => t.success).length}/${finp2pResults.transfers.length} successful)`);
+            console.log(`Direct Mode: ${directResults.stats?.mean?.toFixed(2)}ms mean (${directResults.transfers.filter(t => t.success).length}/${directResults.transfers.length} successful)`);
+            console.log(`Overhead: ${report.comparison.performance_overhead.absolute_ms}ms (${report.comparison.performance_overhead.percentage})`);
+            console.log('=' .repeat(60));
             
         } catch (error) {
             console.error('❌ Benchmark failed:', error);
-            await this.cleanup();
-            setTimeout(() => process.exit(1), 1000);
+            throw error;
         } finally {
             await this.cleanup();
         }
     }
 }
 
-// Parse command line arguments
-const args = process.argv.slice(2);
-const iterations = args.length > 0 ? parseInt(args[0]) : 10;
-
-if (isNaN(iterations) || iterations < 1) {
-    console.error('❌ Invalid iterations parameter. Usage: node benchmark-unified.js [iterations]');
-    process.exit(1);
+// Run the benchmark
+if (require.main === module) {
+    const iterations = process.argv.includes('--detailed') ? 20 : 10;
+    const benchmark = new AdapterBenchmark(iterations);
+    
+    benchmark.run()
+        .then(() => {
+            console.log('\n🎉 Benchmark completed successfully!');
+            process.exit(0);
+        })
+        .catch((error) => {
+            console.error('\n❌ Benchmark failed:', error);
+            process.exit(1);
+        });
 }
 
-// Run the benchmark
-const benchmark = new UnifiedBenchmark(iterations);
-benchmark.run().catch(console.error); 
+module.exports = { AdapterBenchmark }; 

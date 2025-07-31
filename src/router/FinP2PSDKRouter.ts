@@ -22,7 +22,7 @@ import { createLogger } from '../utils/logger';
 export interface FinP2PSDKConfig {
   routerId: string;
   port: number;
-  host?: string; // Optional with default fallback
+  host?: string;
   orgId: string;
   custodianOrgId: string;
   owneraAPIAddress: string;
@@ -35,18 +35,18 @@ export interface FinP2PSDKConfig {
       raw: string;
     };
   };
-  // Mock mode for development/dissertation
   mockMode?: boolean;
 }
 
 /**
- * FinP2P SDK Router with Credential Mocking Support
+ * FinP2P SDK Router
  * 
- * This implementation:
- * - Uses the REAL FinP2P SDK structure and patterns
- * - Mocks credentials when needed for development/dissertation
- * - Maintains proper FinP2P ownership model (no asset movement)
- * - Provides FinID to wallet address resolution for blockchain adapters
+ * Provides FinP2P protocol implementation with:
+ * - FinID to wallet address resolution
+ * - Atomic swap coordination
+ * - Asset ownership management
+ * - Cross-chain transaction routing
+ * - Mock mode support for development
  */
 export class FinP2PSDKRouter extends EventEmitter {
   private app: express.Application;
@@ -64,10 +64,10 @@ export class FinP2PSDKRouter extends EventEmitter {
   private mockUsers: Map<string, any> = new Map();
   private mockAssets: Map<string, any> = new Map();
   private mockOwnership: Map<string, any> = new Map();
-  private mockWalletMappings: Map<string, Map<string, string>> = new Map(); // finId -> chain -> walletAddress
+  private mockWalletMappings: Map<string, Map<string, string>> = new Map();
   private mockSwaps: Map<string, AtomicSwap> = new Map();
   private swapTimeouts: Map<string, NodeJS.Timeout> = new Map();
-  private swapMonitoringIntervals: Map<string, NodeJS.Timeout> = new Map(); // swapId -> swap data
+  private swapMonitoringIntervals: Map<string, NodeJS.Timeout> = new Map();
 
   constructor(config: FinP2PSDKConfig) {
     super();
@@ -226,12 +226,14 @@ export class FinP2PSDKRouter extends EventEmitter {
     const realSuiAddress = this.extractSuiAddressFromEnv();
     const realHederaAccountId = process.env.HEDERA_ACCOUNT_ID || '0.0.123456';
     
+    // Get second account addresses for Bob (different from Alice)
+    const bobSuiAddress = process.env.SUI_ADDRESS_2 || realSuiAddress || '0x000...bob_sui_not_available';
+    const bobHederaAccount = process.env.HEDERA_ACCOUNT_ID_2 || realHederaAccountId;
+    
     // TRUE CROSS-CHAIN SWAP SETUP: Alice has SUI (wants HBAR), Bob has HBAR (wants SUI)
     // This demonstrates real cross-party asset exchange via FinP2P coordination
     const aliceSuiAddress = realSuiAddress || '0x000...alice_sui_not_available'; // Alice has SUI to trade
     const aliceHederaAccount = realHederaAccountId; // Alice wants to receive HBAR here
-    const bobSuiAddress = realSuiAddress || '0x000...bob_sui_same_as_alice'; // Bob wants to receive SUI here  
-    const bobHederaAccount = realHederaAccountId; // Bob has HBAR to trade
     
     this.logger.info('🔄 TRUE CROSS-CHAIN ASSET EXCHANGE SETUP:');
     this.logger.info('   • Alice: Has SUI tokens, wants HBAR tokens');
@@ -269,7 +271,7 @@ export class FinP2PSDKRouter extends EventEmitter {
         wallets: {
           sui: aliceSuiAddress, // Alice's SUI wallet (has SUI to trade)
           hedera: aliceHederaAccount, // Alice's HBAR wallet (wants to receive HBAR)
-          ethereum: '0x000...placeholder'
+          ethereum: process.env.SEPOLIA_WALLET_ADDRESS || '0x000...placeholder'
         }
       },
       // Bob: Has HBAR, wants SUI - will trade his HBAR for Alice's SUI
@@ -280,7 +282,7 @@ export class FinP2PSDKRouter extends EventEmitter {
         wallets: {
           sui: bobSuiAddress, // Bob's SUI wallet (wants to receive SUI)
           hedera: bobHederaAccount, // Bob's HBAR wallet (has HBAR to trade)
-          ethereum: '0x000...placeholder'
+          ethereum: process.env.SEPOLIA_WALLET_ADDRESS || '0x000...placeholder'
         }
       }
     ];

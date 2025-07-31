@@ -20,19 +20,17 @@ export interface FinP2PIntegratedHederaConfig {
   network: 'testnet' | 'mainnet' | 'previewnet';
   accountId?: string;
   privateKey?: string;
-  finp2pRouter: FinP2PSDKRouter; // FinP2P integration
+  finp2pRouter: FinP2PSDKRouter;
 }
 
 /**
  * Hedera Adapter Integrated with FinP2P
  * 
- * This adapter demonstrates the CORRECT integration pattern:
+ * Provides Hedera blockchain integration with FinP2P identity resolution:
  * - Uses FinP2P for identity resolution (FinID -> wallet address)
- * - Performs actual blockchain operations on Hedera
- * - Assets stay on Hedera permanently
- * - FinP2P tracks ownership changes
- * 
- * Supports both mock mode and real Hedera testnet!
+ * - Performs blockchain operations on Hedera network
+ * - Supports both FinID-based and direct address transfers
+ * - Integrates with FinP2P atomic swap coordination
  */
 export class FinP2PIntegratedHederaAdapter extends EventEmitter {
   private client: Client | null = null;
@@ -61,7 +59,7 @@ export class FinP2PIntegratedHederaAdapter extends EventEmitter {
   async connect(): Promise<void> {
     try {
       if (this.config.accountId && this.config.privateKey) {
-        // Real Hedera testnet connection
+        // Real Hedera network connection
         this.operatorAccountId = AccountId.fromString(this.config.accountId);
         this.operatorPrivateKey = PrivateKey.fromString(this.config.privateKey);
 
@@ -577,6 +575,25 @@ export class FinP2PIntegratedHederaAdapter extends EventEmitter {
       this.logger.error('❌ Failed to transfer by FinID:', error);
       throw error;
     }
+  }
+
+  /**
+   * Direct HBAR transfer using account IDs (not FinIDs)
+   */
+  async transfer(fromAccountId: string, toAccountId: string, amount: bigint, assetType: string): Promise<{ txId: string }> {
+    if (!this.connected) throw new Error('Not connected to Hedera network');
+    if (!this.client || !this.operatorPrivateKey) throw new Error('No client or operator key');
+    if (assetType !== 'HBAR') throw new Error('Only native HBAR transfers are supported');
+    // Only allow sending from the operator account for now
+    if (fromAccountId !== this.operatorAccountId?.toString()) throw new Error('Direct transfer only supported from operator account');
+    const transaction = await new TransferTransaction()
+      .addHbarTransfer(AccountId.fromString(fromAccountId), Hbar.fromTinybars(-Number(amount)))
+      .addHbarTransfer(AccountId.fromString(toAccountId), Hbar.fromTinybars(Number(amount)))
+      .execute(this.client);
+    const receipt = await transaction.getReceipt(this.client);
+    if (receipt.status !== Status.Success) throw new Error(`Transaction failed with status: ${receipt.status}`);
+    this.logger.info('✅ Hedera direct/native transfer completed:', { txId: transaction.transactionId?.toString(), fromAccountId, toAccountId, amount: amount.toString() });
+    return { txId: transaction.transactionId?.toString() || `hedera_tx_${Date.now()}` };
   }
 
   /**
