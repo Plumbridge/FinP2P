@@ -1461,4 +1461,37 @@ export class FinP2PSDKRouter extends EventEmitter {
       throw new Error('Real FinP2P integration not implemented yet');
     }
   }
+
+  /**
+   * Resolve FinID to wallet information across all supported chains
+   * This method returns wallet addresses for all supported blockchains
+   */
+  public async resolveFinId(finId: string): Promise<{
+    ethereumAddress?: string;
+    suiAddress?: string;
+    hederaAccountId?: string;
+  }> {
+    try {
+      if (this.config.mockMode) {
+        // Return mock wallet data for all chains
+        const userWallets = this.mockWalletMappings.get(finId);
+        if (!userWallets) {
+          throw new Error(`FinID not found: ${finId}`);
+        }
+        
+        return {
+          ethereumAddress: userWallets.get('ethereum') || undefined,
+          suiAddress: userWallets.get('sui') || undefined,
+          hederaAccountId: userWallets.get('hedera') || undefined
+        };
+      }
+      
+      // Real FinP2P SDK implementation would go here
+      this.logger.warn('Real FinP2P SDK resolveFinId not implemented');
+      throw new Error(`FinID not found: ${finId}`);
+    } catch (error) {
+      this.logger.error('Error resolving FinID:', error);
+      throw error;
+    }
+  }
 }

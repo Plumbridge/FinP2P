@@ -1,7 +1,8 @@
+// Core FinP2P-integrated adapters that can read normal transactions and work with FinP2P
 export * from './FinP2PIntegratedSuiAdapter';
 export * from './FinP2PIntegratedHederaAdapter';
 
-// Export specific types from Fusion adapter to avoid conflicts
+// Fusion-integrated adapter that combines FinP2P with Fusion specs for handover
 export {
     FinP2PIntegratedFusionAdapter,
     FusionLocation,
@@ -19,5 +20,13 @@ export {
     FusionStatus,
     FusionExecuteRequest,
     FusionExecuteResponse,
-    FinP2PIntegratedFusionConfig
+    FinP2PIntegratedFusionConfig,
+    // New Read Operation Interfaces (v1.0.0)
+    FusionSmartContractReadRequest,
+    FusionEVMAccountBalanceResponse,
+    FusionEVMAccountNonceResponse,
+    FusionEVMTransactionResponse,
+    FusionEVMBlockResponse,
+    FusionEVMSmartContractResponse,
+    FusionEVMReadResponse
   } from './FinP2PIntegratedFusionAdapter';

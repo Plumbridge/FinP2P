@@ -108,6 +108,96 @@ export interface FusionExecuteResponse {
   status: FusionStatus;
 }
 
+// New Read Operation Interfaces (FusionSpec.yaml v1.0.0)
+export interface FusionSmartContractReadRequest {
+  location: FusionLocation;
+  nodeToConnect?: string;
+  contractDetails: {
+    smartContractId: string;
+    functionName: string;
+    inputParameters: FusionParameter[];
+    outputParameters: FusionParameter[];
+  };
+}
+
+export interface FusionEVMAccountBalanceResponse {
+  balance: string; // Hex string representing balance in wei
+}
+
+export interface FusionEVMAccountNonceResponse {
+  nonce: string; // Hex string representing transaction count
+}
+
+export interface FusionEVMTransactionResponse {
+  blockHash: string | null;
+  blockNumber: string | null;
+  from: string;
+  gas: string;
+  gasPrice?: string;
+  hash: string;
+  input: string;
+  nonce: string;
+  to: string | null;
+  transactionIndex: string | null;
+  value: string;
+  v: string;
+  r: string;
+  s: string;
+  type?: string;
+  chainId?: string;
+  maxFeePerGas?: string;
+  maxPriorityFeePerGas?: string;
+  accessList?: Array<{
+    address: string;
+    storageKeys: string[];
+  }>;
+  yParity?: string;
+}
+
+export interface FusionEVMBlockResponse {
+  number: string | null;
+  hash: string | null;
+  parentHash: string;
+  nonce: string | null;
+  sha3Uncles: string;
+  logsBloom: string | null;
+  transactionsRoot: string;
+  stateRoot: string;
+  receiptsRoot: string;
+  miner: string;
+  difficulty: string;
+  totalDifficulty: string;
+  extraData: string;
+  size: string;
+  gasLimit: string;
+  gasUsed: string;
+  timestamp: string;
+  transactions: (string | FusionEVMTransactionResponse)[];
+  uncles: string[];
+  baseFeePerGas?: string;
+  blobGasUsed?: string;
+  excessBlobGas?: string;
+  mixHash?: string;
+  parentBeaconBlockRoot?: string;
+  requestsHash?: string;
+  withdrawals?: Array<{
+    address: string;
+    amount: string;
+    index: string;
+    validatorIndex: string;
+  }>;
+  withdrawalsRoot?: string;
+}
+
+export interface FusionEVMSmartContractResponse {
+  rawValue: string; // Hex-encoded return data
+  returns: FusionParameter[]; // Decoded values with types and names
+}
+
+export interface FusionEVMReadResponse {
+  rawData: FusionEVMAccountBalanceResponse | FusionEVMAccountNonceResponse | FusionEVMTransactionResponse | FusionEVMBlockResponse | FusionEVMSmartContractResponse;
+}
+
 // FinP2P Integration Configuration
 export interface FinP2PIntegratedFusionConfig {
   // EVM Network Configuration
@@ -756,8 +846,8 @@ export class FinP2PIntegratedFusionAdapter extends EventEmitter {
         hardfork: 'london'
       };
 
-      // Calculate total fee for response
-      const totalFee = BigInt(nativeData.gas) * BigInt(maxFeePerGas);
+      // Calculate total fee for response (use maxPriorityFeePerGas for EIP-1559)
+      const totalFee = BigInt(nativeData.gas) * BigInt(maxPriorityFeePerGas);
       const networkConfig = this.config.networks[chainId];
       
       return {
@@ -928,13 +1018,39 @@ export class FinP2PIntegratedFusionAdapter extends EventEmitter {
     // Estimate gas for deployment
     let gasLimit = '2500000'; // Default high limit for deployment
     try {
-      const estimatedGas = await provider.estimateGas({
-        from: deployerAddress,
-        data: deploymentData
-      });
-      gasLimit = (estimatedGas * 120n / 100n).toString(); // Add 20% buffer
+      // Validate bytecode format before estimation
+      if (!deploymentData.startsWith('0x')) {
+        deploymentData = '0x' + deploymentData;
+      }
+      
+      // Check if bytecode is valid hex
+      if (!/^0x[0-9a-fA-F]+$/.test(deploymentData)) {
+        throw new Error('Invalid bytecode format: must be valid hex string');
+      }
+      
+      // For very long bytecode, use a conservative estimate
+      if (deploymentData.length > 10000) {
+        gasLimit = '5000000'; // Higher limit for complex contracts
+        this.logger.info('Using conservative gas estimate for large bytecode');
+      } else {
+        const estimatedGas = await provider.estimateGas({
+          from: deployerAddress,
+          data: deploymentData
+        });
+        gasLimit = (estimatedGas * 120n / 100n).toString(); // Add 20% buffer
+      }
     } catch (error) {
-      this.logger.warn('Failed to estimate deployment gas, using default:', error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      this.logger.warn('Failed to estimate deployment gas, using default:', errorMessage);
+      // Use a reasonable default based on bytecode size
+      const bytecodeSize = deploymentData.length - 2; // Remove 0x prefix
+      if (bytecodeSize > 5000) {
+        gasLimit = '3000000'; // Higher limit for larger contracts
+      } else if (bytecodeSize > 2000) {
+        gasLimit = '2000000'; // Medium limit for medium contracts
+      } else {
+        gasLimit = '1000000'; // Lower limit for smaller contracts
+      }
     }
 
     // Build transaction
@@ -1067,6 +1183,334 @@ export class FinP2PIntegratedFusionAdapter extends EventEmitter {
     return this.config.networks[chainId];
   }
 
+  // ===== READ OPERATIONS (FusionSpec.yaml v1.0.0) =====
+
+  /**
+   * Read data from a smart contract (POST /smartContract-read)
+   */
+  async readSmartContract(request: FusionSmartContractReadRequest): Promise<FusionEVMSmartContractResponse> {
+    try {
+      this.logger.info('📖 Reading smart contract data', {
+        contract: this.truncateAddress(request.contractDetails.smartContractId),
+        function: request.contractDetails.functionName,
+        location: `${request.location.technology} ${request.location.network}`
+      });
+
+      // Step 1: Get provider and validate location
+      const chainId = this.getChainIdFromLocation(request.location);
+      const provider = this.providers.get(chainId);
+      if (!provider) {
+        throw new Error(`No provider found for chain ID ${chainId}`);
+      }
+
+      // Step 2: Build function signature and encode parameters
+      const functionSignature = this.buildFunctionSignature(
+        request.contractDetails.functionName,
+        request.contractDetails.inputParameters
+      );
+
+      // Step 3: Encode function call data
+      const iface = new ethers.Interface([`function ${functionSignature}`]);
+      const encodedParams = iface.encodeFunctionData(
+        request.contractDetails.functionName,
+        request.contractDetails.inputParameters.map(p => p.value)
+      );
+
+      // Step 4: Call smart contract
+      const rawValue = await provider.call({
+        to: request.contractDetails.smartContractId,
+        data: encodedParams
+      });
+
+      // Step 5: Decode return values
+      const returns = this.decodeSmartContractReturns(
+        rawValue,
+        request.contractDetails.outputParameters,
+        iface
+      );
+
+      this.logger.info('✅ Smart contract read successful', {
+        contract: this.truncateAddress(request.contractDetails.smartContractId),
+        function: request.contractDetails.functionName,
+        rawValue: rawValue.substring(0, 66) + '...' // Truncate for logging
+      });
+
+      return {
+        rawValue,
+        returns
+      };
+    } catch (error) {
+      this.logger.error('❌ Smart contract read failed:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Get account balance (GET /balance)
+   */
+  async getAccountBalance(
+    technology: string,
+    network: string,
+    accountId: string,
+    nodeToConnect?: string
+  ): Promise<FusionEVMAccountBalanceResponse> {
+    try {
+      this.logger.info('💰 Getting account balance', {
+        account: this.truncateAddress(accountId),
+        location: `${technology} ${network}`
+      });
+
+      // Step 1: Get provider
+      const location: FusionLocation = { technology, network };
+      const chainId = this.getChainIdFromLocation(location);
+      const provider = this.providers.get(chainId);
+      if (!provider) {
+        throw new Error(`No provider found for chain ID ${chainId}`);
+      }
+
+      // Step 2: Resolve FinID to address if needed
+      const resolvedAddress = await this.resolveAddressFromId(accountId, location);
+
+      // Step 3: Get balance
+      const balance = await provider.getBalance(resolvedAddress);
+
+      this.logger.info('✅ Account balance retrieved', {
+        account: this.truncateAddress(resolvedAddress),
+        balance: balance.toString(),
+        chainId
+      });
+
+      return {
+        balance: balance.toString()
+      };
+    } catch (error) {
+      this.logger.error('❌ Failed to get account balance:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Get account nonce (GET /nonce)
+   */
+  async getAccountNonce(
+    technology: string,
+    network: string,
+    accountId: string,
+    nodeToConnect?: string
+  ): Promise<FusionEVMAccountNonceResponse> {
+    try {
+      this.logger.info('🔢 Getting account nonce', {
+        account: this.truncateAddress(accountId),
+        location: `${technology} ${network}`
+      });
+
+      // Step 1: Get provider
+      const location: FusionLocation = { technology, network };
+      const chainId = this.getChainIdFromLocation(location);
+      const provider = this.providers.get(chainId);
+      if (!provider) {
+        throw new Error(`No provider found for chain ID ${chainId}`);
+      }
+
+      // Step 2: Resolve FinID to address if needed
+      const resolvedAddress = await this.resolveAddressFromId(accountId, location);
+
+      // Step 3: Get nonce
+      const nonce = await provider.getTransactionCount(resolvedAddress);
+
+      this.logger.info('✅ Account nonce retrieved', {
+        account: this.truncateAddress(resolvedAddress),
+        nonce: nonce.toString(),
+        chainId
+      });
+
+      return {
+        nonce: nonce.toString()
+      };
+    } catch (error) {
+      this.logger.error('❌ Failed to get account nonce:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Get transaction details (GET /transaction)
+   */
+  async getTransaction(
+    transactionId: string,
+    technology: string,
+    network: string,
+    nodeToConnect?: string
+  ): Promise<FusionEVMTransactionResponse> {
+    try {
+      this.logger.info('📄 Getting transaction details', {
+        txHash: this.truncateAddress(transactionId),
+        location: `${technology} ${network}`
+      });
+
+      // Step 1: Get provider
+      const location: FusionLocation = { technology, network };
+      const chainId = this.getChainIdFromLocation(location);
+      const provider = this.providers.get(chainId);
+      if (!provider) {
+        throw new Error(`No provider found for chain ID ${chainId}`);
+      }
+
+      // Step 2: Get transaction
+      const transaction = await provider.getTransaction(transactionId);
+      if (!transaction) {
+        throw new Error(`Transaction not found: ${transactionId}`);
+      }
+
+      // Step 3: Convert to response format
+      const response: FusionEVMTransactionResponse = {
+        blockHash: transaction.blockHash,
+        blockNumber: transaction.blockNumber?.toString() || null,
+        from: transaction.from,
+        gas: transaction.gasLimit?.toString() || '0x0',
+        gasPrice: transaction.gasPrice?.toString(),
+        hash: transaction.hash,
+        input: transaction.data,
+        nonce: transaction.nonce.toString(),
+        to: transaction.to,
+        transactionIndex: transaction.index?.toString() || null,
+        value: transaction.value.toString(),
+        v: '0x0', // Not available in ethers.js v6
+        r: '0x0', // Not available in ethers.js v6
+        s: '0x0', // Not available in ethers.js v6
+        type: transaction.type?.toString(),
+        chainId: transaction.chainId?.toString(),
+        maxFeePerGas: transaction.maxFeePerGas?.toString(),
+        maxPriorityFeePerGas: transaction.maxPriorityFeePerGas?.toString(),
+        accessList: transaction.accessList?.map(item => ({
+          address: item.address,
+          storageKeys: item.storageKeys
+        })),
+        yParity: '0x0' // Not available in ethers.js v6
+      };
+
+      this.logger.info('✅ Transaction details retrieved', {
+        txHash: this.truncateAddress(transactionId),
+        blockNumber: transaction.blockNumber?.toString(),
+        from: this.truncateAddress(transaction.from),
+        to: transaction.to ? this.truncateAddress(transaction.to) : 'Contract Creation'
+      });
+
+      return response;
+    } catch (error) {
+      this.logger.error('❌ Failed to get transaction details:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Get block information (Fusion API: /block)
+   */
+  async getBlock(blockId: string, technology: string, network: string, nodeToConnect?: string): Promise<FusionEVMBlockResponse> {
+    try {
+      this.logger.info('📦 Getting EVM block for Fusion', { blockId, technology, network });
+
+      const location: FusionLocation = { technology, network };
+      const chainId = this.getChainIdFromLocation(location);
+      const provider = this.providers.get(chainId);
+      if (!provider) {
+        throw new Error(`No provider found for chain ID ${chainId}`);
+      }
+      // Handle different block ID formats
+      let block;
+      if (blockId === 'latest') {
+        block = await provider.getBlock('latest');
+      } else if (blockId.startsWith('0x')) {
+        const blockNumber = parseInt(blockId, 16);
+        if (isNaN(blockNumber)) {
+          throw new Error(`Invalid block ID format: ${blockId}`);
+        }
+        block = await provider.getBlock(blockNumber);
+      } else {
+        const blockNumber = parseInt(blockId);
+        if (isNaN(blockNumber)) {
+          throw new Error(`Invalid block ID format: ${blockId}`);
+        }
+        block = await provider.getBlock(blockNumber);
+      }
+
+      if (!block) {
+        throw new Error(`Block not found: ${blockId}`);
+      }
+
+      return {
+        number: block.number?.toString() || null,
+        hash: block.hash || null,
+        parentHash: block.parentHash,
+        nonce: block.nonce || null,
+        sha3Uncles: '0x0000000000000000000000000000000000000000000000000000000000000000', // Default for ethers v6
+        logsBloom: null, // Not available in ethers.js v6
+        transactionsRoot: '0x0000000000000000000000000000000000000000000000000000000000000000', // Default value
+        stateRoot: '0x0000000000000000000000000000000000000000000000000000000000000000', // Default value
+        receiptsRoot: '0x0000000000000000000000000000000000000000000000000000000000000000', // Default value
+        miner: block.miner || '0x0000000000000000000000000000000000000000',
+        difficulty: block.difficulty?.toString() || '0',
+        totalDifficulty: '0', // Not available in ethers.js v6
+        extraData: block.extraData || '0x',
+        size: '0', // Not available in ethers.js v6
+        gasLimit: block.gasLimit?.toString() || '0',
+        gasUsed: block.gasUsed?.toString() || '0',
+        timestamp: block.timestamp?.toString() || '0',
+        transactions: block.transactions.map((tx: any) => 
+          typeof tx === 'string' ? tx : tx.hash || tx
+        ),
+        uncles: [], // Default empty array for ethers v6
+        baseFeePerGas: block.baseFeePerGas?.toString(),
+        blobGasUsed: block.blobGasUsed?.toString(),
+        excessBlobGas: block.excessBlobGas?.toString(),
+        mixHash: '0x0000000000000000000000000000000000000000000000000000000000000000', // Default for ethers v6
+        parentBeaconBlockRoot: block.parentBeaconBlockRoot || undefined,
+        requestsHash: '0x0000000000000000000000000000000000000000000000000000000000000000', // Default for ethers v6
+        withdrawals: [], // Default empty array for ethers v6
+        withdrawalsRoot: '0x0000000000000000000000000000000000000000000000000000000000000000' // Default for ethers v6
+      };
+    } catch (error) {
+      this.logger.error('❌ Error getting EVM block:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Decode smart contract return values
+   */
+  private decodeSmartContractReturns(
+    rawValue: string,
+    outputParameters: FusionParameter[],
+    iface: ethers.Interface
+  ): FusionParameter[] {
+    try {
+      if (rawValue === '0x' || outputParameters.length === 0) {
+        return [];
+      }
+
+      // Decode the return data
+      const decoded = iface.decodeFunctionResult(
+        outputParameters[0].name || 'result',
+        rawValue
+      );
+
+      // Map decoded values to output parameters
+      return outputParameters.map((param, index) => ({
+        name: param.name,
+        type: param.type,
+        value: decoded[index]
+      }));
+    } catch (error) {
+      this.logger.warn('⚠️ Failed to decode smart contract returns:', error);
+      // Return raw value if decoding fails
+      return [{
+        name: 'rawValue',
+        type: 'bytes',
+        value: rawValue
+      }];
+    }
+  }
+
   public async disconnect(): Promise<void> {
     // Clear monitoring timeouts
     for (const timeout of this.transactionMonitoring.values()) {
@@ -1080,5 +1524,26 @@ export class FinP2PIntegratedFusionAdapter extends EventEmitter {
     this.connected = false;
     this.logger.info('🔌 Fusion adapter disconnected');
     this.emit('disconnected');
+  }
+
+  /**
+   * Get the adapter configuration and status
+   */
+  getStatus(): {
+    connected: boolean;
+    network: string;
+    hasCredentials: boolean;
+    finp2pIntegration: boolean;
+    endpoint: string;
+    supportedNetworks: number[];
+  } {
+    return {
+      connected: this.connected,
+      network: 'EVM Multi-Chain',
+      hasCredentials: this.providers.size > 0,
+      finp2pIntegration: true,
+      endpoint: this.config.finp2pRouter.getRouterInfo().endpoint,
+      supportedNetworks: this.getSupportedNetworks()
+    };
   }
 }

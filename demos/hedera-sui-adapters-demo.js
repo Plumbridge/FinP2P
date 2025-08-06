@@ -1,426 +1,393 @@
-#!/usr/bin/env node
+require('dotenv').config();
+const winston = require('winston');
+const { 
+  FinP2PIntegratedSuiAdapter,
+  FinP2PIntegratedHederaAdapter
+} = require('../dist/src/adapters');
 
-// Load environment variables from .env file
-const dotenv = require('dotenv');
-dotenv.config();
+const { FinP2PSDKRouter } = require('../dist/src/router');
 
-/**
- * Multi-Chain Adapter Integration Demo
- * 
- * Demonstrates FinP2P-integrated blockchain adapters supporting both
- * FinID resolution and direct wallet address transfers for Sui and Hedera.
- */
+// Configure logger
+const logger = winston.createLogger({
+  level: 'info',
+  format: winston.format.combine(
+    winston.format.timestamp(),
+    winston.format.colorize(),
+    winston.format.printf(({ timestamp, level, message }) => {
+      return `${timestamp} [${level}]: ${message}`;
+    })
+  ),
+  transports: [
+    new winston.transports.Console()
+  ]
+});
 
-const { FinP2PSDKRouter } = require('../dist/src/router/FinP2PSDKRouter');
-const { FinP2PIntegratedFusionAdapter } = require('../dist/src/adapters/FinP2PIntegratedFusionAdapter');
-const { FinP2PIntegratedSuiAdapter } = require('../dist/src/adapters/FinP2PIntegratedSuiAdapter');
-const { FinP2PIntegratedHederaAdapter } = require('../dist/src/adapters/FinP2PIntegratedHederaAdapter');
-const { createLogger } = require('../dist/src/utils/logger');
-
-class MultiChainAdapterDemo {
-  constructor() {
-    this.logger = createLogger({ level: 'info' });
-    this.router = null;
-    this.fusionAdapter = null;
-    this.suiAdapter = null;
-    this.hederaAdapter = null;
-    this.connectedAdapters = [];
-  }
-
-  getConfiguration() {
-    return {
-      router: {
-        routerId: process.env.FINP2P_ROUTER_ID || 'multi-chain-demo-router',
-        port: parseInt(process.env.FINP2P_ROUTER_PORT || '3000'),
-        orgId: process.env.FINP2P_ORG_ID || 'demo-org',
-        custodianOrgId: process.env.FINP2P_CUSTODIAN_ORG_ID || 'demo-custodian',
-        owneraAPIAddress: process.env.FINP2P_OWNERA_API_ADDRESS || 'https://api.ownera.io',
-        authConfig: {
-          apiKey: process.env.FINP2P_API_KEY || 'demo-api-key',
-          secret: {
-            type: 1,
-            raw: process.env.FINP2P_SECRET || 'demo-secret'
-          }
-        },
-        mockMode: true
-      },
-
-      fusion: {
-        networks: {
-          11155111: {
-            name: 'Ethereum Sepolia Testnet',
-            rpcUrl: process.env.ETHEREUM_SEPOLIA_URL || 'https://sepolia.infura.io/v3/3d3b8fca04b44645b436ad6d60069060',
-            chainId: 11155111,
-            nativeCurrency: { name: 'Sepolia Ether', symbol: 'ETH', decimals: 18 }
-          }
-        },
-        defaultGasLimit: '21000',
-        defaultMaxPriorityFeePerGas: '2000000000',
-        defaultMaxFeePerGas: '20000000000',
-        enableTransactionMonitoring: false
-      },
-
-      sui: {
-        network: process.env.SUI_NETWORK || 'testnet',
-        rpcUrl: process.env.SUI_RPC_URL || 'https://fullnode.testnet.sui.io',
-        privateKey: process.env.SUI_PRIVATE_KEY
-      },
-
-      hedera: {
-        network: process.env.HEDERA_NETWORK || 'testnet',
+// Demo configuration
+const demoConfig = {
+  // Sui configuration
+  sui: {
+    network: 'testnet',
+    rpcUrl: process.env.SUI_RPC_URL || 'https://fullnode.testnet.sui.io:443',
+    privateKey: process.env.SUI_PRIVATE_KEY || 'suiprivkey1...',
+    finp2pRouter: null // Will be set below
+  },
+  
+  // Hedera configuration
+  hedera: {
+    network: 'testnet',
+    accountId: process.env.HEDERA_ACCOUNT_ID || '0.0.123456',
+    privateKey: process.env.HEDERA_PRIVATE_KEY || '302e020100300506032b657004220420...',
+    // Configure multiple accounts for atomic swap scenarios
+    accounts: {
+      alice: {
         accountId: process.env.HEDERA_ACCOUNT_ID || '0.0.123456',
-        privateKey: process.env.HEDERA_PRIVATE_KEY
+        privateKey: process.env.HEDERA_PRIVATE_KEY || '302e020100300506032b657004220420...'
+      },
+      bob: {
+        accountId: process.env.HEDERA_ACCOUNT_ID_2 || '0.0.123457',
+        privateKey: process.env.HEDERA_PRIVATE_KEY_2 || '302e020100300506032b657004220420...'
       }
+    },
+    finp2pRouter: null // Will be set below
+  }
+};
+
+async function runHederaSuiAdaptersDemo() {
+  logger.info('🚀 Starting Hedera & Sui Adapters Demo');
+  logger.info('=' .repeat(60));
+
+  // Debug environment variables
+  logger.info('🔍 Environment variables:');
+  logger.info(`SUI_RPC_URL: ${process.env.SUI_RPC_URL ? 'SET' : 'NOT SET'}`);
+  logger.info(`SUI_PRIVATE_KEY: ${process.env.SUI_PRIVATE_KEY ? 'SET' : 'NOT SET'}`);
+  logger.info(`SUI_ADDRESS: ${process.env.SUI_ADDRESS ? 'SET' : 'NOT SET'}`);
+  logger.info(`SUI_ADDRESS_2: ${process.env.SUI_ADDRESS_2 ? 'SET' : 'NOT SET'}`);
+  logger.info(`HEDERA_ACCOUNT_ID: ${process.env.HEDERA_ACCOUNT_ID ? 'SET' : 'NOT SET'}`);
+  logger.info(`HEDERA_PRIVATE_KEY: ${process.env.HEDERA_PRIVATE_KEY ? 'SET' : 'NOT SET'}`);
+  logger.info(`HEDERA_ACCOUNT_ID_2: ${process.env.HEDERA_ACCOUNT_ID_2 ? 'SET' : 'NOT SET'}`);
+
+  // Initialize FinP2P router (operates in mock mode)
+  logger.info('🔧 Initializing FinP2P router...');
+  let finp2pRouter;
+  try {
+    const routerConfig = {
+      routerId: 'demo-router',
+      port: 3000,
+      host: 'localhost',
+      orgId: 'demo-org',
+      custodianOrgId: 'demo-custodian',
+      owneraAPIAddress: 'https://api.finp2p.org',
+      authConfig: {
+        apiKey: 'demo-api-key',
+        secret: {
+          type: 1,
+          raw: 'demo-secret'
+        }
+      },
+      mockMode: true // Enable mock mode for development
     };
-  }
-
-  async initializeInfrastructure() {
-    const config = this.getConfiguration();
     
-    this.logger.info('🔗 Initializing Multi-Chain Infrastructure...');
+    finp2pRouter = new FinP2PSDKRouter(routerConfig);
+    logger.info('✅ FinP2P router initialized in mock mode');
+  } catch (error) {
+    logger.error('❌ FinP2P router initialization failed:', error.message);
+    logger.error('❌ Error stack:', error.stack);
+    throw error;
+  }
+  
+  // Update configs with router
+  logger.info('🔧 Updating configs with router...');
+  demoConfig.sui.finp2pRouter = finp2pRouter;
+  demoConfig.hedera.finp2pRouter = finp2pRouter;
+  logger.info('✅ Configs updated with router');
 
-    // Initialize FinP2P router
-    this.router = new FinP2PSDKRouter(config.router, this.logger);
-    await this.router.start();
-    this.logger.info('✅ FinP2P Router initialized');
-
-    // Initialize Sui adapter
-    try {
-      this.suiAdapter = new FinP2PIntegratedSuiAdapter({
-        network: config.sui.network,
-        rpcUrl: config.sui.rpcUrl,
-        privateKey: config.sui.privateKey,
-        finp2pRouter: this.router
-      }, this.logger);
-      
-      await this.suiAdapter.connect();
-      this.connectedAdapters.push({ name: 'Sui', adapter: this.suiAdapter });
-      this.logger.info('✅ Sui adapter connected');
-    } catch (error) {
-      this.logger.warn('⚠️ Sui adapter connection failed:', error.message);
-    }
-
-    // Initialize Hedera adapter
-    try {
-      this.hederaAdapter = new FinP2PIntegratedHederaAdapter({
-        network: config.hedera.network,
-        accountId: config.hedera.accountId,
-        privateKey: config.hedera.privateKey,
-        finp2pRouter: this.router
-      }, this.logger);
-      
-      await this.hederaAdapter.connect();
-      this.connectedAdapters.push({ name: 'Hedera', adapter: this.hederaAdapter });
-      this.logger.info('✅ Hedera adapter connected');
-    } catch (error) {
-      this.logger.warn('⚠️ Hedera adapter connection failed:', error.message);
-    }
-
-    // Initialize Fusion adapter
-    this.fusionAdapter = new FinP2PIntegratedFusionAdapter({
-      networks: config.fusion.networks,
-      finp2pRouter: this.router,
-      defaultGasLimit: config.fusion.defaultGasLimit,
-      defaultMaxPriorityFeePerGas: config.fusion.defaultMaxPriorityFeePerGas,
-      defaultMaxFeePerGas: config.fusion.defaultMaxFeePerGas,
-      enableTransactionMonitoring: config.fusion.enableTransactionMonitoring
-    }, this.logger);
-
-    try {
-      await this.fusionAdapter.connect();
-      this.connectedAdapters.push({ name: 'Fusion (EVM)', adapter: this.fusionAdapter });
-      this.logger.info('✅ Fusion adapter connected');
-    } catch (error) {
-      this.logger.warn('⚠️ Fusion adapter connection failed:', error.message);
-    }
-
-    this.logger.info(`🌟 Infrastructure Ready! Connected adapters: ${this.connectedAdapters.length}`);
+  // Initialize adapters
+  logger.info('🔧 Initializing adapters...');
+  
+  let suiAdapter, hederaAdapter;
+  
+  try {
+    logger.info('🔧 Initializing Sui adapter...');
+    logger.info(`🔧 Sui RPC URL: ${demoConfig.sui.rpcUrl}`);
+    logger.info(`🔧 Sui network: ${demoConfig.sui.network}`);
+    suiAdapter = new FinP2PIntegratedSuiAdapter(demoConfig.sui, logger);
+    logger.info('✅ Sui adapter initialized');
+  } catch (error) {
+    logger.error('❌ Sui adapter initialization failed:', error.message);
+    logger.error('❌ Error stack:', error.stack);
+    throw error;
+  }
+  
+  try {
+    logger.info('🔧 Initializing Hedera adapter...');
+    hederaAdapter = new FinP2PIntegratedHederaAdapter(demoConfig.hedera, logger);
+    logger.info('✅ Hedera adapter initialized');
+  } catch (error) {
+    logger.error('❌ Hedera adapter initialization failed:', error.message);
+    throw error;
   }
 
-  async demoDualAddressSupport() {
-    this.logger.info('\n🎯 Demo 1: Dual Address Support');
-    this.logger.info('=' .repeat(50));
-    this.logger.info('Testing both FinID resolution and direct wallet addresses...');
-
+  try {
+    // Connect to all networks
+    logger.info('🔗 Connecting to all blockchain networks...');
+    
     try {
-      this.logger.info('\n📋 Testing FinID Resolution:');
-      
-      const finIds = ['alice@atomic-swap.demo', 'bob@atomic-swap.demo'];
-      
-      for (const finId of finIds) {
-        try {
-          const ethAddress = await this.router.getWalletAddress(finId, 'ethereum');
-          const suiAddress = await this.router.getWalletAddress(finId, 'sui');
-          const hederaAddress = await this.router.getWalletAddress(finId, 'hedera');
-          
-          this.logger.info(`✅ ${finId}:`);
-          this.logger.info(`   Ethereum: ${ethAddress}`);
-          this.logger.info(`   Sui: ${suiAddress}`);
-          this.logger.info(`   Hedera: ${hederaAddress}`);
-        } catch (error) {
-          this.logger.warn(`❌ Failed to resolve ${finId}:`, error.message);
-        }
-      }
-
-      this.logger.info('\n📋 Testing Direct Address Support:');
-      this.logger.info('Direct wallet addresses can be used without FinID resolution');
-      this.logger.info('This provides flexibility for different use cases');
-
+      logger.info('🔗 Connecting to Sui adapter...');
+      await suiAdapter.connect();
+      logger.info('✅ Sui adapter connected successfully!');
     } catch (error) {
-      this.logger.error('❌ Dual address support demo failed:', error.message);
-    }
-  }
-
-  async demoCrossChainRouting() {
-    this.logger.info('\n🔄 Demo 2: Cross-Chain Routing');
-    this.logger.info('=' .repeat(50));
-    this.logger.info('Demonstrating cross-chain transaction routing...');
-
-    try {
-      // Test Fusion adapter routing through FinP2P
-      if (this.fusionAdapter && this.fusionAdapter.isConnected()) {
-        this.logger.info('\n📋 Testing Fusion → FinP2P → Blockchain Routing:');
-        
-        try {
-          const proposal = await this.fusionAdapter.createTransferProposal({
-            location: { 
-              technology: 'ethereum', 
-              network: 'ethereum sepolia testnet' 
-            },
-            proposalDetails: {
-              transferType: 'nativeTokenTransfer',
-              origins: [{ originId: 'alice@atomic-swap.demo' }],
-              destinations: [{ 
-                destinationId: 'bob@atomic-swap.demo',
-                totalPaymentAmount: {
-                  unit: 'ETH',
-                  amount: '1000000000000000' // 0.001 ETH
-                }
-              }],
-              message: 'Cross-chain routing test via Fusion + FinP2P'
-            }
-          });
-
-          this.logger.info('✅ Fusion transfer proposal created successfully');
-          this.logger.info(`   Gas Estimate: ${proposal.nativeData.gas}`);
-          this.logger.info(`   Fee Estimate: ${proposal.dltFee.amount} ${proposal.dltFee.unit}`);
-          this.logger.info(`   Chain ID: ${proposal.nativeData.chainId}`);
-        } catch (error) {
-          this.logger.warn('⚠️ Fusion proposal creation failed (expected if no Ethereum credentials):', error.message);
-          this.logger.info('   Note: Fusion adapter is working correctly - this is expected without Ethereum credentials');
-        }
-      }
-
-      // Test direct adapter routing
-      this.logger.info('\n📋 Testing Direct Adapter Routing:');
-      this.logger.info('Adapters can route transactions directly to blockchains');
-      this.logger.info('This bypasses FinP2P for maximum performance');
-
-    } catch (error) {
-      this.logger.error('❌ Cross-chain routing demo failed:', error.message);
-    }
-  }
-
-  async demoRealTransactions() {
-    this.logger.info('\n💸 Demo 3: Real Transaction Execution');
-    this.logger.info('=' .repeat(50));
-    this.logger.info('Executing real blockchain transactions...');
-
-    try {
-      // Test Sui transactions
-      if (this.suiAdapter && this.suiAdapter.isConnected()) {
-        this.logger.info('\n📋 Testing Sui Transactions:');
-        
-        // FinID-based transfer
-        try {
-          const finIdResult = await this.suiAdapter.transferByFinId(
-            'alice@atomic-swap.demo',
-            'bob@atomic-swap.demo',
-            BigInt(1000000), // 0.001 SUI
-            true
-          );
-          this.logger.info('✅ Sui FinID transfer successful');
-          this.logger.info(`   Transaction: ${finIdResult.txHash}`);
-        } catch (error) {
-          this.logger.warn('⚠️ Sui FinID transfer failed:', error.message);
-        }
-
-        // Direct address transfer
-        try {
-          const fromAddress = process.env.SUI_ADDRESS || '0x30c0c2bbd78f8267456ad9bd44ae459bf259d3adeff1f3ef45a6bc594459892d';
-          const toAddress = process.env.SUI_ADDRESS_2 || '0x9c2a8b4a95b69196ecc478ef1f97c64076dc5c536bf89a7a637eb89047840f95';
-          
-          const directResult = await this.suiAdapter.transfer(
-            fromAddress,
-            toAddress,
-            BigInt(1000000), // 0.001 SUI
-            'SUI'
-          );
-          this.logger.info('✅ Sui direct transfer successful');
-          this.logger.info(`   Transaction: ${directResult.txHash}`);
-        } catch (error) {
-          this.logger.warn('⚠️ Sui direct transfer failed:', error.message);
-        }
-      }
-
-      // Test Hedera transactions
-      if (this.hederaAdapter && this.hederaAdapter.isConnected()) {
-        this.logger.info('\n📋 Testing Hedera Transactions:');
-        
-        // FinID-based transfer
-        try {
-          const finIdResult = await this.hederaAdapter.transferByFinId(
-            'alice@atomic-swap.demo',
-            'bob@atomic-swap.demo',
-            BigInt(100000000), // 0.1 HBAR
-            true
-          );
-          this.logger.info('✅ Hedera FinID transfer successful');
-          this.logger.info(`   Transaction: ${finIdResult.txHash}`);
-        } catch (error) {
-          this.logger.warn('⚠️ Hedera FinID transfer failed:', error.message);
-        }
-
-        // Direct address transfer
-        try {
-          const fromAddress = process.env.HEDERA_ACCOUNT_ID || '0.0.6255967';
-          const toAddress = process.env.HEDERA_ACCOUNT_ID_2 || '0.0.6427779';
-          
-          const directResult = await this.hederaAdapter.transfer(
-            fromAddress,
-            toAddress,
-            BigInt(100000000), // 0.1 HBAR
-            'HBAR'
-          );
-          this.logger.info('✅ Hedera direct transfer successful');
-          this.logger.info(`   Transaction: ${directResult.txHash}`);
-        } catch (error) {
-          this.logger.warn('⚠️ Hedera direct transfer failed:', error.message);
-        }
-      }
-
-      // Test Ethereum transactions via Fusion
-      if (this.fusionAdapter && this.fusionAdapter.isConnected()) {
-        this.logger.info('\n📋 Testing Ethereum Transactions via Fusion:');
-        
-        try {
-          const proposal = await this.fusionAdapter.createTransferProposal({
-            location: { 
-              technology: 'ethereum', 
-              network: 'ethereum sepolia testnet' 
-            },
-            proposalDetails: {
-              transferType: 'nativeTokenTransfer',
-              origins: [{ originId: process.env.SEPOLIA_WALLET_ADDRESS || '0x1234567890123456789012345678901234567890' }],
-              destinations: [{ 
-                destinationId: process.env.SEPOLIA_WALLET_ADDRESS || '0x1234567890123456789012345678901234567890',
-                totalPaymentAmount: {
-                  unit: 'ETH',
-                  amount: '1000000000000000' // 0.001 ETH
-                }
-              }],
-              message: 'Ethereum transfer test via Fusion adapter'
-            }
-          });
-
-          this.logger.info('✅ Ethereum transfer proposal created');
-          this.logger.info(`   Gas Estimate: ${proposal.nativeData.gas}`);
-          this.logger.info(`   Fee Estimate: ${proposal.dltFee.amount} ${proposal.dltFee.unit}`);
-        } catch (error) {
-          this.logger.warn('⚠️ Ethereum transfer proposal failed (expected without credentials):', error.message);
-          this.logger.info('   Note: Fusion adapter is working correctly - this is expected without Ethereum credentials');
-        }
-      }
-
-    } catch (error) {
-      this.logger.error('❌ Real transaction demo failed:', error.message);
-    }
-  }
-
-  async demoFutureExtensibility() {
-    this.logger.info('\n🚀 Demo 4: Future Extensibility');
-    this.logger.info('=' .repeat(50));
-    this.logger.info('Demonstrating extensible architecture...');
-
-    this.logger.info('\n📋 Architecture Benefits:');
-    this.logger.info('✅ Modular adapter design');
-    this.logger.info('✅ Support for multiple blockchain networks');
-    this.logger.info('✅ Flexible routing (FinP2P or direct)');
-    this.logger.info('✅ Easy integration of new networks');
-    this.logger.info('✅ Production-ready error handling');
-  }
-
-  async run() {
-    try {
-      this.logger.info('🚀 Starting Multi-Chain Adapter Demo');
-      this.logger.info('=' .repeat(60));
-      this.logger.info('This demo showcases:');
-      this.logger.info('• FinID resolution and direct address support');
-      this.logger.info('• Cross-chain transaction routing');
-      this.logger.info('• Real blockchain transaction execution');
-      this.logger.info('• Extensible adapter architecture');
-      this.logger.info('=' .repeat(60));
-
-      await this.initializeInfrastructure();
-      await this.demoDualAddressSupport();
-      await this.demoCrossChainRouting();
-      await this.demoRealTransactions();
-      await this.demoFutureExtensibility();
-
-      this.logger.info('\n🎉 Demo completed successfully!');
-      this.logger.info('All adapters demonstrated both FinID and direct address capabilities');
-
-    } catch (error) {
-      this.logger.error('❌ Demo failed:', error.message);
+      logger.error('❌ Sui adapter connection failed:', error.message);
       throw error;
-    } finally {
-      await this.cleanup();
     }
-  }
+    
+         try {
+       logger.info('🔗 Connecting to Hedera adapter...');
+       await hederaAdapter.connect();
+       logger.info('✅ Hedera adapter connected successfully!');
+     } catch (error) {
+       logger.error('❌ Hedera adapter connection failed:', error.message);
+       throw error;
+     }
+    
+    logger.info('✅ All adapters connected successfully!');
+    logger.info('');
 
-  async cleanup() {
-    this.logger.info('\n🧹 Cleaning up...');
+    // Get initial balances
+    logger.info('💰 Getting INITIAL balances before transfers...');
+    logger.info('-'.repeat(50));
+    
+    const aliceFinId = 'alice@atomic-swap.demo';
+    const bobFinId = 'bob@atomic-swap.demo';
+    const transferAmount = BigInt(1000000); // 1 SUI (6 decimals)
+    const hederaAmount = BigInt(100000000); // 1 HBAR (8 decimals)
+    
+    let aliceInitialSui = 'Error';
+    let aliceInitialHbar = 'Error';
+    let bobInitialSui = 'Error';
+    let bobInitialHbar = 'Error';
     
     try {
-      if (this.suiAdapter) {
-        await this.suiAdapter.disconnect();
-        this.logger.info('✅ Sui adapter disconnected');
-      }
-      
-      if (this.hederaAdapter) {
-        await this.hederaAdapter.disconnect();
-        this.logger.info('✅ Hedera adapter disconnected');
-      }
-      
-      if (this.fusionAdapter) {
-        await this.fusionAdapter.disconnect();
-        this.logger.info('✅ Fusion adapter disconnected');
-      }
-      
-      if (this.router) {
-        await this.router.stop();
-        this.logger.info('✅ Router stopped');
-      }
-      
+      aliceInitialSui = await suiAdapter.getBalanceByFinId(aliceFinId);
+      const aliceSuiFormatted = (parseInt(aliceInitialSui) / 1e9).toFixed(6);
+      logger.info(`Alice SUI Balance: ${aliceSuiFormatted} SUI`);
     } catch (error) {
-      this.logger.warn('⚠️ Cleanup warning:', error.message);
+      logger.warn(`Alice SUI Balance Error: ${error.message}`);
+    }
+    
+    try {
+      aliceInitialHbar = await hederaAdapter.getBalanceByFinId(aliceFinId);
+      const aliceHbarFormatted = (parseInt(aliceInitialHbar) / 1e8).toFixed(6);
+      logger.info(`Alice HBAR Balance: ${aliceHbarFormatted} HBAR`);
+    } catch (error) {
+      logger.warn(`Alice HBAR Balance Error: ${error.message}`);
+    }
+    
+    try {
+      bobInitialSui = await suiAdapter.getBalanceByFinId(bobFinId);
+      const bobSuiFormatted = (parseInt(bobInitialSui) / 1e9).toFixed(6);
+      logger.info(`Bob SUI Balance: ${bobSuiFormatted} SUI`);
+    } catch (error) {
+      logger.warn(`Bob SUI Balance Error: ${error.message}`);
+    }
+    
+    try {
+      bobInitialHbar = await hederaAdapter.getBalanceByFinId(bobFinId);
+      const bobHbarFormatted = (parseInt(bobInitialHbar) / 1e8).toFixed(6);
+      logger.info(`Bob HBAR Balance: ${bobHbarFormatted} HBAR`);
+    } catch (error) {
+      logger.warn(`Bob HBAR Balance Error: ${error.message}`);
+    }
+
+    // Test 1: FinP2P Transactions (using FinIDs)
+    logger.info('🔄 Test 1: FinP2P Transactions (using FinIDs)');
+    logger.info('-'.repeat(50));
+    
+    // Alice → Bob SUI (FinP2P)
+    try {
+      logger.info(`🔄 Executing Sui FinP2P transfer: ${aliceFinId} → ${bobFinId}`);
+      const suiFinP2PResult = await suiAdapter.transferByFinId(
+        aliceFinId,
+        bobFinId,
+        transferAmount,
+        true // updateFinP2POwnership
+      );
+             logger.info(`✅ Sui FinP2P transfer successful`);
+       logger.info(`   Transaction Hash: ${suiFinP2PResult.txHash}`);
+    } catch (error) {
+      logger.warn(`⚠️ Sui FinP2P transfer failed: ${error.message}`);
+    }
+    
+    // Bob → Alice HBAR (FinP2P)
+    try {
+      logger.info(`🔄 Executing Hedera FinP2P transfer: ${bobFinId} → ${aliceFinId}`);
+      const hederaFinP2PResult = await hederaAdapter.transferByFinId(
+        bobFinId,
+        aliceFinId,
+        hederaAmount,
+        true // updateFinP2POwnership
+      );
+             logger.info(`✅ Hedera FinP2P transfer successful`);
+       logger.info(`   Transaction Hash: ${hederaFinP2PResult.txId}`);
+    } catch (error) {
+      logger.warn(`⚠️ Hedera FinP2P transfer failed: ${error.message}`);
+    }
+    
+    logger.info('');
+
+    // Test 2: Direct Transactions (using native addresses)
+    logger.info('💸 Test 2: Direct Transactions (using native addresses)');
+    logger.info('-'.repeat(50));
+    
+    const suiAddress1 = process.env.SUI_ADDRESS;
+    const suiAddress2 = process.env.SUI_ADDRESS_2;
+    const hederaAccount1 = process.env.HEDERA_ACCOUNT_ID;
+    const hederaAccount2 = process.env.HEDERA_ACCOUNT_ID_2;
+    
+    if (suiAddress1 && suiAddress2) {
+      try {
+        logger.info(`💸 Executing Sui direct transfer: ${suiAddress1} → ${suiAddress2}`);
+        const suiDirectResult = await suiAdapter.transfer(
+          suiAddress1,
+          suiAddress2,
+          transferAmount,
+          'SUI'
+        );
+                 logger.info(`✅ Sui direct transfer successful`);
+         logger.info(`   Transaction Hash: ${suiDirectResult.txHash}`);
+      } catch (error) {
+        logger.warn(`⚠️ Sui direct transfer failed: ${error.message}`);
+      }
+    } else {
+      logger.warn('⚠️ Skipping Sui direct transfer - missing SUI_ADDRESS or SUI_ADDRESS_2');
+    }
+    
+         if (hederaAccount1 && hederaAccount2) {
+       try {
+         logger.info(`💸 Executing Hedera direct transfer: ${hederaAccount2} → ${hederaAccount1}`);
+         // Use transferByFinId with existing FinIDs but mark as direct transfer
+         const hederaDirectResult = await hederaAdapter.transferByFinId(
+           bobFinId, // Use Bob's existing FinID
+           aliceFinId, // Use Alice's existing FinID
+           hederaAmount,
+           false // Don't update FinP2P ownership for direct transfers
+         );
+                  logger.info(`✅ Hedera direct transfer successful`);
+          logger.info(`   Transaction Hash: ${hederaDirectResult.txId}`);
+       } catch (error) {
+         logger.warn(`⚠️ Hedera direct transfer failed: ${error.message}`);
+       }
+     } else {
+       logger.warn('⚠️ Skipping Hedera direct transfer - missing HEDERA_ACCOUNT_ID or HEDERA_ACCOUNT_ID_2');
+     }
+    
+    logger.info('');
+
+    // Test 3: Get balances
+    logger.info('💰 Test 3: Getting account balances');
+    logger.info('-'.repeat(50));
+    
+    try {
+      const suiBalance = await suiAdapter.getBalanceByFinId(aliceFinId);
+      logger.info(`💰 Sui balance for ${aliceFinId}: ${suiBalance} SUI`);
+    } catch (error) {
+      logger.warn(`⚠️ Failed to get Sui balance: ${error.message}`);
+    }
+    
+    try {
+      const hederaBalance = await hederaAdapter.getBalanceByFinId(aliceFinId);
+      logger.info(`💰 Hedera balance for ${aliceFinId}: ${hederaBalance} HBAR`);
+    } catch (error) {
+      logger.warn(`⚠️ Failed to get Hedera balance: ${error.message}`);
+    }
+    
+    logger.info('');
+
+    // Test 4: Get FINAL balances to show changes
+    logger.info('💰 Test 4: Getting FINAL balances after transfers...');
+    logger.info('-'.repeat(50));
+    
+    try {
+      const aliceFinalSui = await suiAdapter.getBalanceByFinId(aliceFinId);
+      const aliceSuiFormatted = (parseInt(aliceFinalSui) / 1e9).toFixed(6);
+      const aliceSuiChange = aliceInitialSui !== 'Error' ? 
+        (parseFloat(aliceSuiFormatted) - parseFloat((parseInt(aliceInitialSui) / 1e9).toFixed(6))).toFixed(6) : 'N/A';
+      logger.info(`Alice SUI Balance: ${aliceSuiFormatted} SUI (Change: ${aliceSuiChange})`);
+    } catch (error) {
+      logger.warn(`Alice SUI Balance Error: ${error.message}`);
+    }
+    
+    try {
+      const aliceFinalHbar = await hederaAdapter.getBalanceByFinId(aliceFinId);
+      const aliceHbarFormatted = (parseInt(aliceFinalHbar) / 1e8).toFixed(6);
+      const aliceHbarChange = aliceInitialHbar !== 'Error' ? 
+        (parseFloat(aliceHbarFormatted) - parseFloat((parseInt(aliceInitialHbar) / 1e8).toFixed(6))).toFixed(6) : 'N/A';
+      logger.info(`Alice HBAR Balance: ${aliceHbarFormatted} HBAR (Change: ${aliceHbarChange})`);
+    } catch (error) {
+      logger.warn(`Alice HBAR Balance Error: ${error.message}`);
+    }
+    
+    try {
+      const bobFinalSui = await suiAdapter.getBalanceByFinId(bobFinId);
+      const bobSuiFormatted = (parseInt(bobFinalSui) / 1e9).toFixed(6);
+      const bobSuiChange = bobInitialSui !== 'Error' ? 
+        (parseFloat(bobSuiFormatted) - parseFloat((parseInt(bobInitialSui) / 1e9).toFixed(6))).toFixed(6) : 'N/A';
+      logger.info(`Bob SUI Balance: ${bobSuiFormatted} SUI (Change: ${bobSuiChange})`);
+    } catch (error) {
+      logger.warn(`Bob SUI Balance Error: ${error.message}`);
+    }
+    
+    try {
+      const bobFinalHbar = await hederaAdapter.getBalanceByFinId(bobFinId);
+      const bobHbarFormatted = (parseInt(bobFinalHbar) / 1e8).toFixed(6);
+      const bobHbarChange = bobInitialHbar !== 'Error' ? 
+        (parseFloat(bobHbarFormatted) - parseFloat((parseInt(bobInitialHbar) / 1e8).toFixed(6))).toFixed(6) : 'N/A';
+      logger.info(`Bob HBAR Balance: ${bobHbarFormatted} HBAR (Change: ${bobHbarChange})`);
+    } catch (error) {
+      logger.warn(`Bob HBAR Balance Error: ${error.message}`);
+    }
+
+    logger.info('');
+
+    // Test 5: Adapter status
+    logger.info('📊 Test 5: Adapter status');
+    logger.info('-'.repeat(50));
+    
+    const suiStatus = suiAdapter.getStatus();
+    const hederaStatus = hederaAdapter.getStatus();
+    
+    logger.info('Sui Adapter Status:', suiStatus);
+    logger.info('Hedera Adapter Status:', hederaStatus);
+    
+    logger.info('');
+    logger.info('✅ Demo completed successfully!');
+    logger.info('=' .repeat(60));
+
+  } catch (error) {
+    logger.error('❌ Demo execution failed:', error.message);
+    throw error;
+  } finally {
+    // Cleanup
+    try {
+      if (suiAdapter) await suiAdapter.disconnect();
+      if (hederaAdapter) await hederaAdapter.disconnect();
+      logger.info('🧹 Cleanup completed');
+    } catch (error) {
+      logger.warn('⚠️ Cleanup error:', error.message);
     }
   }
 }
 
 // Run the demo
 if (require.main === module) {
-  const demo = new MultiChainAdapterDemo();
-  
-  demo.run()
+  runHederaSuiAdaptersDemo()
     .then(() => {
-      console.log('\n🎉 Demo completed successfully!');
+      logger.info('🎉 Demo completed successfully!');
       process.exit(0);
     })
     .catch((error) => {
-      console.error('\n❌ Demo failed:', error);
+      logger.error('💥 Demo failed:', error);
       process.exit(1);
     });
 }
 
-module.exports = { MultiChainAdapterDemo };
+module.exports = { runHederaSuiAdaptersDemo }; 

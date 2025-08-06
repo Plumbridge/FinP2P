@@ -20,6 +20,13 @@ export interface FinP2PIntegratedHederaConfig {
   network: 'testnet' | 'mainnet' | 'previewnet';
   accountId?: string;
   privateKey?: string;
+  // Support for multiple accounts (for atomic swap scenarios)
+  accounts?: {
+    [accountId: string]: {
+      accountId: string;
+      privateKey: string;
+    };
+  };
   finp2pRouter: FinP2PSDKRouter;
 }
 
@@ -36,6 +43,8 @@ export class FinP2PIntegratedHederaAdapter extends EventEmitter {
   private client: Client | null = null;
   private operatorAccountId: AccountId | null = null;
   private operatorPrivateKey: PrivateKey | null = null;
+  // Store multiple accounts for atomic swap scenarios
+  private accountKeys: Map<string, PrivateKey> = new Map();
   private config: FinP2PIntegratedHederaConfig;
   private logger: Logger;
   private connected: boolean = false;
@@ -58,10 +67,26 @@ export class FinP2PIntegratedHederaAdapter extends EventEmitter {
 
   async connect(): Promise<void> {
     try {
+      // Load multiple accounts if configured
+      if (this.config.accounts) {
+        for (const [accountId, accountConfig] of Object.entries(this.config.accounts)) {
+          try {
+            const privateKey = PrivateKey.fromString(accountConfig.privateKey);
+            this.accountKeys.set(accountConfig.accountId, privateKey);
+            this.logger.info(`✅ Loaded account key for: ${accountConfig.accountId}`);
+          } catch (error) {
+            this.logger.warn(`⚠️ Failed to load account key for ${accountConfig.accountId}:`, (error as Error).message);
+          }
+        }
+      }
+
       if (this.config.accountId && this.config.privateKey) {
         // Real Hedera network connection
         this.operatorAccountId = AccountId.fromString(this.config.accountId);
         this.operatorPrivateKey = PrivateKey.fromString(this.config.privateKey);
+
+        // Also add the main account to the account keys map
+        this.accountKeys.set(this.config.accountId, this.operatorPrivateKey);
 
         // Create client for specified network
         switch (this.config.network) {
@@ -91,7 +116,8 @@ export class FinP2PIntegratedHederaAdapter extends EventEmitter {
           network: this.config.network,
           accountId: this.config.accountId,
           balance: balance.hbars.toString(),
-          finp2pIntegration: 'active'
+          finp2pIntegration: 'active',
+          totalAccounts: this.accountKeys.size
         });
       } else {
         // Mock mode
@@ -517,12 +543,35 @@ export class FinP2PIntegratedHederaAdapter extends EventEmitter {
       const fromAccountId = AccountId.fromString(fromAddress);
       const toAccountId = AccountId.fromString(toAddress);
 
-             const transaction = await new TransferTransaction()
-         .addHbarTransfer(fromAccountId, Hbar.fromTinybars(-Number(amount)))
-         .addHbarTransfer(toAccountId, Hbar.fromTinybars(Number(amount)))
-         .execute(this.client);
+      // Get the private key for the sender account
+      const senderPrivateKey = this.accountKeys.get(fromAddress);
+      if (!senderPrivateKey) {
+        throw new Error(`No private key found for account ${fromAddress}. Available accounts: ${Array.from(this.accountKeys.keys()).join(', ')}`);
+      }
 
-      const receipt = await transaction.getReceipt(this.client);
+      // Create a new client instance for this specific transaction
+      let transactionClient: Client;
+      switch (this.config.network) {
+        case 'testnet':
+          transactionClient = Client.forTestnet();
+          break;
+        case 'mainnet':
+          transactionClient = Client.forMainnet();
+          break;
+        case 'previewnet':
+          transactionClient = Client.forPreviewnet();
+          break;
+        default:
+          throw new Error(`Unsupported network: ${this.config.network}`);
+      }
+      transactionClient.setOperator(fromAccountId, senderPrivateKey);
+
+      const transaction = await new TransferTransaction()
+        .addHbarTransfer(fromAccountId, Hbar.fromTinybars(-Number(amount)))
+        .addHbarTransfer(toAccountId, Hbar.fromTinybars(Number(amount)))
+        .execute(transactionClient);
+
+      const receipt = await transaction.getReceipt(transactionClient);
 
       if (receipt.status !== Status.Success) {
         throw new Error(`Transaction failed with status: ${receipt.status}`);

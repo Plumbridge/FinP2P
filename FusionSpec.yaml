@@ -1,0 +1,1506 @@
+openapi: 3.0.0
+info:
+  title: Fusion DLT Adapter APIs for Multiple Blockchains
+  version: 1.0.0
+  description: >-
+    REST server for connecting to multiple blockchains and providing necessary
+    APIs to Fusion Adapter Layer
+  contact:
+    name: API Support
+    email: support@example.com
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+servers:
+  - url: http://localhost:5010
+    description: Local Development server
+  - url: http://localhost:5020
+    description: DevNet server
+tags:
+  - name: Write Operations
+    description: Operations for creating proposals and executing signed transactions
+  - name: Read Operations
+    description: Operations for reading blockchain data
+components:
+  schemas:
+    ProposalRequest:
+      type: object
+      required:
+        - location
+        - proposalDetails
+      properties:
+        location:
+          $ref: '#/components/schemas/Location'
+        nodeToConnect:
+          type: string
+          description: >-
+            Optional node URL provided by user, which will be used to connect to
+            the blockchain
+          example: https://mainnet.infura.io/v3/your-api-key
+        proposalDetails:
+          oneOf:
+            - $ref: '#/components/schemas/TransferProposal'
+            - $ref: '#/components/schemas/SmartContractWriteProposal'
+            - $ref: '#/components/schemas/SmartContractDeployProposal'
+    TransferProposal:
+      type: object
+      required:
+        - transferType
+        - origins
+        - destinations
+      properties:
+        transferType:
+          type: string
+          enum:
+            - nativeTokenTransfer
+            - fungibleTokenTransfer
+            - nonFungibleTokenTransfer
+          description: Type of transfer
+        assetId:
+          type: string
+          description: Contract address for fungible/non-fungible tokens
+          example: '0xA0b86a33E6417c31f8D9b1f681Ff1234567890af'
+        origins:
+          type: array
+          items:
+            $ref: '#/components/schemas/TransferOrigin'
+        destinations:
+          type: array
+          items:
+            $ref: '#/components/schemas/TransferDestination'
+        message:
+          type: string
+          description: Optional message
+          example: Payment for services
+        feePayers:
+          type: array
+          items:
+            type: string
+          description: Array of fee payer addresses
+          example:
+            - '0x742d35cc6641c72323cab7c8f71c8c3c1ea7cb0a'
+    SmartContractWriteProposal:
+      type: object
+      required:
+        - callerAccountId
+        - smartContractId
+        - functionName
+        - inputParameters
+        - outputParameters
+      properties:
+        callerAccountId:
+          type: string
+          description: Caller address that will be used to sign a transaction in Overwallet
+          example: '0x742d35cc6641c72323cab7c8f71c8c3c1ea7cb0a'
+        smartContractId:
+          type: string
+          description: Smart contract address
+          example: '0xA0b86a33E6417c31f8D9b1f681Ff1234567890af'
+        functionName:
+          type: string
+          description: Function name to call
+          example: transfer
+        inputParameters:
+          type: array
+          items:
+            $ref: '#/components/schemas/Parameter'
+        outputParameters:
+          type: array
+          items:
+            $ref: '#/components/schemas/Parameter'
+        isStateMutabilityPayable:
+          type: boolean
+          default: false
+          description: Whether the function is payable
+        feePayers:
+          type: array
+          items:
+            type: string
+          description: Array of fee payer addresses
+        message:
+          type: string
+          description: Optional message
+    SmartContractDeployProposal:
+      type: object
+      required:
+        - deployerAccountId
+        - bytecodeToDeploy
+        - constructorParameters
+      properties:
+        deployerAccountId:
+          type: string
+          description: >-
+            Deployer address that will be used to sign a transaction in
+            Overwallet
+          example: '0x742d35cc6641c72323cab7c8f71c8c3c1ea7cb0a'
+        bytecodeToDeploy:
+          type: string
+          description: Contract bytecode to be deployed, which must begin with "0x"
+          example: 0x608060405234801561001057600080fd5b50...
+        constructorParameters:
+          type: array
+          items:
+            $ref: '#/components/schemas/Parameter'
+        feePayers:
+          type: array
+          items:
+            type: string
+          description: Array of fee payer addresses
+        message:
+          type: string
+          description: Optional message
+    ProposalResponse:
+      type: object
+      required:
+        - dltFee
+        - nativeData
+      properties:
+        dltFee:
+          $ref: '#/components/schemas/FeeInfo'
+        nativeData:
+          oneOf:
+            - $ref: '#/components/schemas/EIP155'
+            - $ref: '#/components/schemas/EIP1559'
+    ExecuteRequest:
+      type: object
+      required:
+        - location
+        - signedTransaction
+      properties:
+        location:
+          $ref: '#/components/schemas/Location'
+        nodeToConnect:
+          type: string
+          description: >-
+            Optional node URL provided by user, which will be used to connect to
+            the blockchain
+        signedTransaction:
+          type: string
+          description: >-
+            Signed transaction in hexadecimal format, which is provided by
+            Overwallet
+          example: >-
+            0xf86c098504a817c800825208943535353535353535353535353535353535353535880de0b6b3a76400008025a028ef61340bd939bc2195fe537567866003e1a15d3c71ff63e1590620aa636276a067cbe9d8997f761aecb703304b3800ccf555c9f3dc64214b297fb1966a3b6d83
+    ExecuteResponse:
+      type: object
+      required:
+        - status
+      properties:
+        status:
+          $ref: '#/components/schemas/Status'
+    Location:
+      type: object
+      required:
+        - technology
+        - network
+      properties:
+        technology:
+          type: string
+          description: The blockchain technology
+          example: ethereum
+        network:
+          type: string
+          description: The network name
+          example: ethereum sepolia testnet
+    FeeInfo:
+      type: object
+      required:
+        - unit
+        - amount
+      properties:
+        unit:
+          type: string
+          description: The fee unit
+          example: ETH
+        amount:
+          type: string
+          description: The fee amount as a string
+          example: '0.00000000021'
+    Parameter:
+      type: object
+      required:
+        - type
+      properties:
+        name:
+          type: string
+          description: Parameter name
+          example: recipient
+        type:
+          type: string
+          description: Parameter type
+          example: address
+        value:
+          oneOf:
+            - type: string
+            - type: number
+            - type: boolean
+            - type: object
+            - type: array
+          description: Parameter value
+          example: '0x742d35cc6641c72323cab7c8f71c8c3c1ea7cb0a'
+    TransferOrigin:
+      type: object
+      required:
+        - originId
+      properties:
+        originId:
+          type: string
+          description: Sender address that will be used to sign a transaction in Overwallet
+          example: '0x742d35cc6641c72323cab7c8f71c8c3c1ea7cb0a'
+    TransferDestination:
+      type: object
+      required:
+        - destinationId
+      properties:
+        destinationId:
+          type: string
+          description: Destination address
+          example: 0x8ba1f109551bD432803012645Hac136c22C177e9
+        totalPaymentAmount:
+          $ref: '#/components/schemas/FeeInfo'
+        nftTokenId:
+          type: string
+          description: NFT token ID for non-fungible token transfers
+          example: '1234'
+    EIP155:
+      type: object
+      required:
+        - chainId
+        - nonce
+        - gasPrice
+        - gas
+        - to
+        - value
+        - data
+      properties:
+        chainId:
+          type: integer
+          example: 11155111
+        nonce:
+          type: integer
+          example: 42
+        gasPrice:
+          type: string
+          example: '20000000000'
+        gas:
+          type: string
+          example: '21000'
+        to:
+          type: string
+          example: 0x8ba1f109551bD432803012645Hac136c22C177e9
+        value:
+          type: string
+          example: '1000000000000000000'
+        data:
+          type: string
+          example: 0x
+    EIP1559:
+      type: object
+      required:
+        - chainId
+        - nonce
+        - gas
+        - maxPriorityFeePerGas
+        - maxFeePerGas
+        - to
+        - value
+        - data
+        - hardfork
+      properties:
+        chainId:
+          type: integer
+          example: 11155111
+        nonce:
+          type: integer
+          example: 42
+        gas:
+          type: string
+          example: '21000'
+        maxPriorityFeePerGas:
+          type: string
+          example: '2000000000'
+        maxFeePerGas:
+          type: string
+          example: '20000000000'
+        to:
+          type: string
+          example: 0x8ba1f109551bD432803012645Hac136c22C177e9
+        value:
+          type: string
+          example: '1000000000000000000'
+        data:
+          type: string
+          example: 0x
+        hardfork:
+          type: string
+          example: london
+    Status:
+      type: object
+      required:
+        - message
+        - value
+        - timestamp
+      properties:
+        message:
+          type: string
+          description: Status message
+          example: Transaction submitted successfully
+        txHash:
+          type: string
+          description: Transaction hash (optional)
+          example: 0xabc123def456...
+        value:
+          type: string
+          enum:
+            - pending
+            - success
+            - failed
+          description: Status value
+        timestamp:
+          type: string
+          description: Timestamp of the status
+          example: '2024-01-15T10:30:00Z'
+    ErrorResponse:
+      type: object
+      required:
+        - error
+      properties:
+        error:
+          type: string
+          description: Error message
+          example: Invalid request format
+        details:
+          oneOf:
+            - type: string
+            - type: array
+              items:
+                type: string
+          description: Additional error details
+          example:
+            - Field "location" is required
+            - Field "proposalDetails" is required
+    BaseReadRequest:
+      type: object
+      required:
+        - technology
+        - network
+      properties:
+        technology:
+          type: string
+          description: The blockchain technology
+          example: ethereum
+        network:
+          type: string
+          description: The network name
+          example: ethereum sepolia testnet
+        nodeToConnect:
+          type: string
+          description: >-
+            Optional node URL provided by user, which will be used to connect to
+            the blockchain
+    AccountReadRequest:
+      allOf:
+        - $ref: '#/components/schemas/BaseReadRequest'
+        - type: object
+          required:
+            - accountId
+          properties:
+            accountId:
+              type: string
+              description: Account address to retrieve
+    TransactionReadRequest:
+      allOf:
+        - $ref: '#/components/schemas/BaseReadRequest'
+        - type: object
+          required:
+            - transactionId
+          properties:
+            transactionId:
+              type: string
+              description: Transaction hash to retrieve
+    BlockReadRequest:
+      allOf:
+        - $ref: '#/components/schemas/BaseReadRequest'
+        - type: object
+          required:
+            - blockId
+          properties:
+            blockId:
+              type: string
+              description: Block hash to retrieve
+    SmartContractReadRequest:
+      type: object
+      required:
+        - contractDetails
+        - location
+      properties:
+        location:
+          $ref: '#/components/schemas/Location'
+        nodeToConnect:
+          type: string
+          description: Optional node to connect to
+          example: https://sepolia.infura.io/v3/your-api-key
+        contractDetails:
+          type: object
+          required:
+            - smartContractId
+            - functionName
+            - inputParameters
+            - outputParameters
+          properties:
+            smartContractId:
+              type: string
+              description: Smart contract address
+              example: '0xf6333F500dB0a8B05d19Aed9cd1E6042B2687f95'
+            functionName:
+              type: string
+              description: Function name to call
+              example: balanceOf
+            inputParameters:
+              type: array
+              items:
+                $ref: '#/components/schemas/Parameter'
+            outputParameters:
+              type: array
+              items:
+                $ref: '#/components/schemas/Parameter'
+    EVMReadResponse:
+      type: object
+      required:
+        - rawData
+      description: >-
+        EVM blockchain read response containing raw data from various read
+        operations
+      properties:
+        rawData:
+          oneOf:
+            - $ref: '#/components/schemas/EVMAccountBalanceResponse'
+            - $ref: '#/components/schemas/EVMAccountNonceResponse'
+            - $ref: '#/components/schemas/EVMTransactionResponse'
+            - $ref: '#/components/schemas/EVMBlockResponse'
+            - $ref: '#/components/schemas/EVMSmartContractResponse'
+          description: >-
+            Raw data returned by EVM blockchain RPC methods for reading account,
+            transaction, block, or smart contract
+    EVMAccountBalanceResponse:
+      type: object
+      required:
+        - balance
+      properties:
+        balance:
+          type: string
+          description: >-
+            Hex string representing balance in wei, which is returned from using
+            Ethereum RPC method eth_getBalance
+          example: '0x1bc16d674ec80000'
+    EVMAccountNonceResponse:
+      type: object
+      required:
+        - nonce
+      properties:
+        nonce:
+          type: string
+          description: >-
+            Hex string representing the number of transactions sent from the
+            address, which is returned from using Ethereum RPC method
+            eth_getTransactionCount
+          example: '0x1'
+    EVMTransactionResponse:
+      type: object
+      required:
+        - blockHash
+        - blockNumber
+        - from
+        - gas
+        - hash
+        - input
+        - nonce
+        - to
+        - transactionIndex
+        - value
+        - v
+        - r
+        - s
+      description: >-
+        Transaction object, which is returned from using Ethereum RPC method
+        eth_getTransactionByHash
+      properties:
+        blockHash:
+          type: string
+          nullable: true
+          description: >-
+            32 Bytes - hash of the block where this transaction was in. null
+            when pending
+          example: '0xb1112ef37861f39ff395a245eb962791e11eae26f94b50bb95e3e31378ef3d25'
+        blockNumber:
+          type: string
+          nullable: true
+          description: Block number where this transaction was in. null when pending
+          example: '0xfd27df'
+        from:
+          type: string
+          description: 20 Bytes - address of the sender
+          example: '0x2d218ce7d8892fc6b391b614f84278d12decae52'
+        gas:
+          type: string
+          description: Gas provided by the sender
+          example: '0xf478'
+        gasPrice:
+          type: string
+          description: Gas price provided by the sender in Wei (legacy transactions only)
+          example: '0x5bcdcacee'
+        hash:
+          type: string
+          description: 32 Bytes - hash of the transaction
+          example: '0xb1fac2cb5074a4eda8296faebe3b5a3c10b48947dd9a738b2fdf859be0e1fbaf'
+        input:
+          type: string
+          description: The data send along with the transaction
+          example: >-
+            0xa9059cbb000000000000000000000000b6ae07829376a5b704bb46a0869f383555097c29000000000000000000000000000000000000000000000034df6db862352c72d0
+        nonce:
+          type: string
+          description: The number of transactions made by the sender prior to this one
+          example: '0x2768'
+        to:
+          type: string
+          nullable: true
+          description: >-
+            20 Bytes - address of the receiver. null when its a contract
+            creation transaction
+          example: '0x111111517e4929d3dcbdfa7cce55d30d4b6bc4d6'
+        transactionIndex:
+          type: string
+          nullable: true
+          description: >-
+            Integer of the transactions index position in the block. null when
+            pending
+          example: '0xb4'
+        value:
+          type: string
+          description: Value transferred in Wei
+          example: '0x0'
+        v:
+          type: string
+          description: ECDSA recovery id
+          example: '0x1'
+        r:
+          type: string
+          description: ECDSA signature r
+          example: '0x4dec2c2ab964f28385d31cd203fe5960e001ccd110db816ad462d411cf496548'
+        s:
+          type: string
+          description: ECDSA signature s
+          example: '0x62ffcab5b6ae1cf4a59d32dd39a92f14eadea5fbbb7587c1a845a3d0d8621253'
+        type:
+          type: string
+          description: Transaction type (0x0=legacy, 0x1=access list, 0x2=dynamic fee)
+          example: '0x2'
+        chainId:
+          type: string
+          description: Chain id that this transaction is valid on
+          example: '0x1'
+        maxFeePerGas:
+          type: string
+          description: Maximum fee per gas willing to pay (EIP-1559)
+          example: '0x645a4b0a6'
+        maxPriorityFeePerGas:
+          type: string
+          description: Maximum priority fee per gas (tip) willing to pay (EIP-1559)
+          example: '0x173eed80'
+        accessList:
+          type: array
+          items:
+            type: object
+            properties:
+              address:
+                type: string
+                description: 20 Bytes - address that will be accessed
+              storageKeys:
+                type: array
+                items:
+                  type: string
+                description: Array of 32-byte storage keys that will be accessed
+          description: Access list for EIP-2930 and EIP-1559 transactions
+          example: []
+        yParity:
+          type: string
+          description: >-
+            The parity (0 for even, 1 for odd) of the y-coordinate of the
+            secp256k1 signature
+    EVMBlockResponse:
+      type: object
+      required:
+        - number
+        - hash
+        - parentHash
+        - nonce
+        - sha3Uncles
+        - logsBloom
+        - transactionsRoot
+        - stateRoot
+        - receiptsRoot
+        - miner
+        - difficulty
+        - totalDifficulty
+        - extraData
+        - size
+        - gasLimit
+        - gasUsed
+        - timestamp
+        - transactions
+        - uncles
+      description: >-
+        Block object, which is returned from using Ethereum RPC method
+        eth_getBlockByHash
+      properties:
+        number:
+          type: string
+          nullable: true
+          description: The block number. null when its pending block
+          example: '0x10c582e'
+        hash:
+          type: string
+          nullable: true
+          description: 32 Bytes - hash of the block. null when its pending block
+          example: '0x3f07a9c83155594c000642e7d60e8a8a00038d03e9849171a05ed0e2d47acbb3'
+        parentHash:
+          type: string
+          description: 32 Bytes - hash of the parent block
+          example: '0x5d5ccd7726eeca1f1b8d82ccaf55a55c86ee4647e5ff84e4345b6b68afd835e4'
+        nonce:
+          type: string
+          nullable: true
+          description: >-
+            8 Bytes - hash of the generated proof-of-work. null when its pending
+            block (or post-merge)
+          example: '0x0000000000000000'
+        sha3Uncles:
+          type: string
+          description: 32 Bytes - SHA3 of the uncles data in the block
+          example: '0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347'
+        logsBloom:
+          type: string
+          nullable: true
+          description: >-
+            256 Bytes - the bloom filter for the logs of the block. null when
+            its pending block
+          example: >-
+            0x4661734261c431449406ec8180129028925a74170201187501291e379407488680401aa08140282302802d38ba7315082285b0608c0be08c07d0c02df06d6d0589500048c4230928a940411fc03e78358211042909402f4000076122e6239cc0b20061202fd701831108b218a01218541251365218100550b200555c305cd295c6000948011a91b9004354225122940510208481d94648480817a0ca40901129ca972160100c7c184003ecc2901915559710820220f28123d1aa0182150800955b50446a0728084b08109470803b93983ee77222c41c285a014345022d24e8241610a74560888b0200a7f6a263091080183072188a0924440a0c4c4332312425
+        transactionsRoot:
+          type: string
+          description: 32 Bytes - the root of the transaction trie of the block
+          example: '0x454271da3c0119434a61de5bb9fc2155b3885195fb8a051aee78edd5f4cc12af'
+        stateRoot:
+          type: string
+          description: 32 Bytes - the root of the final state trie of the block
+          example: '0xc2bba9851341223b1c7d58e8242ef906e0b47a743c1ae83af1f518b446d221df'
+        receiptsRoot:
+          type: string
+          description: 32 Bytes - the root of the receipts trie of the block
+          example: '0x5e407b2a8177a6cff4e2fe66402da0165e4517b9981bbd1c49f55e6108b2de66'
+        miner:
+          type: string
+          description: >-
+            20 Bytes - the address of the beneficiary to whom the mining rewards
+            were given
+          example: '0x4675c7e5baafbffbca748158becba61ef3b0a263'
+        difficulty:
+          type: string
+          description: Integer of the difficulty for this block
+          example: '0x0'
+        totalDifficulty:
+          type: string
+          description: Integer of the total difficulty of the chain until this block
+          example: '0x3ed290d6d1340f2'
+        extraData:
+          type: string
+          description: The "extra data" field of this block
+          example: '0x546974616e2028746974616e6275696c6465722e78797a29'
+        size:
+          type: string
+          description: Integer the size of this block in bytes
+          example: '0xed40'
+        gasLimit:
+          type: string
+          description: The maximum gas allowed in this block
+          example: '0x1c9c380'
+        gasUsed:
+          type: string
+          description: The total used gas by all transactions in this block
+          example: '0xa43ff7'
+        timestamp:
+          type: string
+          description: The unix timestamp for when the block was collated
+          example: '0x649db4c3'
+        transactions:
+          type: array
+          description: >-
+            Array of transaction objects, or 32 Bytes transaction hashes
+            depending on the last given parameter
+          items:
+            anyOf:
+              - type: string
+                description: Transaction hash
+              - $ref: '#/components/schemas/EVMTransactionResponse'
+          example:
+            - '0xde670a91aae6a838a7a86b5f78df9bad82f2c68fa7c17c697f8434e1a293a188'
+            - '0x8e56e1c506958a20ad1282fd159baa26ce2bce23f7edf24624c6a6f8cab438fb'
+        uncles:
+          type: array
+          items:
+            type: string
+          description: Array of uncle hashes
+          example: []
+        baseFeePerGas:
+          type: string
+          description: Base fee per gas in wei (EIP-1559)
+          example: '0xa9c1a2812'
+        blobGasUsed:
+          type: string
+          description: >-
+            Total amount of blob gas consumed by the transactions in the block
+            (EIP-4844)
+          example: '0x20000'
+        excessBlobGas:
+          type: string
+          description: Excess blob gas for the block (EIP-4844)
+          example: '0x0'
+        mixHash:
+          type: string
+          description: 32 Bytes - mix hash (replaced by prevRandao post-merge)
+          example: '0x1ae62e0fb485923e132a225995763ca753d3907a66faca42a355e4a78c64e9fa'
+        parentBeaconBlockRoot:
+          type: string
+          description: 32 Bytes - hash of the parent beacon block root
+          example: '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef'
+        requestsHash:
+          type: string
+          description: 32 Bytes - hash of the execution layer requests
+          example: '0xabcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890'
+        withdrawals:
+          type: array
+          items:
+            type: object
+            properties:
+              address:
+                type: string
+                description: 20 Bytes - address of the withdrawal recipient
+              amount:
+                type: string
+                description: Amount withdrawn in Gwei
+              index:
+                type: string
+                description: Withdrawal index
+              validatorIndex:
+                type: string
+                description: Validator index
+          description: Array of withdrawal objects (post-Merge)
+          example:
+            - index: '0x8698af'
+              validatorIndex: '0x96f2f'
+              address: '0xb92b4a201f4320a6db6d1fb2d3bac834bdaa95c9'
+              amount: '0xd6de21'
+        withdrawalsRoot:
+          type: string
+          description: 32 Bytes - root of the withdrawals trie
+          example: '0x18653ee7f94eedf77354349c686d1eee2b1ce45b414b3a3a903370b7fd63d05e'
+    EVMSmartContractResponse:
+      type: object
+      required:
+        - returns
+      description: >-
+        Smart contract response object, which is returned from using Ethereum
+        RPC method eth_call
+      properties:
+        rawValue:
+          type: string
+          description: Hex-encoded return data from the contract call
+          example: '0x000000000000000000000000000000000000000000000000000000e8d4a51000'
+        returns:
+          type: array
+          items:
+            $ref: '#/components/schemas/Parameter'
+          description: >-
+            Array of decoded values with their types and names matching
+            outputParameters
+    SolanaReadResponse:
+      type: object
+      description: Solana blockchain read response (to be implemented)
+      properties:
+        rawData:
+          type: object
+          description: Raw data returned by Solana blockchain SDK (structure to be defined)
+    HederaReadResponse:
+      type: object
+      description: Hedera blockchain read response (to be implemented)
+      properties:
+        rawData:
+          type: object
+          description: Raw data returned by Hedera blockchain SDK (structure to be defined)
+    ReadResponse:
+      type: object
+      description: Unified read response for all supported blockchain technologies
+      oneOf:
+        - $ref: '#/components/schemas/EVMReadResponse'
+        - $ref: '#/components/schemas/SolanaReadResponse'
+        - $ref: '#/components/schemas/HederaReadResponse'
+paths:
+  /transfer-proposal:
+    post:
+      tags:
+        - Write Operations
+      summary: Create a transfer proposal
+      description: >-
+        Creates a proposal for transferring native tokens, fungible tokens, or
+        non-fungible tokens on EVM or Solana blockchains
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProposalRequest'
+            examples:
+              nativeTokenTransfer:
+                summary: Native token transfer example
+                value:
+                  location:
+                    technology: ethereum
+                    network: ethereum sepolia testnet
+                  nodeToConnect: https://sepolia.infura.io/v3/your-api-key
+                  proposalDetails:
+                    transferType: nativeTokenTransfer
+                    origins:
+                      - originId: '0x742d35cc6641c72323cab7c8f71c8c3c1ea7cb0a'
+                    destinations:
+                      - destinationId: 0x8ba1f109551bD432803012645Hac136c22C177e9
+                        totalPaymentAmount:
+                          unit: ETH
+                          amount: '0.1'
+                    message: Payment for services
+                    feePayers:
+                      - '0x742d35cc6641c72323cab7c8f71c8c3c1ea7cb0a'
+              fungibleTokenTransfer:
+                summary: Fungible token transfer example
+                value:
+                  location:
+                    technology: ethereum
+                    network: ethereum sepolia testnet
+                  proposalDetails:
+                    transferType: fungibleTokenTransfer
+                    assetId: '0xA0b86a33E6417c31f8D9b1f681Ff1234567890af'
+                    origins:
+                      - originId: '0x742d35cc6641c72323cab7c8f71c8c3c1ea7cb0a'
+                    destinations:
+                      - destinationId: 0x8ba1f109551bD432803012645Hac136c22C177e9
+                        totalPaymentAmount:
+                          unit: USDC
+                          amount: '100'
+                    feePayers:
+                      - '0x742d35cc6641c72323cab7c8f71c8c3c1ea7cb0a'
+              nonFungibleTokenTransfer:
+                summary: NFT transfer example
+                value:
+                  location:
+                    technology: ethereum
+                    network: ethereum sepolia testnet
+                  proposalDetails:
+                    transferType: nonFungibleTokenTransfer
+                    assetId: '0xA0b86a33E6417c31f8D9b1f681Ff1234567890af'
+                    origins:
+                      - originId: '0x742d35cc6641c72323cab7c8f71c8c3c1ea7cb0a'
+                    destinations:
+                      - destinationId: 0x8ba1f109551bD432803012645Hac136c22C177e9
+                        nftTokenId: '1234'
+                    feePayers:
+                      - '0x742d35cc6641c72323cab7c8f71c8c3c1ea7cb0a'
+      responses:
+        '200':
+          description: Transfer proposal created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProposalResponse'
+              examples:
+                eip155Response:
+                  summary: EIP-155 transaction response
+                  value:
+                    dltFee:
+                      unit: ETH
+                      amount: '0.00000000021'
+                    nativeData:
+                      chainId: 11155111
+                      nonce: 42
+                      gasPrice: '20000000000'
+                      gas: '21000'
+                      to: 0x8ba1f109551bD432803012645Hac136c22C177e9
+                      value: '1000000000000000000'
+                      data: 0x
+                eip1559Response:
+                  summary: EIP-1559 transaction response
+                  value:
+                    dltFee:
+                      unit: ETH
+                      amount: '0.00000000021'
+                    nativeData:
+                      chainId: 11155111
+                      nonce: 42
+                      gas: '21000'
+                      maxPriorityFeePerGas: '2000000000'
+                      maxFeePerGas: '20000000000'
+                      to: 0x8ba1f109551bD432803012645Hac136c22C177e9
+                      value: '1000000000000000000'
+                      data: 0x
+                      hardfork: london
+        '400':
+          description: Bad request - Invalid location or proposal details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: Invalid location configuration
+                details:
+                  - Field 'technology' is required
+                  - Field 'network' is required
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '501':
+          description: Method not implemented for the specified technology
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: Method not implemented
+                message: transferProposal is not implemented for solana technology
+  /smartContractWrite-proposal:
+    post:
+      tags:
+        - Write Operations
+      summary: Create a smart contract write proposal
+      description: >-
+        Creates a proposal for writing to a smart contract function on EVM or
+        Solana blockchains
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProposalRequest'
+            example:
+              location:
+                technology: ethereum
+                network: ethereum sepolia testnet
+              nodeToConnect: https://sepolia.infura.io/v3/your-api-key
+              proposalDetails:
+                callerAccountId: '0x742d35cc6641c72323cab7c8f71c8c3c1ea7cb0a'
+                smartContractId: '0xA0b86a33E6417c31f8D9b1f681Ff1234567890af'
+                functionName: transfer
+                inputParameters:
+                  - name: recipient
+                    type: address
+                    value: 0x8ba1f109551bD432803012645Hac136c22C177e9
+                  - name: amount
+                    type: uint256
+                    value: '1000000000000000000'
+                outputParameters:
+                  - name: success
+                    type: bool
+                isStateMutabilityPayable: false
+                feePayers:
+                  - '0x742d35cc6641c72323cab7c8f71c8c3c1ea7cb0a'
+                message: Token transfer via smart contract
+      responses:
+        '200':
+          description: Smart contract write proposal created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProposalResponse'
+        '400':
+          description: Bad request - Invalid location or proposal details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '501':
+          description: Method not implemented for the specified technology
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /smartContractDeploy-proposal:
+    post:
+      tags:
+        - Write Operations
+      summary: Create a smart contract deployment proposal
+      description: >-
+        Creates a proposal for deploying a smart contract on EVM or Solana
+        blockchains
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProposalRequest'
+            example:
+              location:
+                technology: ethereum
+                network: ethereum sepolia testnet
+              nodeToConnect: https://sepolia.infura.io/v3/your-api-key
+              proposalDetails:
+                deployerAccountId: '0x742d35cc6641c72323cab7c8f71c8c3c1ea7cb0a'
+                bytecodeToDeploy: 0x608060405234801561001057600080fd5b50...
+                constructorParameters:
+                  - name: initialSupply
+                    type: uint256
+                    value: '1000000000000000000000'
+                  - name: tokenName
+                    type: string
+                    value: MyToken
+                feePayers:
+                  - '0x742d35cc6641c72323cab7c8f71c8c3c1ea7cb0a'
+                message: Deploy ERC20 token contract
+      responses:
+        '200':
+          description: Smart contract deployment proposal created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProposalResponse'
+        '400':
+          description: Bad request - Invalid location or proposal details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '501':
+          description: Method not implemented for the specified technology
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /execute:
+    post:
+      tags:
+        - Write Operations
+      summary: Execute a signed transaction
+      description: Executes a signed transaction on the specified blockchain
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExecuteRequest'
+            example:
+              location:
+                technology: ethereum
+                network: ethereum sepolia testnet
+              nodeToConnect: https://sepolia.infura.io/v3/your-api-key
+              signedTransaction: >-
+                0xf86c098504a817c800825208943535353535353535353535353535353535353535880de0b6b3a76400008025a028ef61340bd939bc2195fe537567866003e1a15d3c71ff63e1590620aa636276a067cbe9d8997f761aecb703304b3800ccf555c9f3dc64214b297fb1966a3b6d83
+      responses:
+        '200':
+          description: Transaction executed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExecuteResponse'
+              examples:
+                successfulExecution:
+                  summary: Successful transaction execution
+                  value:
+                    status:
+                      message: Transaction submitted successfully
+                      txHash: 0xabc123def456789...
+                      value: pending
+                      timestamp: '2024-01-15T10:30:00Z'
+                failedExecution:
+                  summary: Failed transaction execution
+                  value:
+                    status:
+                      message: 'Transaction failed: insufficient funds'
+                      value: failed
+                      timestamp: '2024-01-15T10:30:00Z'
+        '400':
+          description: Bad request - Invalid location or signed transaction
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '501':
+          description: Method not implemented for the specified technology
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /smartContract-read:
+    post:
+      summary: Read data from a smart contract
+      description: Reads data from a smart contract function
+      tags:
+        - Read Operations
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SmartContractReadRequest'
+            example:
+              location:
+                technology: ethereum
+                network: ethereum sepolia testnet
+              contractDetails:
+                smartContractId: '0xf6333F500dB0a8B05d19Aed9cd1E6042B2687f95'
+                functionName: balanceOf
+                inputParameters:
+                  - name: accountId
+                    type: address
+                    value: '0xf506791CB2a403AD050E61180880dcC6A493B961'
+                outputParameters:
+                  - name: balance
+                    type: uint256
+      responses:
+        '200':
+          description: Smart contract function called successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EVMSmartContractResponse'
+              examples:
+                ethereumSmartContract:
+                  summary: Ethereum smart contract read response
+                  value:
+                    rawData:
+                      rawValue: >-
+                        0x000000000000000000000000000000000000000000000000000000e8d4a51000
+                      returns:
+                        - name: balance
+                          type: uint256
+                          value: '1000000000000'
+        '400':
+          description: Invalid request format or validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /balance:
+    get:
+      summary: Get account balance
+      description: Retrieves information about a specific account balance
+      tags:
+        - Read Operations
+      parameters:
+        - name: technology
+          in: query
+          required: true
+          description: The technology of the blockchain network
+          schema:
+            type: string
+            example: ethereum
+        - name: network
+          in: query
+          required: true
+          description: The network of the blockchain network
+          schema:
+            type: string
+            example: ethereum sepolia testnet
+        - name: accountId
+          in: query
+          required: true
+          description: The account address to retrieve the balance for
+          schema:
+            type: string
+            example: '0x670B24610DF99b1685aEAC0dfD5307B92e0cF4d7'
+        - name: nodeToConnect
+          in: query
+          required: false
+          description: Optional node to connect to
+          schema:
+            type: string
+            example: https://sepolia.infura.io/v3/your-api-key
+      responses:
+        '200':
+          description: Account balance retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EVMAccountBalanceResponse'
+              examples:
+                ethereumBalance:
+                  summary: Ethereum account balance response
+                  value:
+                    rawData:
+                      balance: '0x1bc16d674ec80000'
+        '400':
+          description: Invalid request format or validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /nonce:
+    get:
+      summary: Get account nonce
+      description: Retrieves information about a specific account nonce
+      tags:
+        - Read Operations
+      parameters:
+        - name: technology
+          in: query
+          required: true
+          description: The technology of the blockchain network
+          schema:
+            type: string
+            example: ethereum
+        - name: network
+          in: query
+          required: true
+          description: The network of the blockchain network
+          schema:
+            type: string
+            example: ethereum sepolia testnet
+        - name: accountId
+          in: query
+          required: true
+          description: The account address to retrieve the nonce for
+          schema:
+            type: string
+            example: '0x670B24610DF99b1685aEAC0dfD5307B92e0cF4d7'
+        - name: nodeToConnect
+          in: query
+          required: false
+          description: Optional node to connect to
+          schema:
+            type: string
+            example: https://sepolia.infura.io/v3/your-api-key
+      responses:
+        '200':
+          description: Account nonce retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EVMAccountNonceResponse'
+              examples:
+                ethereumNonce:
+                  summary: Ethereum account nonce response
+                  value:
+                    rawData:
+                      nonce: '0x1'
+        '400':
+          description: Invalid request format or validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /transaction:
+    get:
+      summary: Get transaction details
+      description: >-
+        Retrieves details of a specific transaction including transfer or smart
+        contract information
+      tags:
+        - Read Operations
+      parameters:
+        - name: transactionId
+          in: query
+          required: true
+          description: The transaction ID to retrieve information for
+          schema:
+            type: string
+            example: '0x4dfdfbea3c43edd690d336fa727caa7fd484aec1d2f115a239b038c55e9aa6a8'
+        - name: technology
+          in: query
+          required: true
+          description: The technology of the blockchain network
+          schema:
+            type: string
+            example: ethereum
+        - name: network
+          in: query
+          required: true
+          description: The network of the blockchain network
+          schema:
+            type: string
+            example: ethereum sepolia testnet
+        - name: nodeToConnect
+          in: query
+          required: false
+          description: Optional node to connect to
+          schema:
+            type: string
+            example: https://sepolia.infura.io/v3/your-api-key
+      responses:
+        '200':
+          description: Transaction information retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EVMTransactionResponse'
+              examples:
+                ethereumTransaction:
+                  summary: Ethereum transaction response
+                  value:
+                    rawData:
+                      blockHash: >-
+                        0xb1112ef37861f39ff395a245eb962791e11eae26f94b50bb95e3e31378ef3d25
+                      blockNumber: '0xfd27df'
+                      from: '0x2d218ce7d8892fc6b391b614f84278d12decae52'
+                      gas: '0xf478'
+                      gasPrice: '0x5bcdcacee'
+                      hash: >-
+                        0xb1fac2cb5074a4eda8296faebe3b5a3c10b48947dd9a738b2fdf859be0e1fbaf
+                      input: >-
+                        0xa9059cbb000000000000000000000000b6ae07829376a5b704bb46a0869f383555097c29000000000000000000000000000000000000000000000034df6db862352c72d0
+                      nonce: '0x2768'
+                      to: '0x111111517e4929d3dcbdfa7cce55d30d4b6bc4d6'
+                      transactionIndex: '0xb4'
+                      value: '0x0'
+                      v: '0x1'
+                      r: >-
+                        0x4dec2c2ab964f28385d31cd203fe5960e001ccd110db816ad462d411cf496548
+                      s: >-
+                        0x62ffcab5b6ae1cf4a59d32dd39a92f14eadea5fbbb7587c1a845a3d0d8621253
+                      type: '0x2'
+                      chainId: '0x1'
+        '400':
+          description: Invalid request format or validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /block:
+    get:
+      summary: Get block information
+      description: Retrieves information about a specific block
+      tags:
+        - Read Operations
+      parameters:
+        - name: technology
+          in: query
+          required: true
+          description: The technology of the blockchain network
+          schema:
+            type: string
+            example: ethereum
+        - name: network
+          in: query
+          required: true
+          description: The network of the blockchain network
+          schema:
+            type: string
+            example: ethereum sepolia testnet
+        - name: blockId
+          in: query
+          required: true
+          description: The block ID to retrieve information for
+          schema:
+            type: string
+            example: '0xfde5d931b867461061c6459fe29687761fddedd1d888816e597a961ef5caaef0'
+        - name: nodeToConnect
+          in: query
+          required: false
+          description: Optional node to connect to
+          schema:
+            type: string
+            example: https://sepolia.infura.io/v3/your-api-key
+      responses:
+        '200':
+          description: Block information retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EVMBlockResponse'
+              examples:
+                ethereumBlock:
+                  summary: Ethereum block response
+                  value:
+                    rawData:
+                      number: '0x10c582e'
+                      hash: >-
+                        0x3f07a9c83155594c000642e7d60e8a8a00038d03e9849171a05ed0e2d47acbb3
+                      parentHash: >-
+                        0x5d5ccd7726eeca1f1b8d82ccaf55a55c86ee4647e5ff84e4345b6b68afd835e4
+                      nonce: '0x0000000000000000'
+                      sha3Uncles: >-
+                        0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347
+                      logsBloom: >-
+                        0x4661734261c431449406ec8180129028925a74170201187501291e379407488680401aa08140282302802d38ba7315082285b0608c0be08c07d0c02df06d6d0589500048c4230928a940411fc03e78358211042909402f4000076122e6239cc0b20061202fd701831108b218a01218541251365218100550b200555c305cd295c6000948011a91b9004354225122940510208481d94648480817a0ca40901129ca972160100c7c184003ecc2901915559710820220f28123d1aa0182150800955b50446a0728084b08109470803b93983ee77222c41c285a014345022d24e8241610a74560888b0200a7f6a263091080183072188a0924440a0c4c4332312425
+                      transactionsRoot: >-
+                        0x454271da3c0119434a61de5bb9fc2155b3885195fb8a051aee78edd5f4cc12af
+                      stateRoot: >-
+                        0xc2bba9851341223b1c7d58e8242ef906e0b47a743c1ae83af1f518b446d221df
+                      receiptsRoot: >-
+                        0x5e407b2a8177a6cff4e2fe66402da0165e4517b9981bbd1c49f55e6108b2de66
+                      miner: '0x4675c7e5baafbffbca748158becba61ef3b0a263'
+                      difficulty: '0x0'
+                      totalDifficulty: '0x3ed290d6d1340f2'
+                      extraData: '0x546974616e2028746974616e6275696c6465722e78797a29'
+                      size: '0xed40'
+                      gasLimit: '0x1c9c380'
+                      gasUsed: '0xa43ff7'
+                      timestamp: '0x649db4c3'
+                      transactions:
+                        - >-
+                          0xde670a91aae6a838a7a86b5f78df9bad82f2c68fa7c17c697f8434e1a293a188
+                        - >-
+                          0x8e56e1c506958a20ad1282fd159baa26ce2bce23f7edf24624c6a6f8cab438fb
+                      uncles: []
+        '400':
+          description: Invalid request format or validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
