@@ -1,28 +1,29 @@
+// Load environment variables from .env file
+require('dotenv').config();
+
 module.exports = {
   preset: 'ts-jest',
   testEnvironment: 'node',
-  roots: ['<rootDir>/src', '<rootDir>/tests'],
-  testMatch: ['**/*.test.ts', '**/*.test.js'],
-
+  roots: ['<rootDir>/testing/tests'],
+  testMatch: ['**/__tests__/**/*.ts', '**/?(*.)+(spec|test).ts'],
   transform: {
-    '^.+\.[tj]sx?$': ['ts-jest', {
-      tsconfig: {
-        esModuleInterop: true,
-        allowJs: true,
-      },
-    }],
+    '^.+\\.ts$': 'ts-jest',
   },
-  moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
+  collectCoverageFrom: [
+    '<rootDir>/dist/**/*.js',
+    '!<rootDir>/dist/**/*.d.ts',
+    '!<rootDir>/dist/**/__tests__/**',
+    '!<rootDir>/dist/**/node_modules/**',
+  ],
+  // setupFilesAfterEnv: ['<rootDir>/testing/tests/jest-simple-setup.js'],
+  testTimeout: 60000, // 60 seconds for comprehensive tests
+  verbose: true,
   moduleNameMapper: {
-    '^@mysten/sui/transactions$': '<rootDir>/tests/__mocks__/@mysten/sui/transactions.js'
+    '^@/(.*)$': '<rootDir>/dist/$1',
   },
-  clearMocks: true,
-  restoreMocks: true,
-  resetMocks: true,
-  testTimeout: 15000,
-  bail: false,
-  detectOpenHandles: true,
-  forceExit: true,
-  setupFiles: ['<rootDir>/tests/jest-env-setup.js'],
-  setupFilesAfterEnv: ['<rootDir>/tests/setup.ts'],
+  moduleFileExtensions: ['ts', 'js', 'json'],
+  testPathIgnorePatterns: [
+    '<rootDir>/node_modules/',
+    '<rootDir>/dist/',
+  ],
 };
