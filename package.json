@@ -61,8 +61,6 @@
     "demo:layerzero:ts": "npx ts-node demos/layerzero/layerzero-adapter-demo.ts",
     "demo:layerzero-router": "npm run build && node layerzero-router/layerzero-router-demo.js",
     "demo:layerzero-router:ts": "npx ts-node layerzero-router/layerzero-router-demo.ts",
-    "demo:wormhole": "REMOVED",
-    "demo:wormhole:ts": "REMOVED",
     "benchmark:axelar": "npx ts-node results/axelar/benchmark-test/axelar-criteria-benchmark.ts",
     "benchmark:axelar:run": "bash results/axelar/benchmark-test/run-axelar-benchmark.sh",
     "benchmark:axelar:run:win": "results\\axelar\\benchmark-test\\run-axelar-benchmark.bat",

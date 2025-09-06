@@ -183,8 +183,7 @@ export class FinP2PIntegratedSuiAdapter extends EventEmitter {
       });
 
       // Split the required amount from the primary coin
-      const splitCoins = lockTransaction.splitCoins(primaryCoin.coinObjectId, [amount]);
-      const splitCoin = splitCoins[0]; // Get the first split coin
+      const [splitCoin] = lockTransaction.splitCoins(primaryCoin.coinObjectId, [amount]);
       
       // In real atomic swap, this would go to a time-locked contract address
       lockTransaction.transferObjects([splitCoin], recipientAddress);
@@ -350,8 +349,7 @@ export class FinP2PIntegratedSuiAdapter extends EventEmitter {
         note: 'SUI will automatically handle gas from primary coin'
       });
 
-      const splitCoins = unlockTransaction.splitCoins(primaryCoin.coinObjectId, [amount]);
-      const splitCoin = splitCoins[0]; // Get the first split coin
+      const [splitCoin] = unlockTransaction.splitCoins(primaryCoin.coinObjectId, [amount]);
       
       unlockTransaction.transferObjects([splitCoin], account1Address);
 
@@ -490,14 +488,12 @@ export class FinP2PIntegratedSuiAdapter extends EventEmitter {
         );
         
         // Split the required amount from the merged coin
-        const splitCoins = transaction.splitCoins(primaryCoin.coinObjectId, [amount]);
-        const splitCoin = splitCoins[0]; // Get the first split coin
+        const [splitCoin] = transaction.splitCoins(primaryCoin.coinObjectId, [amount]);
         return splitCoin;
       }
 
       // Single coin case - split the amount we need
-      const splitCoins = transaction.splitCoins(selectedCoins[0].coinObjectId, [amount]);
-      const splitCoin = splitCoins[0]; // Get the first split coin
+      const [splitCoin] = transaction.splitCoins(selectedCoins[0].coinObjectId, [amount]);
       return splitCoin;
 
     } catch (error) {
@@ -607,32 +603,26 @@ export class FinP2PIntegratedSuiAdapter extends EventEmitter {
 
       // Calculate total available balance
       const totalBalance = coins.data.reduce((sum, coin) => sum + BigInt(coin.balance), BigInt(0));
-      
-      // Estimate gas fees (conservative estimate: 1000 MIST for FinP2P transfer)
-      const estimatedGas = BigInt(1000);
-      const totalRequired = amount + estimatedGas;
-      
-      if (totalBalance < totalRequired) {
-        throw new Error(`Insufficient balance. Need ${totalRequired.toString()} MIST (${amount.toString()} + ${estimatedGas.toString()} gas), have ${totalBalance.toString()} MIST`);
+      if (totalBalance < amount) {
+        throw new Error(`Insufficient balance. Need ${amount.toString()} MIST, have ${totalBalance.toString()} MIST`);
       }
 
-      // Find a coin with sufficient balance for the entire operation
-      const suitableCoin = coins.data.find(coin => BigInt(coin.balance) >= totalRequired);
-      
-      if (!suitableCoin) {
-        throw new Error(`No single coin has sufficient balance for transfer + gas. Need ${totalRequired.toString()} MIST`);
-      }
+      // Sort coins by balance (largest first)
+      const sortedCoins = coins.data
+        .filter(coin => BigInt(coin.balance) > 0)
+        .sort((a, b) => Number(BigInt(b.balance) - BigInt(a.balance)));
+
+      // Use the first coin as primary coin, SUI will handle gas automatically
+      const [primaryCoin] = sortedCoins;
       
       this.logger.info('🪙 Using SUI gas smashing for transfer:', {
-        suitableCoinBalance: suitableCoin.balance,
+        primaryCoinBalance: primaryCoin.balance,
         requiredAmount: amount.toString(),
-        estimatedGas: estimatedGas.toString(),
-        note: 'SUI will automatically handle gas from suitable coin'
+        note: 'SUI will automatically handle gas from primary coin'
       });
 
-      // Split the required amount from the suitable coin
-      const splitCoins = transaction.splitCoins(suitableCoin.coinObjectId, [amount]);
-      const splitCoin = splitCoins[0]; // Get the first split coin
+      // Split the required amount from the primary coin
+      const [splitCoin] = transaction.splitCoins(primaryCoin.coinObjectId, [amount]);
       
       transaction.transferObjects([splitCoin], toAddress);
 
@@ -721,44 +711,24 @@ export class FinP2PIntegratedSuiAdapter extends EventEmitter {
       const totalBalance = coins.data.reduce((sum, coin) => sum + BigInt(coin.balance), BigInt(0));
       this.logger.info('💰 Total balance:', { totalBalance: totalBalance.toString(), requiredAmount: amount.toString() });
       
-      // Estimate gas fees (conservative estimate: 1000 MIST for FinP2P transfer)
-      const estimatedGas = BigInt(1000);
-      const totalRequired = amount + estimatedGas;
-      
-      if (totalBalance < totalRequired) {
-        this.logger.error('❌ Insufficient balance for transfer + gas:', { 
-          required: totalRequired.toString(), 
-          available: totalBalance.toString(),
-          transferAmount: amount.toString(),
-          estimatedGas: estimatedGas.toString()
+      if (totalBalance < amount) {
+        this.logger.error('❌ Insufficient balance:', { 
+          required: amount.toString(), 
+          available: totalBalance.toString() 
         });
-        throw new Error(`Insufficient balance. Need ${totalRequired.toString()} MIST (${amount.toString()} + ${estimatedGas.toString()} gas), have ${totalBalance.toString()} MIST`);
+        throw new Error(`Insufficient balance. Need ${amount.toString()} MIST, have ${totalBalance.toString()} MIST`);
       }
       
-      // Find a coin with sufficient balance for the entire operation
-      const suitableCoin = coins.data.find(coin => BigInt(coin.balance) >= totalRequired);
+      const sortedCoins = coins.data.filter(coin => BigInt(coin.balance) > 0).sort((a, b) => Number(BigInt(b.balance) - BigInt(a.balance)));
+      const [primaryCoin] = sortedCoins;
       
-      if (!suitableCoin) {
-        this.logger.error('❌ No single coin has sufficient balance for transfer + gas:', {
-          required: totalRequired.toString(),
-          availableCoins: coins.data.map(c => ({ id: c.coinObjectId, balance: c.balance }))
-        });
-        throw new Error(`No single coin has sufficient balance for transfer + gas. Need ${totalRequired.toString()} MIST`);
-      }
-      
-      this.logger.info('🔧 Creating transaction with suitable coin:', { 
-        coinObjectId: suitableCoin.coinObjectId,
-        coinBalance: suitableCoin.balance,
-        requiredAmount: totalRequired.toString()
+      this.logger.info('🔧 Creating transaction with primary coin:', { 
+        coinObjectId: primaryCoin.coinObjectId,
+        coinBalance: primaryCoin.balance 
       });
       
       const transaction = new Transaction();
-      
-      // Split the required amount from the suitable coin
-      const splitCoins = transaction.splitCoins(suitableCoin.coinObjectId, [amount]);
-      const splitCoin = splitCoins[0]; // Get the first split coin
-      
-      // Transfer the split coin to the destination
+      const [splitCoin] = transaction.splitCoins(primaryCoin.coinObjectId, [amount]);
       transaction.transferObjects([splitCoin], toAddress);
       
       this.logger.info('📝 Executing transaction...');
