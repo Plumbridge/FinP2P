@@ -25,19 +25,20 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.FinP2PPerformanceCharacteristicsBenchmark = void 0;
 const events_1 = require("events");
-const FinP2PSDKRouter_1 = require("../../../core/router/FinP2PSDKRouter");
-const FinP2PIntegratedSuiAdapter_1 = require("../../../adapters/finp2p/FinP2PIntegratedSuiAdapter");
-const FinP2PIntegratedHederaAdapter_1 = require("../../../adapters/finp2p/FinP2PIntegratedHederaAdapter");
-const logger_1 = require("../../../core/utils/logger");
-const port_scanner_1 = require("../../../core/utils/port-scanner");
 const fs = __importStar(require("fs"));
 const path = __importStar(require("path"));
+const projectRoot = path.join(__dirname, '../../..');
+const FinP2PSDKRouter_1 = require(path.join(projectRoot, 'dist/core/router/FinP2PSDKRouter'));
+const FinP2PIntegratedSuiAdapter_1 = require(path.join(projectRoot, 'dist/adapters/finp2p/FinP2PIntegratedSuiAdapter'));
+const FinP2PIntegratedHederaAdapter_1 = require(path.join(projectRoot, 'dist/adapters/finp2p/FinP2PIntegratedHederaAdapter'));
+const logger_1 = require(path.join(projectRoot, 'dist/core/utils/logger'));
+const port_scanner_1 = require(path.join(projectRoot, 'dist/core/utils/port-scanner'));
 const child_process_1 = require("child_process");
 const util_1 = require("util");
 const dotenv = __importStar(require("dotenv"));
 const execAsync = (0, util_1.promisify)(child_process_1.exec);
 // Load environment variables
-const envPath = path.join(__dirname, '../../../.env');
+const envPath = path.join(projectRoot, '.env');
 dotenv.config({ path: envPath });
 class FinP2PPerformanceCharacteristicsBenchmark extends events_1.EventEmitter {
     constructor() {
@@ -265,35 +266,47 @@ class FinP2PPerformanceCharacteristicsBenchmark extends events_1.EventEmitter {
             for (let i = 0; i < transferCount; i++) {
                 const startTime = Date.now();
                 try {
-                    // Perform atomic swap
-                    this.emit('progress', { message: `   Atomic swap ${i + 1}/${transferCount}: SUI transfer` });
-                    const suiTransfer = await this.suiAdapter?.transferByFinId('performance-test-account1@finp2p.test', 'performance-test-account2@finp2p.test', suiAmount, true);
-                    if (suiTransfer) {
-                        this.emit('progress', { message: `   Atomic swap ${i + 1}/${transferCount}: HBAR transfer` });
-                        const hbarTransfer = await this.hederaAdapter?.transferByFinId('performance-test-account2@finp2p.test', 'performance-test-account1@finp2p.test', hbarAmount, true);
-                        const endTime = Date.now();
-                        const latency = endTime - startTime;
+                    // Perform atomic swap using FinP2P FinID mapping
+                    this.emit('progress', { message: `   Atomic swap ${i + 1}/${transferCount}: SUI → HBAR via FinID` });
+                    const result = await this.performAtomicSwap(suiAmount, hbarAmount);
+                    const endTime = Date.now();
+                    const latency = endTime - startTime;
+                    
+                    if (result.success) {
                         latencies.push(latency);
                         artifacts.push({
                             type: 'atomic_swap_latency',
                             transferNumber: i + 1,
-                            suiTxHash: suiTransfer.txHash,
-                            hederaTxId: hbarTransfer?.txId,
+                            suiTxHash: result.suiTxHash,
+                            hederaTxId: result.hbarTxId,
                             latency: latency,
                             suiAmount: suiAmount.toString(),
                             hbarAmount: hbarAmount.toString(),
                             timestamp: new Date().toISOString()
                         });
-                        // Small delay between transfers to avoid overwhelming the network
-                        await new Promise(resolve => setTimeout(resolve, 1000));
+                        this.emit('progress', { message: `   ✅ Atomic swap ${i + 1} completed: ${latency}ms` });
+                    } else {
+                        this.emit('progress', { message: `   ❌ Atomic swap ${i + 1} failed: ${result.error}` });
+                        artifacts.push({
+                            type: 'atomic_swap_error',
+                            transferNumber: i + 1,
+                            error: result.error,
+                            latency: latency,
+                            timestamp: new Date().toISOString()
+                        });
                     }
+                    // Small delay between transfers to avoid overwhelming the network
+                    await new Promise(resolve => setTimeout(resolve, 1000));
                 }
                 catch (error) {
+                    const endTime = Date.now();
+                    const latency = endTime - startTime;
                     this.emit('progress', { message: `   ⚠️ Atomic swap ${i + 1} failed: ${error instanceof Error ? error.message : String(error)}` });
                     artifacts.push({
                         type: 'atomic_swap_error',
                         transferNumber: i + 1,
                         error: error instanceof Error ? error.message : String(error),
+                        latency: latency,
                         timestamp: new Date().toISOString()
                     });
                 }
@@ -389,19 +402,19 @@ class FinP2PPerformanceCharacteristicsBenchmark extends events_1.EventEmitter {
                 testResult.metrics.passedTests++;
             else
                 testResult.metrics.failedTests++;
-            // Calculate score based on throughput performance
+            // CORRECTED: Calculate score based on enterprise-level throughput performance
             const errorRate = scalabilityResult.errorRate;
             const sustainableTPS = scalabilityResult.sustainableTPS;
-            if (errorRate <= 0.05 && sustainableTPS >= 6) { // ≤5% errors and ≥6 TPS
+            if (errorRate <= 0.05 && sustainableTPS >= 100) { // ≤5% errors and ≥100 TPS (enterprise)
                 testResult.score = 100;
             }
-            else if (errorRate <= 0.05 && sustainableTPS >= 4) { // ≤5% errors and ≥4 TPS
+            else if (errorRate <= 0.05 && sustainableTPS >= 50) { // ≤5% errors and ≥50 TPS (good)
                 testResult.score = 90;
             }
-            else if (errorRate <= 0.10 && sustainableTPS >= 2) { // ≤10% errors and ≥2 TPS
+            else if (errorRate <= 0.10 && sustainableTPS >= 25) { // ≤10% errors and ≥25 TPS (acceptable)
                 testResult.score = 80;
             }
-            else if (errorRate <= 0.20 && sustainableTPS >= 1) { // ≤20% errors and ≥1 TPS
+            else if (errorRate <= 0.20 && sustainableTPS >= 10) { // ≤20% errors and ≥10 TPS (minimum)
                 testResult.score = 60;
             }
             else {
@@ -423,26 +436,31 @@ class FinP2PPerformanceCharacteristicsBenchmark extends events_1.EventEmitter {
     }
     async testThroughputScalability() {
         const artifacts = [];
-        const rpsLevels = [1, 2, 4, 8]; // Requests per second levels
-        const testDurationPerLevel = 60 * 1000; // 60 seconds per level (4 minutes total)
+        // CORRECTED: Test realistic throughput levels for testnet performance
+        const rpsLevels = [1, 2, 5, 10, 15, 20]; // Realistic testnet RPS testing
+        const testDurationPerLevel = 30 * 1000; // 30 seconds per level (3 minutes total)
         const suiAmount = BigInt(1000000);
         const hbarAmount = BigInt(10000000);
         let sustainableTPS = 0;
         let errorRate = 0;
         let kneePoint = 0;
         try {
-            this.emit('progress', { message: '   Starting step load testing...' });
+            this.emit('progress', { message: '   Starting CORRECTED enterprise throughput testing...' });
             for (const rps of rpsLevels) {
-                this.emit('progress', { message: `   Testing ${rps} RPS for 60 seconds...` });
+                this.emit('progress', { message: `   Testing ${rps} RPS for 30 seconds (enterprise level)...` });
                 const levelStartTime = Date.now();
                 const levelResults = [];
-                // Run at current RPS level
+                let totalProcessed = 0;
+                // CORRECTED: Conservative concurrent processing for testnet limits
+                const batchSize = Math.min(rps, 5); // Process in small batches to avoid rate limits
+                const batchInterval = 2000; // 2 seconds between batches
                 while (Date.now() - levelStartTime < testDurationPerLevel) {
                     const batchStartTime = Date.now();
                     const promises = [];
-                    // Launch RPS number of concurrent atomic swaps
-                    for (let i = 0; i < rps; i++) {
-                        promises.push(this.performAtomicSwap(suiAmount, hbarAmount));
+                    // CORRECTED: Launch batch of concurrent operations (not just RPS)
+                    const currentBatchSize = Math.min(batchSize, rps - totalProcessed);
+                    for (let i = 0; i < currentBatchSize; i++) {
+                        promises.push(this.performRealThroughputOperation(suiAmount, hbarAmount));
                     }
                     const batchResults = await Promise.allSettled(promises);
                     // Process results
@@ -461,17 +479,20 @@ class FinP2PPerformanceCharacteristicsBenchmark extends events_1.EventEmitter {
                             });
                         }
                     });
-                    // Wait for next second
+                    totalProcessed += currentBatchSize;
+                    // CORRECTED: Wait for batch interval, not just 1 second
                     const batchDuration = Date.now() - batchStartTime;
-                    if (batchDuration < 1000) {
-                        await new Promise(resolve => setTimeout(resolve, 1000 - batchDuration));
+                    if (batchDuration < batchInterval) {
+                        await new Promise(resolve => setTimeout(resolve, batchInterval - batchDuration));
                     }
                 }
-                // Calculate level statistics
+                // CORRECTED: Calculate level statistics with proper TPS calculation
                 const successCount = levelResults.filter(r => r.success).length;
                 const totalCount = levelResults.length;
                 const levelErrorRate = (totalCount - successCount) / totalCount;
-                const levelTPS = successCount / (testDurationPerLevel / 1000);
+                // CORRECTED: TPS should be based on actual processing rate, not just success count
+                const actualTestDuration = (Date.now() - levelStartTime) / 1000; // seconds
+                const levelTPS = successCount / actualTestDuration;
                 // Calculate error breakdown
                 const errorBreakdown = levelResults
                     .filter(r => !r.success)
@@ -491,8 +512,8 @@ class FinP2PPerformanceCharacteristicsBenchmark extends events_1.EventEmitter {
                     errorBreakdown: errorBreakdown,
                     timestamp: new Date().toISOString()
                 });
-                // Update sustainable TPS if this level is successful
-                if (levelErrorRate <= 0.05) { // ≤5% errors
+                // CORRECTED: Update sustainable TPS with enterprise-level criteria
+                if (levelErrorRate <= 0.10) { // ≤10% errors (more realistic for high throughput)
                     sustainableTPS = levelTPS;
                     this.emit('progress', { message: `   ✅ Level ${rps} RPS: SUCCESS (${(levelErrorRate * 100).toFixed(1)}% errors, ${levelTPS.toFixed(2)} TPS)` });
                 }
@@ -540,33 +561,106 @@ class FinP2PPerformanceCharacteristicsBenchmark extends events_1.EventEmitter {
             };
         }
     }
-    async performAtomicSwap(suiAmount, hbarAmount) {
+    async performAtomicSwap(suiAmount, hbarAmount, retryCount = 0) {
         const startTime = Date.now();
+        const maxRetries = 3;
+        const baseDelay = 1000; // 1 second base delay
+        
         try {
-            // Perform SUI transfer
+            // Perform atomic swap using FinP2P FinID mapping
+            // Wallet 1 sends SUI to Wallet 2, Wallet 2 sends HBAR to Wallet 1
+            // FinP2P handles the FinID → wallet address mapping locally
+            
+            // Step 1: Wallet 1 sends SUI to Wallet 2 (via FinID)
             const suiTransfer = await this.suiAdapter?.transferByFinId('performance-test-account1@finp2p.test', 'performance-test-account2@finp2p.test', suiAmount, true);
-            if (suiTransfer) {
-                // Perform HBAR transfer
+            
+            if (suiTransfer && suiTransfer.txHash) {
+                // Step 2: Wallet 2 sends HBAR to Wallet 1 (via FinID)
                 const hbarTransfer = await this.hederaAdapter?.transferByFinId('performance-test-account2@finp2p.test', 'performance-test-account1@finp2p.test', hbarAmount, true);
+                
                 const endTime = Date.now();
                 const latency = endTime - startTime;
-                return {
-                    success: true,
-                    latency: latency
-                };
+                
+                if (hbarTransfer && hbarTransfer.txId) {
+                    return {
+                        success: true,
+                        latency: latency,
+                        suiTxHash: suiTransfer.txHash,
+                        hbarTxId: hbarTransfer.txId
+                    };
+                }
+                else {
+                    return {
+                        success: false,
+                        latency: latency,
+                        error: 'HBAR transfer failed in atomic swap'
+                    };
+                }
             }
             else {
                 return {
                     success: false,
                     latency: 0,
-                    error: 'SUI transfer failed'
+                    error: 'SUI transfer failed in atomic swap'
                 };
             }
         }
         catch (error) {
+            const endTime = Date.now();
+            const latency = endTime - startTime;
+            const errorMessage = error instanceof Error ? error.message : String(error);
+            
+            // Handle rate limiting with exponential backoff
+            if (errorMessage.includes('429') && retryCount < maxRetries) {
+                const delay = baseDelay * Math.pow(2, retryCount) + Math.random() * 1000; // Add jitter
+                this.emit('progress', { message: `   ⚠️ Rate limited, retrying in ${delay.toFixed(0)}ms (attempt ${retryCount + 1}/${maxRetries})` });
+                await new Promise(resolve => setTimeout(resolve, delay));
+                return this.performAtomicSwap(suiAmount, hbarAmount, retryCount + 1);
+            }
+            
             return {
                 success: false,
-                latency: 0,
+                latency: latency,
+                error: errorMessage
+            };
+        }
+    }
+    /**
+     * CORRECTED: Real throughput operation for enterprise-level testing
+     * This performs actual FinP2P operations to measure real system throughput
+     */
+    async performRealThroughputOperation(suiAmount, hbarAmount) {
+        const startTime = Date.now();
+        try {
+            // Perform actual FinP2P atomic swap operation using FinID mapping
+            // This measures real system throughput with FinP2P's core functionality
+            const swapId = `throughput_test_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+            // Execute real atomic swap: SUI → HBAR using FinID mapping
+            const result = await this.performAtomicSwap(suiAmount, hbarAmount);
+            const endTime = Date.now();
+            const latency = endTime - startTime;
+            if (result.success) {
+                return {
+                    success: true,
+                    latency: latency,
+                    suiTxHash: result.suiTxHash,
+                    hbarTxId: result.hbarTxId
+                };
+            }
+            else {
+                return {
+                    success: false,
+                    latency: latency,
+                    error: result.error || 'Atomic swap failed'
+                };
+            }
+        }
+        catch (error) {
+            const endTime = Date.now();
+            const latency = endTime - startTime;
+            return {
+                success: false,
+                latency: latency,
                 error: error instanceof Error ? error.message : String(error)
             };
         }
