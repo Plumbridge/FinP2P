@@ -1,48 +1,48 @@
 # LayerZero Security Robustness Benchmark Results
 
-**Test Date:** 2025-09-07T11:07:13.968Z
+**Test Date:** 2025-09-07T19:15:14.103Z
 **Duration:** N/A
-**Overall Score:** 70.00%
+**Overall Score:** 50.00%
 **Domain:** Security Robustness
 
 ## Summary
 
 - **Total Criteria:** 5
-- **Passed:** 3
+- **Passed:** 2
 - **Partial:** 1
-- **Failed:** 1
+- **Failed:** 2
 
 ## Criteria Results
 
 ### ❌ Formal Verification Coverage
 - **Status:** FAILED
-- **Score:** 0 FVC compliance score (%)
+- **Score:** 25 FVC compliance score (%)
 - **Method:** Runtime conformance to claimed invariants (black-box)
-- **Timestamp:** 2025-09-07T11:06:01.055Z
+- **Timestamp:** 2025-09-07T19:11:24.397Z
 
-### ⚠️ Cryptographic Robustness
-- **Status:** PARTIAL
-- **Score:** 66.66666666666667 Crypto compliance score (%)
+### ❌ Cryptographic Robustness
+- **Status:** FAILED
+- **Score:** 0 Crypto compliance score (%)
 - **Method:** Signature binding & tamper rejection (on-chain verifiable)
-- **Timestamp:** 2025-09-07T11:06:39.159Z
+- **Timestamp:** 2025-09-07T19:11:28.545Z
 
 ### ✅ HSM/KMS Support
 - **Status:** PASSED
 - **Score:** 100 HSM compliance score (%)
 - **Method:** Signer abstraction / external-signer compatibility (software proxy)
-- **Timestamp:** 2025-09-07T11:06:39.160Z
+- **Timestamp:** 2025-09-07T19:11:28.545Z
 
-### ✅ Byzantine Fault Tolerance
-- **Status:** PASSED
-- **Score:** 100 BFT compliance score (%)
+### ⚠️ Byzantine Fault Tolerance
+- **Status:** PARTIAL
+- **Score:** 75 BFT compliance score (%)
 - **Method:** Quorum/finality enforcement at the API boundary
-- **Timestamp:** 2025-09-07T11:07:13.967Z
+- **Timestamp:** 2025-09-07T19:15:14.102Z
 
 ### ✅ Vulnerability Assessment Coverage
 - **Status:** PASSED
 - **Score:** 100 Vuln compliance score (%)
 - **Method:** Surface scan of deployed components only
-- **Timestamp:** 2025-09-07T11:07:13.968Z
+- **Timestamp:** 2025-09-07T19:15:14.103Z
 
 ## Detailed Results
 

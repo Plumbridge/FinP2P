@@ -1,55 +1,59 @@
 {
-  "testDate": "2025-09-07T11:07:13.968Z",
+  "testDate": "2025-09-07T19:15:14.103Z",
   "duration": "N/A",
-  "overallScore": "70.00%",
+  "overallScore": "50.00%",
   "totalCriteria": 5,
-  "passedCriteria": 3,
+  "passedCriteria": 2,
   "partialCriteria": 1,
-  "failedCriteria": 1,
+  "failedCriteria": 2,
   "domain": "Security Robustness",
   "criteria": [
     {
       "domain": "Security Robustness",
       "criterion": "Formal Verification Coverage",
       "unit": "FVC compliance score (%)",
-      "value": 0,
+      "value": 25,
       "method": "Runtime conformance to claimed invariants (black-box)",
-      "timestamp": "2025-09-07T11:06:01.055Z",
+      "timestamp": "2025-09-07T19:11:24.397Z",
       "details": {
-        "fvcScore": "0.0%",
+        "fvcScore": "25.0%",
         "totalTests": 4,
-        "violations": 4,
-        "violationRate": "100.00%",
+        "violations": 3,
+        "violationRate": "75.00%",
         "individualTestScores": {
           "replayRejection": 0,
-          "valueConservation": 0,
+          "valueConservation": 100,
           "finalizationTiming": 0,
           "idempotencyRetries": 0
         },
-        "note": "Tested 4 formal verification criteria with 4 violations"
+        "note": "Tested 4 formal verification criteria with 3 violations"
       },
       "evidence": {
         "proofs": [
           {
+            "test": "value_conservation",
+            "passed": true,
+            "initialBalance1": "1.133294218095745159",
+            "finalBalance1": "1.133304218095745159",
+            "initialBalance2": "4.95334387499661117",
+            "finalBalance2": "4.95188850017583317"
+          },
+          {
             "test": "idempotency_retries",
             "passed": false,
             "result1": false,
-            "result2": true,
+            "result2": false,
             "note": "Both retry attempts should succeed"
           }
         ],
         "errors": [
           {
             "test": "replay_rejection",
-            "error": "could not coalesce error (error={ \"code\": 30, \"message\": \"Request timeout on the free tier, please upgrade your tier to the paid one\" }, payload={ \"id\": 10, \"jsonrpc\": \"2.0\", \"method\": \"eth_sendRawTransaction\", \"params\": [ \"0x02f87683013882818d851c016a4abe851c016a4b3c825208947b52c77f01ae2cd0a59c0b24de48f21121e6c2bc8609184e72a00080c001a01854d72a15dfb9b08b56c756d964bf908cc11ffb4f13d22b2b0a99cae4121f0ba03bec30aec4b61142e9d7a4da8b8750d13ccde1739a90bfeab34d7475ccc0544d\" ] }, code=UNKNOWN_ERROR, version=6.15.0)"
-          },
-          {
-            "test": "value_conservation",
-            "error": "could not coalesce error (error={ \"code\": 30, \"message\": \"Request timeout on the free tier, please upgrade your tier to the paid one\" }, payload={ \"id\": 14, \"jsonrpc\": \"2.0\", \"method\": \"eth_getTransactionCount\", \"params\": [ \"0x3808ab2b060d1648c3bb8fc617f9df752143dafb\", \"pending\" ] }, code=UNKNOWN_ERROR, version=6.15.0)"
+            "error": "could not coalesce error (error={ \"code\": 30, \"message\": \"Request timeout on the free tier, please upgrade your tier to the paid one\" }, payload={ \"id\": 2, \"jsonrpc\": \"2.0\", \"method\": \"eth_getTransactionCount\", \"params\": [ \"0x3808ab2b060d1648c3bb8fc617f9df752143dafb\", \"pending\" ] }, code=UNKNOWN_ERROR, version=6.15.0)"
           },
           {
             "test": "finalization_timing",
-            "error": "could not coalesce error (error={ \"code\": 30, \"message\": \"Request timeout on the free tier, please upgrade your tier to the paid one\" }, payload={ \"id\": 25, \"jsonrpc\": \"2.0\", \"method\": \"eth_sendRawTransaction\", \"params\": [ \"0x02f87683013882818e851c016a4abe851c016a4b3c825208947b52c77f01ae2cd0a59c0b24de48f21121e6c2bc8609184e72a00080c080a0d69f78f5aac2d1b6f2acfd9b23a32cef348bc2859efc9be021f5c537c7c78ff9a00362b5736a3c36cf3c47509a55b064a07f474d4f88c042b3fe6d740697f6c53c\" ] }, code=UNKNOWN_ERROR, version=6.15.0)"
+            "error": "could not coalesce error (error={ \"code\": 30, \"message\": \"Request timeout on the free tier, please upgrade your tier to the paid one\" }, payload={ \"id\": 20, \"jsonrpc\": \"2.0\", \"method\": \"eth_getTransactionCount\", \"params\": [ \"0x3808ab2b060d1648c3bb8fc617f9df752143dafb\", \"pending\" ] }, code=UNKNOWN_ERROR, version=6.15.0)"
           }
         ],
         "txHashes": []
@@ -60,27 +64,18 @@
       "domain": "Security Robustness",
       "criterion": "Cryptographic Robustness",
       "unit": "Crypto compliance score (%)",
-      "value": 66.66666666666667,
+      "value": 0,
       "method": "Signature binding & tamper rejection (on-chain verifiable)",
-      "timestamp": "2025-09-07T11:06:39.159Z",
+      "timestamp": "2025-09-07T19:11:28.545Z",
       "details": {
-        "cryptoScore": "66.7%",
+        "cryptoScore": "0.0%",
         "totalTests": 3,
-        "mismatches": 1,
-        "mismatchRate": "33.33%",
-        "note": "Tested 3 cryptographic criteria with 1 mismatches"
+        "mismatches": 3,
+        "mismatchRate": "100.00%",
+        "note": "Tested 3 cryptographic criteria with 3 mismatches"
       },
       "evidence": {
         "proofs": [
-          {
-            "test": "sender_authenticity",
-            "passed": true,
-            "result": {
-              "success": true,
-              "sepoliaTxHash": "0xc5e0b59f75198a43e87aa1a6e0476e884378046269ecf8e8c6cd5f634974d1f0",
-              "polygonTxHash": "0xfa38391101bc34ffc2dd2ef42ecb0497ee2c4ac28b3499c9f99917583797d831"
-            }
-          },
           {
             "test": "domain_separation",
             "passed": false,
@@ -90,19 +85,23 @@
           },
           {
             "test": "tamper_rejection",
-            "passed": true,
+            "passed": false,
             "result": {
-              "success": true,
-              "sepoliaTxHash": "0x8fbead8f4292050315d2025cd3a280ea9b027433c975e66c89a9e47af4cb8092",
-              "polygonTxHash": "0x0fe5e45ca5e5149c147d66cfcc270616852f792ebf78ace116d9b5136a50f33e"
+              "success": false,
+              "error": "could not coalesce error (error={ \"code\": 30, \"message\": \"Request timeout on the free tier, please upgrade your tier to the paid one\" }, payload={ \"id\": 28, \"jsonrpc\": \"2.0\", \"method\": \"eth_getTransactionCount\", \"params\": [ \"0x3808ab2b060d1648c3bb8fc617f9df752143dafb\", \"pending\" ] }, code=UNKNOWN_ERROR, version=6.15.0)"
             },
             "note": "Invalid transactions should be rejected"
           }
         ],
-        "errors": [],
+        "errors": [
+          {
+            "test": "sender_authenticity",
+            "error": "could not coalesce error (error={ \"code\": 30, \"message\": \"Request timeout on the free tier, please upgrade your tier to the paid one\" }, payload={ \"id\": 26, \"jsonrpc\": \"2.0\", \"method\": \"eth_getTransactionCount\", \"params\": [ \"0x3808ab2b060d1648c3bb8fc617f9df752143dafb\", \"pending\" ] }, code=UNKNOWN_ERROR, version=6.15.0)"
+          }
+        ],
         "txHashes": []
       },
-      "status": "partial"
+      "status": "failed"
     },
     {
       "domain": "Security Robustness",
@@ -110,7 +109,7 @@
       "unit": "HSM compliance score (%)",
       "value": 100,
       "method": "Signer abstraction / external-signer compatibility (software proxy)",
-      "timestamp": "2025-09-07T11:06:39.160Z",
+      "timestamp": "2025-09-07T19:11:28.545Z",
       "details": {
         "hsmScore": "100.0%",
         "externalSignerWorks": true,
@@ -142,46 +141,466 @@
       "domain": "Security Robustness",
       "criterion": "Byzantine Fault Tolerance",
       "unit": "BFT compliance score (%)",
-      "value": 100,
+      "value": 75,
       "method": "Quorum/finality enforcement at the API boundary",
-      "timestamp": "2025-09-07T11:07:13.967Z",
+      "timestamp": "2025-09-07T19:15:14.102Z",
       "details": {
-        "bftScore": "100.0%",
+        "bftScore": "75.0%",
+        "rawBftScore": "95.0%",
+        "formalVerificationRequired": true,
         "prematureFinalizationRate": "0.00%",
-        "staleStateAcceptanceRate": "0.00%",
-        "totalTests": 2,
-        "totalViolations": 0,
-        "violationRate": "0.00%",
-        "bftCompliant": true,
-        "note": "Tested 2 BFT criteria: 0 premature finalizations, 0 stale state acceptances"
+        "staleStateAcceptanceRate": "5.00%",
+        "totalTransfers": 40,
+        "totalViolations": 2,
+        "violationRate": "5.00%",
+        "bftCompliant": false,
+        "confirmationLevels": [
+          0,
+          1,
+          2
+        ],
+        "transfersPerLevel": 10,
+        "staleBlockTests": 5,
+        "reorgTests": 5,
+        "note": "Tested BFT with 40 transfers: 0 premature finalizations, 2 stale state acceptances. BFT capped at 75% without formal verification."
       },
       "evidence": {
         "proofs": [
           {
-            "test": "finality_threshold",
-            "passed": true,
+            "test": "finality_threshold_n0",
+            "transfer": 1,
+            "passed": false,
             "result": {
-              "success": true,
-              "sepoliaTxHash": "0xff4c37957d57486ff98a30fa85e4411c742b2a5e47629bd7a285ac3eacdd9e2e",
-              "polygonTxHash": "0xfd7ce682d24e129b8b31a8216148a13ad9ce78d0fbb65654deea06b2262d888a"
+              "success": false,
+              "error": "could not coalesce error (error={ \"code\": 30, \"message\": \"Request timeout on the free tier, please upgrade your tier to the paid one\" }, payload={ \"id\": 30, \"jsonrpc\": \"2.0\", \"method\": \"eth_getTransactionCount\", \"params\": [ \"0x3808ab2b060d1648c3bb8fc617f9df752143dafb\", \"pending\" ] }, code=UNKNOWN_ERROR, version=6.15.0)"
             },
-            "note": "Finality threshold respected"
+            "confirmations": 0,
+            "note": "Transfer 1: Settlement before 0 confirmations"
           },
           {
-            "test": "stale_state_rejection",
+            "test": "finality_threshold_n0",
+            "transfer": 2,
+            "passed": false,
+            "result": {
+              "success": false,
+              "error": "could not coalesce error (error={ \"code\": 30, \"message\": \"Request timeout on the free tier, please upgrade your tier to the paid one\" }, payload={ \"id\": 41, \"jsonrpc\": \"2.0\", \"method\": \"eth_sendRawTransaction\", \"params\": [ \"0x02f8768301388281dc8510d38d79748510d38d79f2825208947b52c77f01ae2cd0a59c0b24de48f21121e6c2bc86048c2739500080c001a0213395ad18b9f1900ba089ed63650a000eac88f27871d2b3e957ebcaf82c5fc0a054650e82e1f0653d4a56681632a79da7383cc99c34b3834fc5ae97c11770d030\" ] }, code=UNKNOWN_ERROR, version=6.15.0)"
+            },
+            "confirmations": 0,
+            "note": "Transfer 2: Settlement before 0 confirmations"
+          },
+          {
+            "test": "finality_threshold_n0",
+            "transfer": 3,
+            "passed": false,
+            "result": {
+              "success": false,
+              "error": "could not coalesce error (error={ \"code\": 30, \"message\": \"Request timeout on the free tier, please upgrade your tier to the paid one\" }, payload={ \"id\": 43, \"jsonrpc\": \"2.0\", \"method\": \"eth_getTransactionCount\", \"params\": [ \"0x3808ab2b060d1648c3bb8fc617f9df752143dafb\", \"pending\" ] }, code=UNKNOWN_ERROR, version=6.15.0)"
+            },
+            "confirmations": 0,
+            "note": "Transfer 3: Settlement before 0 confirmations"
+          },
+          {
+            "test": "finality_threshold_n0",
+            "transfer": 4,
+            "passed": false,
+            "result": {
+              "success": false,
+              "error": "could not coalesce error (error={ \"code\": 30, \"message\": \"Request timeout on the free tier, please upgrade your tier to the paid one\" }, payload={ \"id\": 54, \"jsonrpc\": \"2.0\", \"method\": \"eth_sendRawTransaction\", \"params\": [ \"0x02f8768301388281dd8510d38d79748510d38d79f2825208947b52c77f01ae2cd0a59c0b24de48f21121e6c2bc86048c2739500080c001a028d159c24ed7585e9a999030b2457957422660048e97bd50e712ff8a55130341a051847a4601b68ffb3d3d411a4f38707f4e924e7eb79e7e65f1bbbcf02866d378\" ] }, code=UNKNOWN_ERROR, version=6.15.0)"
+            },
+            "confirmations": 0,
+            "note": "Transfer 4: Settlement before 0 confirmations"
+          },
+          {
+            "test": "finality_threshold_n0",
+            "transfer": 5,
+            "passed": false,
+            "result": {
+              "success": false,
+              "error": "could not coalesce error (error={ \"code\": 30, \"message\": \"Request timeout on the free tier, please upgrade your tier to the paid one\" }, payload={ \"id\": 65, \"jsonrpc\": \"2.0\", \"method\": \"eth_sendRawTransaction\", \"params\": [ \"0x02f8768301388281dd8510d38d79748510d38d79f2825208947b52c77f01ae2cd0a59c0b24de48f21121e6c2bc86048c2739500080c001a028d159c24ed7585e9a999030b2457957422660048e97bd50e712ff8a55130341a051847a4601b68ffb3d3d411a4f38707f4e924e7eb79e7e65f1bbbcf02866d378\" ] }, code=UNKNOWN_ERROR, version=6.15.0)"
+            },
+            "confirmations": 0,
+            "note": "Transfer 5: Settlement before 0 confirmations"
+          },
+          {
+            "test": "finality_threshold_n0",
+            "transfer": 6,
+            "passed": false,
+            "result": {
+              "success": false,
+              "error": "could not coalesce error (error={ \"code\": 30, \"message\": \"Request timeout on the free tier, please upgrade your tier to the paid one\" }, payload={ \"id\": 67, \"jsonrpc\": \"2.0\", \"method\": \"eth_getTransactionCount\", \"params\": [ \"0x3808ab2b060d1648c3bb8fc617f9df752143dafb\", \"pending\" ] }, code=UNKNOWN_ERROR, version=6.15.0)"
+            },
+            "confirmations": 0,
+            "note": "Transfer 6: Settlement before 0 confirmations"
+          },
+          {
+            "test": "finality_threshold_n0",
+            "transfer": 7,
+            "passed": false,
+            "result": {
+              "success": false,
+              "error": "could not coalesce error (error={ \"code\": 30, \"message\": \"Request timeout on the free tier, please upgrade your tier to the paid one\" }, payload={ \"id\": 69, \"jsonrpc\": \"2.0\", \"method\": \"eth_getTransactionCount\", \"params\": [ \"0x3808ab2b060d1648c3bb8fc617f9df752143dafb\", \"pending\" ] }, code=UNKNOWN_ERROR, version=6.15.0)"
+            },
+            "confirmations": 0,
+            "note": "Transfer 7: Settlement before 0 confirmations"
+          },
+          {
+            "test": "finality_threshold_n0",
+            "transfer": 8,
+            "passed": false,
+            "result": {
+              "success": false,
+              "error": "could not coalesce error (error={ \"code\": 30, \"message\": \"Request timeout on the free tier, please upgrade your tier to the paid one\" }, payload={ \"id\": 71, \"jsonrpc\": \"2.0\", \"method\": \"eth_getTransactionCount\", \"params\": [ \"0x3808ab2b060d1648c3bb8fc617f9df752143dafb\", \"pending\" ] }, code=UNKNOWN_ERROR, version=6.15.0)"
+            },
+            "confirmations": 0,
+            "note": "Transfer 8: Settlement before 0 confirmations"
+          },
+          {
+            "test": "finality_threshold_n0",
+            "transfer": 9,
+            "passed": false,
+            "result": {
+              "success": false,
+              "error": "could not coalesce error (error={ \"code\": 30, \"message\": \"Request timeout on the free tier, please upgrade your tier to the paid one\" }, payload={ \"id\": 73, \"jsonrpc\": \"2.0\", \"method\": \"eth_getTransactionCount\", \"params\": [ \"0x3808ab2b060d1648c3bb8fc617f9df752143dafb\", \"pending\" ] }, code=UNKNOWN_ERROR, version=6.15.0)"
+            },
+            "confirmations": 0,
+            "note": "Transfer 9: Settlement before 0 confirmations"
+          },
+          {
+            "test": "finality_threshold_n0",
+            "transfer": 10,
             "passed": true,
             "result": {
               "success": true,
-              "sepoliaTxHash": "0xb95fbfefbc3babf8c34ca23183d4a188ff5cd25da57d744a2e2d133b1946ac0f",
-              "polygonTxHash": "0x3a628f00c2741fae6d3b3b940e9c26adbaa55718ec6bc9c42a32f23254f4362b"
+              "sepoliaTxHash": "0x257bed078e39d764a7df3c26430ae360b6793c4ad2977dfd94c3cd9ad2000618",
+              "polygonTxHash": "0x7a39b95fe99301309c0b0335146608e5a93508c637f7e0074b51d8d37d63fe66"
             },
-            "note": "Stale state rejection working"
+            "confirmations": 0,
+            "note": "Transfer 10: Settlement after 0 confirmations"
+          },
+          {
+            "test": "finality_threshold_n1",
+            "transfer": 1,
+            "passed": true,
+            "result": {
+              "success": true,
+              "sepoliaTxHash": "0x0f4800fc8f5fc5153973b0a294d0355b69fd7212b4ea03ab688278c86e3a704d",
+              "polygonTxHash": "0xb0869760035a6d2bf71dd9dc6ba473c44be14231cd68a6c8a12e357e4ad9a94c"
+            },
+            "confirmations": 1,
+            "note": "Transfer 1: Settlement after 1 confirmations"
+          },
+          {
+            "test": "finality_threshold_n1",
+            "transfer": 2,
+            "passed": false,
+            "result": {
+              "success": false,
+              "error": "Sepolia transaction timeout"
+            },
+            "confirmations": 1,
+            "note": "Transfer 2: Settlement before 1 confirmations"
+          },
+          {
+            "test": "finality_threshold_n1",
+            "transfer": 3,
+            "passed": false,
+            "result": {
+              "success": false,
+              "error": "could not coalesce error (error={ \"code\": 30, \"message\": \"Request timeout on the free tier, please upgrade your tier to the paid one\" }, payload={ \"id\": 132, \"jsonrpc\": \"2.0\", \"method\": \"eth_getTransactionCount\", \"params\": [ \"0x3808ab2b060d1648c3bb8fc617f9df752143dafb\", \"pending\" ] }, code=UNKNOWN_ERROR, version=6.15.0)"
+            },
+            "confirmations": 1,
+            "note": "Transfer 3: Settlement before 1 confirmations"
+          },
+          {
+            "test": "finality_threshold_n1",
+            "transfer": 4,
+            "passed": false,
+            "result": {
+              "success": false,
+              "error": "could not coalesce error (error={ \"code\": 30, \"message\": \"Request timeout on the free tier, please upgrade your tier to the paid one\" }, payload={ \"id\": 143, \"jsonrpc\": \"2.0\", \"method\": \"eth_sendRawTransaction\", \"params\": [ \"0x02f8768301388281e18510066e5b438510066e5bc1825208947b52c77f01ae2cd0a59c0b24de48f21121e6c2bc86048c2739500080c001a04d103e5f53d85fb6edabec86d20363c792293b558867c7ab3d56f98a757d3707a06bd90c9387189996962eeb4c88a032be0a0315e21e2e14c0cd971aed9b5be201\" ] }, code=UNKNOWN_ERROR, version=6.15.0)"
+            },
+            "confirmations": 1,
+            "note": "Transfer 4: Settlement before 1 confirmations"
+          },
+          {
+            "test": "finality_threshold_n1",
+            "transfer": 5,
+            "passed": false,
+            "result": {
+              "success": false,
+              "error": "could not coalesce error (error={ \"code\": 30, \"message\": \"Request timeout on the free tier, please upgrade your tier to the paid one\" }, payload={ \"id\": 154, \"jsonrpc\": \"2.0\", \"method\": \"eth_sendRawTransaction\", \"params\": [ \"0x02f8768301388281e18510066e5b438510066e5bc1825208947b52c77f01ae2cd0a59c0b24de48f21121e6c2bc86048c2739500080c001a04d103e5f53d85fb6edabec86d20363c792293b558867c7ab3d56f98a757d3707a06bd90c9387189996962eeb4c88a032be0a0315e21e2e14c0cd971aed9b5be201\" ] }, code=UNKNOWN_ERROR, version=6.15.0)"
+            },
+            "confirmations": 1,
+            "note": "Transfer 5: Settlement before 1 confirmations"
+          },
+          {
+            "test": "finality_threshold_n1",
+            "transfer": 6,
+            "passed": false,
+            "result": {
+              "success": false,
+              "error": "Sepolia transaction timeout"
+            },
+            "confirmations": 1,
+            "note": "Transfer 6: Settlement before 1 confirmations"
+          },
+          {
+            "test": "finality_threshold_n1",
+            "transfer": 7,
+            "passed": false,
+            "result": {
+              "success": false,
+              "error": "could not coalesce error (error={ \"code\": 30, \"message\": \"Request timeout on the free tier, please upgrade your tier to the paid one\" }, payload={ \"id\": 187, \"jsonrpc\": \"2.0\", \"method\": \"eth_getTransactionCount\", \"params\": [ \"0x3808ab2b060d1648c3bb8fc617f9df752143dafb\", \"pending\" ] }, code=UNKNOWN_ERROR, version=6.15.0)"
+            },
+            "confirmations": 1,
+            "note": "Transfer 7: Settlement before 1 confirmations"
+          },
+          {
+            "test": "finality_threshold_n1",
+            "transfer": 8,
+            "passed": false,
+            "result": {
+              "success": false,
+              "error": "could not coalesce error (error={ \"code\": 30, \"message\": \"Request timeout on the free tier, please upgrade your tier to the paid one\" }, payload={ \"id\": 189, \"jsonrpc\": \"2.0\", \"method\": \"eth_getTransactionCount\", \"params\": [ \"0x3808ab2b060d1648c3bb8fc617f9df752143dafb\", \"pending\" ] }, code=UNKNOWN_ERROR, version=6.15.0)"
+            },
+            "confirmations": 1,
+            "note": "Transfer 8: Settlement before 1 confirmations"
+          },
+          {
+            "test": "finality_threshold_n1",
+            "transfer": 9,
+            "passed": false,
+            "result": {
+              "success": false,
+              "error": "could not coalesce error (error={ \"code\": 30, \"message\": \"Request timeout on the free tier, please upgrade your tier to the paid one\" }, payload={ \"id\": 191, \"jsonrpc\": \"2.0\", \"method\": \"eth_getTransactionCount\", \"params\": [ \"0x3808ab2b060d1648c3bb8fc617f9df752143dafb\", \"pending\" ] }, code=UNKNOWN_ERROR, version=6.15.0)"
+            },
+            "confirmations": 1,
+            "note": "Transfer 9: Settlement before 1 confirmations"
+          },
+          {
+            "test": "finality_threshold_n1",
+            "transfer": 10,
+            "passed": false,
+            "result": {
+              "success": false,
+              "error": "could not coalesce error (error={ \"code\": 30, \"message\": \"Request timeout on the free tier, please upgrade your tier to the paid one\" }, payload={ \"id\": 193, \"jsonrpc\": \"2.0\", \"method\": \"eth_getTransactionCount\", \"params\": [ \"0x3808ab2b060d1648c3bb8fc617f9df752143dafb\", \"pending\" ] }, code=UNKNOWN_ERROR, version=6.15.0)"
+            },
+            "confirmations": 1,
+            "note": "Transfer 10: Settlement before 1 confirmations"
+          },
+          {
+            "test": "finality_threshold_n2",
+            "transfer": 1,
+            "passed": false,
+            "result": {
+              "success": false,
+              "error": "could not coalesce error (error={ \"code\": 30, \"message\": \"Request timeout on the free tier, please upgrade your tier to the paid one\" }, payload={ \"id\": 195, \"jsonrpc\": \"2.0\", \"method\": \"eth_getTransactionCount\", \"params\": [ \"0x3808ab2b060d1648c3bb8fc617f9df752143dafb\", \"pending\" ] }, code=UNKNOWN_ERROR, version=6.15.0)"
+            },
+            "confirmations": 2,
+            "note": "Transfer 1: Settlement before 2 confirmations"
+          },
+          {
+            "test": "finality_threshold_n2",
+            "transfer": 2,
+            "passed": false,
+            "result": {
+              "success": false,
+              "error": "could not coalesce error (error={ \"code\": 30, \"message\": \"Request timeout on the free tier, please upgrade your tier to the paid one\" }, payload={ \"id\": 197, \"jsonrpc\": \"2.0\", \"method\": \"eth_getTransactionCount\", \"params\": [ \"0x3808ab2b060d1648c3bb8fc617f9df752143dafb\", \"pending\" ] }, code=UNKNOWN_ERROR, version=6.15.0)"
+            },
+            "confirmations": 2,
+            "note": "Transfer 2: Settlement before 2 confirmations"
+          },
+          {
+            "test": "finality_threshold_n2",
+            "transfer": 3,
+            "passed": false,
+            "result": {
+              "success": false,
+              "error": "could not coalesce error (error={ \"code\": 30, \"message\": \"Request timeout on the free tier, please upgrade your tier to the paid one\" }, payload={ \"id\": 199, \"jsonrpc\": \"2.0\", \"method\": \"eth_getTransactionCount\", \"params\": [ \"0x3808ab2b060d1648c3bb8fc617f9df752143dafb\", \"pending\" ] }, code=UNKNOWN_ERROR, version=6.15.0)"
+            },
+            "confirmations": 2,
+            "note": "Transfer 3: Settlement before 2 confirmations"
+          },
+          {
+            "test": "finality_threshold_n2",
+            "transfer": 4,
+            "passed": false,
+            "result": {
+              "success": false,
+              "error": "could not coalesce error (error={ \"code\": 30, \"message\": \"Request timeout on the free tier, please upgrade your tier to the paid one\" }, payload={ \"id\": 201, \"jsonrpc\": \"2.0\", \"method\": \"eth_getTransactionCount\", \"params\": [ \"0x3808ab2b060d1648c3bb8fc617f9df752143dafb\", \"pending\" ] }, code=UNKNOWN_ERROR, version=6.15.0)"
+            },
+            "confirmations": 2,
+            "note": "Transfer 4: Settlement before 2 confirmations"
+          },
+          {
+            "test": "finality_threshold_n2",
+            "transfer": 5,
+            "passed": false,
+            "result": {
+              "success": false,
+              "error": "could not coalesce error (error={ \"code\": 30, \"message\": \"Request timeout on the free tier, please upgrade your tier to the paid one\" }, payload={ \"id\": 203, \"jsonrpc\": \"2.0\", \"method\": \"eth_getTransactionCount\", \"params\": [ \"0x3808ab2b060d1648c3bb8fc617f9df752143dafb\", \"pending\" ] }, code=UNKNOWN_ERROR, version=6.15.0)"
+            },
+            "confirmations": 2,
+            "note": "Transfer 5: Settlement before 2 confirmations"
+          },
+          {
+            "test": "finality_threshold_n2",
+            "transfer": 6,
+            "passed": false,
+            "result": {
+              "success": false,
+              "error": "could not coalesce error (error={ \"code\": 30, \"message\": \"Request timeout on the free tier, please upgrade your tier to the paid one\" }, payload={ \"id\": 205, \"jsonrpc\": \"2.0\", \"method\": \"eth_getTransactionCount\", \"params\": [ \"0x3808ab2b060d1648c3bb8fc617f9df752143dafb\", \"pending\" ] }, code=UNKNOWN_ERROR, version=6.15.0)"
+            },
+            "confirmations": 2,
+            "note": "Transfer 6: Settlement before 2 confirmations"
+          },
+          {
+            "test": "finality_threshold_n2",
+            "transfer": 7,
+            "passed": false,
+            "result": {
+              "success": false,
+              "error": "could not coalesce error (error={ \"code\": 30, \"message\": \"Request timeout on the free tier, please upgrade your tier to the paid one\" }, payload={ \"id\": 207, \"jsonrpc\": \"2.0\", \"method\": \"eth_getTransactionCount\", \"params\": [ \"0x3808ab2b060d1648c3bb8fc617f9df752143dafb\", \"pending\" ] }, code=UNKNOWN_ERROR, version=6.15.0)"
+            },
+            "confirmations": 2,
+            "note": "Transfer 7: Settlement before 2 confirmations"
+          },
+          {
+            "test": "finality_threshold_n2",
+            "transfer": 8,
+            "passed": false,
+            "result": {
+              "success": false,
+              "error": "could not coalesce error (error={ \"code\": 30, \"message\": \"Request timeout on the free tier, please upgrade your tier to the paid one\" }, payload={ \"id\": 209, \"jsonrpc\": \"2.0\", \"method\": \"eth_getTransactionCount\", \"params\": [ \"0x3808ab2b060d1648c3bb8fc617f9df752143dafb\", \"pending\" ] }, code=UNKNOWN_ERROR, version=6.15.0)"
+            },
+            "confirmations": 2,
+            "note": "Transfer 8: Settlement before 2 confirmations"
+          },
+          {
+            "test": "finality_threshold_n2",
+            "transfer": 9,
+            "passed": false,
+            "result": {
+              "success": false,
+              "error": "Sepolia transaction timeout"
+            },
+            "confirmations": 2,
+            "note": "Transfer 9: Settlement before 2 confirmations"
+          },
+          {
+            "test": "finality_threshold_n2",
+            "transfer": 10,
+            "passed": false,
+            "result": {
+              "success": false,
+              "error": "could not coalesce error (error={ \"code\": 30, \"message\": \"Request timeout on the free tier, please upgrade your tier to the paid one\" }, payload={ \"id\": 242, \"jsonrpc\": \"2.0\", \"method\": \"eth_getTransactionCount\", \"params\": [ \"0x3808ab2b060d1648c3bb8fc617f9df752143dafb\", \"pending\" ] }, code=UNKNOWN_ERROR, version=6.15.0)"
+            },
+            "confirmations": 2,
+            "note": "Transfer 10: Settlement before 2 confirmations"
+          },
+          {
+            "test": "stale_block_rejection",
+            "transfer": 1,
+            "result": {
+              "success": true,
+              "txHash": "0xc2f650e4cfd92"
+            },
+            "note": "Transfer 1: Stale block accepted"
+          },
+          {
+            "test": "stale_block_rejection",
+            "transfer": 2,
+            "passed": true,
+            "result": {
+              "success": false,
+              "error": "stale block reference rejected"
+            },
+            "note": "Transfer 2: Stale block rejected"
+          },
+          {
+            "test": "stale_block_rejection",
+            "transfer": 3,
+            "passed": true,
+            "result": {
+              "success": false,
+              "error": "stale block reference rejected"
+            },
+            "note": "Transfer 3: Stale block rejected"
+          },
+          {
+            "test": "stale_block_rejection",
+            "transfer": 4,
+            "passed": true,
+            "result": {
+              "success": false,
+              "error": "stale block reference rejected"
+            },
+            "note": "Transfer 4: Stale block rejected"
+          },
+          {
+            "test": "stale_block_rejection",
+            "transfer": 5,
+            "passed": true,
+            "result": {
+              "success": false,
+              "error": "stale block reference rejected"
+            },
+            "note": "Transfer 5: Stale block rejected"
+          },
+          {
+            "test": "reorg_rejection",
+            "transfer": 1,
+            "passed": true,
+            "result": {
+              "success": false,
+              "error": "reorg detected, transfer rejected"
+            },
+            "note": "Transfer 1: Reorg rejected"
+          },
+          {
+            "test": "reorg_rejection",
+            "transfer": 2,
+            "result": {
+              "success": true,
+              "txHash": "0xe7ddcb1b10fff"
+            },
+            "note": "Transfer 2: Reorg accepted"
+          },
+          {
+            "test": "reorg_rejection",
+            "transfer": 3,
+            "passed": true,
+            "result": {
+              "success": false,
+              "error": "reorg detected, transfer rejected"
+            },
+            "note": "Transfer 3: Reorg rejected"
+          },
+          {
+            "test": "reorg_rejection",
+            "transfer": 4,
+            "passed": true,
+            "result": {
+              "success": false,
+              "error": "reorg detected, transfer rejected"
+            },
+            "note": "Transfer 4: Reorg rejected"
+          },
+          {
+            "test": "reorg_rejection",
+            "transfer": 5,
+            "passed": true,
+            "result": {
+              "success": false,
+              "error": "reorg detected, transfer rejected"
+            },
+            "note": "Transfer 5: Reorg rejected"
           }
         ],
         "errors": [],
         "txHashes": []
       },
-      "status": "passed"
+      "status": "partial"
     },
     {
       "domain": "Security Robustness",
@@ -189,7 +608,7 @@
       "unit": "Vuln compliance score (%)",
       "value": 100,
       "method": "Surface scan of deployed components only",
-      "timestamp": "2025-09-07T11:07:13.968Z",
+      "timestamp": "2025-09-07T19:15:14.103Z",
       "details": {
         "vulnScore": "100.0%",
         "highCriticalFindings": 0,

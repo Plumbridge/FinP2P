@@ -414,6 +414,86 @@ export class LayerZeroAdapter extends EventEmitter {
     console.log('🔌 Disconnected from LayerZero network');
   }
 
+  /**
+   * Health check method to verify if the adapter is healthy and ready to accept requests
+   */
+  async isHealthy(): Promise<boolean> {
+    try {
+      // Check if we're connected
+      if (!this.isConnected) {
+        return false;
+      }
+
+      // Check if we have supported chains
+      if (this.supportedChains.size === 0) {
+        return false;
+      }
+
+      // Check if at least one chain is responsive
+      for (const [chainName, chain] of this.supportedChains) {
+        try {
+          const blockNumber = await chain.provider.getBlockNumber();
+          if (blockNumber > 0) {
+            return true; // At least one chain is responsive
+          }
+        } catch (error) {
+          // Continue checking other chains
+          continue;
+        }
+      }
+
+      return false; // No chains are responsive
+    } catch (error) {
+      return false;
+    }
+  }
+
+  /**
+   * Check if the adapter can accept new transfer requests
+   */
+  async canAcceptNewTransfers(): Promise<boolean> {
+    try {
+      // Must be healthy first
+      if (!(await this.isHealthy())) {
+        return false;
+      }
+
+      // Check if we have active swaps (optional: limit concurrent transfers)
+      const maxConcurrentSwaps = 10; // Reasonable limit
+      if (this.activeSwaps.size >= maxConcurrentSwaps) {
+        return false;
+      }
+
+      return true;
+    } catch (error) {
+      return false;
+    }
+  }
+
+  /**
+   * Get adapter status information
+   */
+  async getStatus(): Promise<{
+    isConnected: boolean;
+    isHealthy: boolean;
+    canAcceptTransfers: boolean;
+    supportedChains: number;
+    activeSwaps: number;
+    uptime: number;
+  }> {
+    const isHealthy = await this.isHealthy();
+    const canAcceptTransfers = await this.canAcceptNewTransfers();
+    
+    return {
+      isConnected: this.isConnected,
+      isHealthy,
+      canAcceptTransfers,
+      supportedChains: this.supportedChains.size,
+      activeSwaps: this.activeSwaps.size,
+      uptime: this.isConnected ? Date.now() - (this as any).startTime || 0 : 0
+    };
+  }
+
   async getChainWallet(chainName: string): Promise<SupportedChain | null> {
     return this.supportedChains.get(chainName) || null;
   }

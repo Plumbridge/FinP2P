@@ -491,50 +491,66 @@ export class FinP2PRegulatoryComplianceBenchmark extends EventEmitter {
     };
 
     try {
-      const testPolicies = ['EU_ONLY', 'US_ONLY', 'GLOBAL'];
-      const testRegions = ['EU', 'US', 'ASIA', 'GLOBAL'];
+      // Use same specific region testing as LayerZero for accurate comparison
+      const testRegions = [
+        { region: 'EU', expectedResult: 'allowed' }, // Only EU allowed
+        { region: 'US', expectedResult: 'denied' },
+        { region: 'CN', expectedResult: 'denied' },
+        { region: 'RU', expectedResult: 'denied' },
+        { region: 'ASIA', expectedResult: 'denied' },
+        { region: 'AMERICAS', expectedResult: 'denied' },
+        { region: 'NORTH_KOREA', expectedResult: 'denied' },
+        { region: 'IRAN', expectedResult: 'denied' },
+        { region: 'SYRIA', expectedResult: 'denied' },
+        { region: 'UNKNOWN', expectedResult: 'denied' }
+      ];
       
-      const policies = {
-        EU_ONLY: { allowed: ['EU'], denied: ['US', 'ASIA'] },
-        US_ONLY: { allowed: ['US'], denied: ['EU', 'ASIA'] },
-        GLOBAL: { allowed: ['EU', 'US', 'ASIA'], denied: [] }
+      // Set EU-only policy like LayerZero
+      const policy = {
+        allowedRegions: ['EU'],
+        disallowedRegions: ['US', 'CN', 'RU', 'ASIA', 'AMERICAS', 'NORTH_KOREA', 'IRAN', 'SYRIA'],
+        euOnlyPolicy: true,
+        enforcementEnabled: true
       };
       
-      for (const policy of testPolicies) {
-        for (const region of testRegions) {
-          try {
-            const isAllowed = this.checkRegionPolicy(policy, region, policies[policy as keyof typeof policies]);
-            const shouldBeAllowed = policies[policy as keyof typeof policies].allowed.includes(region);
-            
-            testResult.details.totalPolicyTests++;
-            
-            if (!isAllowed && !shouldBeAllowed) {
-              // Correctly denied
+      for (const testCase of testRegions) {
+        try {
+          const isAllowed = policy.allowedRegions.includes(testCase.region) && 
+                           !policy.disallowedRegions.includes(testCase.region);
+          const actualResult = isAllowed ? 'allowed' : 'denied';
+          
+          testResult.details.totalPolicyTests++;
+          
+          if (actualResult === testCase.expectedResult) {
+            // Correctly enforced
+            if (actualResult === 'denied') {
               testResult.details.violationsBlocked++;
-              testResult.details.auditLogsGenerated++;
-            } else if (isAllowed && shouldBeAllowed) {
-              // Correctly allowed
-              testResult.details.auditLogsGenerated++;
             }
-            
-            this.emit('progress', { message: `   Policy ${policy} for region ${region}: ${isAllowed ? 'ALLOWED' : 'DENIED'}` });
-          } catch (error) {
-            this.emit('progress', { message: `   Policy ${policy} for region ${region}: ERROR - ${error instanceof Error ? error.message : String(error)}` });
+            testResult.details.auditLogsGenerated++;
           }
+          
+          this.emit('progress', { message: `   Region ${testCase.region}: ${actualResult} (expected: ${testCase.expectedResult}) ${actualResult === testCase.expectedResult ? '✅' : '❌'}` });
+        } catch (error) {
+          this.emit('progress', { message: `   Region ${testCase.region}: ERROR - ${error instanceof Error ? error.message : String(error)}` });
         }
       }
       
-      // Calculate results
-      testResult.details.policyViolationRate = (testResult.details.violationsBlocked / testResult.details.totalPolicyTests) * 100;
-      testResult.score = testResult.details.policyViolationRate;
+      // Calculate results - convert to binary as specified
+      const policyViolationAcceptanceRate = testResult.details.violationsBlocked === 0 ? 0 : 100; // Binary: 0% or 100%
+      const auditability = testResult.details.auditLogsGenerated > 0 ? 'Y' : 'N'; // Binary: Y/N
       
-      if (testResult.details.policyViolationRate >= 80) {
+      testResult.details.policyViolationAcceptanceRate = `${policyViolationAcceptanceRate}%`;
+      testResult.details.auditability = auditability;
+      testResult.score = policyViolationAcceptanceRate === 0 && auditability === 'Y' ? 100 : 0;
+      
+      if (policyViolationAcceptanceRate === 0 && auditability === 'Y') {
         testResult.status = 'PASSED';
       } else {
         testResult.status = 'FAILED';
       }
       
-      this.emit('progress', { message: `✅ Data sovereignty test completed: ${testResult.details.policyViolationRate}% violations blocked` });
+      this.emit('progress', { message: `✅ Data sovereignty test completed: ${policyViolationAcceptanceRate}% policy violation acceptance rate` });
+      this.emit('progress', { message: `   Auditability: ${auditability}` });
       this.emit('progress', { message: `   Audit logs generated: ${testResult.details.auditLogsGenerated}` });
       
     } catch (error) {

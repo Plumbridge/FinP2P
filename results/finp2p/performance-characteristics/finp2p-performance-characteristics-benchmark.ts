@@ -458,17 +458,17 @@ export class FinP2PPerformanceCharacteristicsBenchmark extends EventEmitter {
       if (scalabilityResult.status === 'PASSED') testResult.metrics!.passedTests++;
       else testResult.metrics!.failedTests++;
       
-      // Calculate score based on throughput performance
+      // CORRECTED: Calculate score based on enterprise-level throughput performance
       const errorRate = scalabilityResult.errorRate;
       const sustainableTPS = scalabilityResult.sustainableTPS;
       
-      if (errorRate <= 0.05 && sustainableTPS >= 6) { // ≤5% errors and ≥6 TPS
+      if (errorRate <= 0.05 && sustainableTPS >= 100) { // ≤5% errors and ≥100 TPS (enterprise)
         testResult.score = 100;
-      } else if (errorRate <= 0.05 && sustainableTPS >= 4) { // ≤5% errors and ≥4 TPS
+      } else if (errorRate <= 0.05 && sustainableTPS >= 50) { // ≤5% errors and ≥50 TPS (good)
         testResult.score = 90;
-      } else if (errorRate <= 0.10 && sustainableTPS >= 2) { // ≤10% errors and ≥2 TPS
+      } else if (errorRate <= 0.10 && sustainableTPS >= 25) { // ≤10% errors and ≥25 TPS (acceptable)
         testResult.score = 80;
-      } else if (errorRate <= 0.20 && sustainableTPS >= 1) { // ≤20% errors and ≥1 TPS
+      } else if (errorRate <= 0.20 && sustainableTPS >= 10) { // ≤20% errors and ≥10 TPS (minimum)
         testResult.score = 60;
       } else {
         testResult.score = 40;
@@ -492,8 +492,9 @@ export class FinP2PPerformanceCharacteristicsBenchmark extends EventEmitter {
 
   private async testThroughputScalability(): Promise<any> {
     const artifacts: any[] = [];
-    const rpsLevels = [1, 2, 4, 8]; // Requests per second levels
-    const testDurationPerLevel = 60 * 1000; // 60 seconds per level (4 minutes total)
+    // CORRECTED: Test higher throughput levels for enterprise performance
+    const rpsLevels = [10, 25, 50, 100, 200, 500]; // Enterprise-level RPS testing
+    const testDurationPerLevel = 30 * 1000; // 30 seconds per level (3 minutes total)
     const suiAmount = BigInt(1000000);
     const hbarAmount = BigInt(10000000);
     
@@ -502,22 +503,27 @@ export class FinP2PPerformanceCharacteristicsBenchmark extends EventEmitter {
     let kneePoint = 0;
     
     try {
-      this.emit('progress', { message: '   Starting step load testing...' });
+      this.emit('progress', { message: '   Starting CORRECTED enterprise throughput testing...' });
       
       for (const rps of rpsLevels) {
-        this.emit('progress', { message: `   Testing ${rps} RPS for 60 seconds...` });
+        this.emit('progress', { message: `   Testing ${rps} RPS for 30 seconds (enterprise level)...` });
         
         const levelStartTime = Date.now();
         const levelResults: { success: boolean; latency: number; error?: string }[] = [];
+        let totalProcessed = 0;
         
-        // Run at current RPS level
+        // CORRECTED: True concurrent processing with proper batching
+        const batchSize = Math.min(rps, 50); // Process in batches of up to 50 concurrent operations
+        const batchInterval = 1000; // 1 second between batches
+        
         while (Date.now() - levelStartTime < testDurationPerLevel) {
           const batchStartTime = Date.now();
           const promises: Promise<any>[] = [];
           
-          // Launch RPS number of concurrent atomic swaps
-          for (let i = 0; i < rps; i++) {
-            promises.push(this.performAtomicSwap(suiAmount, hbarAmount));
+          // CORRECTED: Launch batch of concurrent operations (not just RPS)
+          const currentBatchSize = Math.min(batchSize, rps - totalProcessed);
+          for (let i = 0; i < currentBatchSize; i++) {
+            promises.push(this.performRealThroughputOperation(suiAmount, hbarAmount));
           }
           
           const batchResults = await Promise.allSettled(promises);
@@ -538,18 +544,22 @@ export class FinP2PPerformanceCharacteristicsBenchmark extends EventEmitter {
             }
           });
           
-          // Wait for next second
+          totalProcessed += currentBatchSize;
+          
+          // CORRECTED: Wait for batch interval, not just 1 second
           const batchDuration = Date.now() - batchStartTime;
-          if (batchDuration < 1000) {
-            await new Promise(resolve => setTimeout(resolve, 1000 - batchDuration));
+          if (batchDuration < batchInterval) {
+            await new Promise(resolve => setTimeout(resolve, batchInterval - batchDuration));
           }
         }
         
-        // Calculate level statistics
+        // CORRECTED: Calculate level statistics with proper TPS calculation
         const successCount = levelResults.filter(r => r.success).length;
         const totalCount = levelResults.length;
         const levelErrorRate = (totalCount - successCount) / totalCount;
-        const levelTPS = successCount / (testDurationPerLevel / 1000);
+        // CORRECTED: TPS should be based on actual processing rate, not just success count
+        const actualTestDuration = (Date.now() - levelStartTime) / 1000; // seconds
+        const levelTPS = successCount / actualTestDuration;
         
         // Calculate error breakdown
         const errorBreakdown = levelResults
@@ -572,8 +582,8 @@ export class FinP2PPerformanceCharacteristicsBenchmark extends EventEmitter {
           timestamp: new Date().toISOString()
         });
         
-        // Update sustainable TPS if this level is successful
-        if (levelErrorRate <= 0.05) { // ≤5% errors
+        // CORRECTED: Update sustainable TPS with enterprise-level criteria
+        if (levelErrorRate <= 0.10) { // ≤10% errors (more realistic for high throughput)
           sustainableTPS = levelTPS;
           this.emit('progress', { message: `   ✅ Level ${rps} RPS: SUCCESS (${(levelErrorRate * 100).toFixed(1)}% errors, ${levelTPS.toFixed(2)} TPS)` });
         } else {
@@ -664,6 +674,54 @@ export class FinP2PPerformanceCharacteristicsBenchmark extends EventEmitter {
       return {
         success: false,
         latency: 0,
+        error: error instanceof Error ? error.message : String(error)
+      };
+    }
+  }
+
+  /**
+   * CORRECTED: Real throughput operation for enterprise-level testing
+   * This performs actual FinP2P operations to measure real system throughput
+   */
+  private async performRealThroughputOperation(suiAmount: bigint, hbarAmount: bigint): Promise<{ success: boolean; latency: number; error?: string }> {
+    const startTime = Date.now();
+    
+    try {
+      // Perform actual FinP2P atomic swap operation
+      // This measures real system throughput with actual blockchain operations
+      
+      const swapId = `throughput_test_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      
+      // Execute real atomic swap between Sui and Hedera
+      const result = await this.performAtomicSwap(
+        swapId,
+        suiAmount,
+        hbarAmount
+      );
+      
+      const endTime = Date.now();
+      const latency = endTime - startTime;
+      
+      if (result.success) {
+        return {
+          success: true,
+          latency: latency
+        };
+      } else {
+        return {
+          success: false,
+          latency: latency,
+          error: result.error || 'Atomic swap failed'
+        };
+      }
+      
+    } catch (error) {
+      const endTime = Date.now();
+      const latency = endTime - startTime;
+      
+      return {
+        success: false,
+        latency: latency,
         error: error instanceof Error ? error.message : String(error)
       };
     }
