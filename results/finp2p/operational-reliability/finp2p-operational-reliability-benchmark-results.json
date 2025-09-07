@@ -1,0 +1,167 @@
+{
+  "domain": "Operational Reliability",
+  "testDate": "2025-09-06T17:45:39.111Z",
+  "duration": 24.924,
+  "overallScore": 100,
+  "status": "COMPLETED",
+  "criteria": [
+    {
+      "name": "Observability Readiness",
+      "status": "PASSED",
+      "score": 100,
+      "details": {
+        "observabilityTest": {
+          "status": "PASSED",
+          "triadPresent": true,
+          "logsPresent": true,
+          "metricsPresent": true,
+          "tracesPresent": true,
+          "fieldCompletenessScore": 5,
+          "artifacts": [
+            {
+              "type": "successful_transfer_observability",
+              "suiTxHash": "CF7cCaDt8qRK9kAnJ4YL6R4BaUCc6scrwLGsKxnpnaJK",
+              "hederaTxId": "0.0.6427779@1757180736.429794589",
+              "latency": 2708,
+              "timestamp": "2025-09-06T17:45:42.348Z",
+              "correlationId": "success-1757180742348",
+              "result": "SUCCESS"
+            }
+          ]
+        }
+      },
+      "metrics": {
+        "totalTests": 1,
+        "passedTests": 1,
+        "failedTests": 0
+      }
+    },
+    {
+      "name": "Fault Recovery Capabilities",
+      "status": "PASSED",
+      "score": 100,
+      "details": {
+        "recoveryTest": {
+          "status": "PASSED",
+          "mttr": 4.3785,
+          "exactlyOnceCompletionRate": 1,
+          "manualStepsCount": 2,
+          "recoveryTestsCount": 2,
+          "artifacts": [
+            {
+              "type": "mid_transfer_recovery",
+              "hederaTxId1": "0.0.6255967@1757180738.821082084",
+              "hederaTxId2": "0.0.6427779@1757180740.636722905",
+              "mttr": 5521,
+              "recoverySuccessful": true,
+              "timestamp": "2025-09-06T17:45:51.274Z"
+            },
+            {
+              "type": "idle_recovery",
+              "hederaTxId1": "0.0.6255967@1757180749.331697414",
+              "hederaTxId2": "0.0.6427779@1757180749.951536333",
+              "recoveryTime": 3236,
+              "exactlyOnceSuccessful": true,
+              "timestamp": "2025-09-06T17:45:58.847Z"
+            }
+          ]
+        }
+      },
+      "metrics": {
+        "totalTests": 1,
+        "passedTests": 1,
+        "failedTests": 0
+      }
+    },
+    {
+      "name": "Lifecycle Management Process",
+      "status": "PASSED",
+      "score": 100,
+      "details": {
+        "lifecycleTest": {
+          "status": "PASSED",
+          "configurationChangeSuccess": true,
+          "connectionResilience": true,
+          "stateTransitionTime": 4.513,
+          "operationalCompatibilityIssues": 0,
+          "artifacts": [
+            {
+              "type": "configuration_change",
+              "newPort": 3001,
+              "changeTime": 220,
+              "success": true,
+              "timestamp": "2025-09-06T17:45:59.069Z"
+            },
+            {
+              "type": "connection_reset",
+              "resetTime": 453,
+              "success": true,
+              "timestamp": "2025-09-06T17:45:59.522Z"
+            },
+            {
+              "type": "state_transition",
+              "hederaTxId1": "0.0.6255967@1757180756.130069580",
+              "hederaTxId2": "0.0.6427779@1757180758.202543204",
+              "transitionTime": 4.513,
+              "success": true,
+              "timestamp": "2025-09-06T17:46:04.036Z"
+            }
+          ]
+        }
+      },
+      "metrics": {
+        "totalTests": 1,
+        "passedTests": 1,
+        "failedTests": 0
+      }
+    }
+  ],
+  "artifacts": [
+    {
+      "type": "successful_transfer_observability",
+      "suiTxHash": "CF7cCaDt8qRK9kAnJ4YL6R4BaUCc6scrwLGsKxnpnaJK",
+      "hederaTxId": "0.0.6427779@1757180736.429794589",
+      "latency": 2708,
+      "timestamp": "2025-09-06T17:45:42.348Z",
+      "correlationId": "success-1757180742348",
+      "result": "SUCCESS"
+    },
+    {
+      "type": "mid_transfer_recovery",
+      "hederaTxId1": "0.0.6255967@1757180738.821082084",
+      "hederaTxId2": "0.0.6427779@1757180740.636722905",
+      "mttr": 5521,
+      "recoverySuccessful": true,
+      "timestamp": "2025-09-06T17:45:51.274Z"
+    },
+    {
+      "type": "idle_recovery",
+      "hederaTxId1": "0.0.6255967@1757180749.331697414",
+      "hederaTxId2": "0.0.6427779@1757180749.951536333",
+      "recoveryTime": 3236,
+      "exactlyOnceSuccessful": true,
+      "timestamp": "2025-09-06T17:45:58.847Z"
+    },
+    {
+      "type": "configuration_change",
+      "newPort": 3001,
+      "changeTime": 220,
+      "success": true,
+      "timestamp": "2025-09-06T17:45:59.069Z"
+    },
+    {
+      "type": "connection_reset",
+      "resetTime": 453,
+      "success": true,
+      "timestamp": "2025-09-06T17:45:59.522Z"
+    },
+    {
+      "type": "state_transition",
+      "hederaTxId1": "0.0.6255967@1757180756.130069580",
+      "hederaTxId2": "0.0.6427779@1757180758.202543204",
+      "transitionTime": 4.513,
+      "success": true,
+      "timestamp": "2025-09-06T17:46:04.036Z"
+    }
+  ]
+}

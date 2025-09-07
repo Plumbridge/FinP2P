@@ -108,6 +108,51 @@ async function main() {
       console.log('');
     }
 
+    // Execute atomic swap demo
+    try {
+      console.log('🔄 Executing LayerZero atomic swap demo...');
+      
+      const atomicSwapRequest = {
+        initiatorChain: 'sepolia',
+        responderChain: 'polygon-amoy',
+        initiatorAsset: {
+          symbol: 'ETH',
+          amount: '0.001',
+          address: '0x0000000000000000000000000000000000000000' // Native ETH
+        },
+        responderAsset: {
+          symbol: 'MATIC',
+          amount: '0.001',
+          address: '0x0000000000000000000000000000000000000000' // Native MATIC
+        },
+        initiatorAddress: Array.from(walletAddresses.values())[0] || '0x0000000000000000000000000000000000000000',
+        responderAddress: Array.from(walletAddresses.values())[1] || '0x0000000000000000000000000000000000000000',
+        timelock: 100 // 100 blocks
+      };
+
+      const swapResult = await adapter.executeAtomicSwap(atomicSwapRequest);
+      
+      console.log('✅ Atomic swap initiated successfully!');
+      console.log(`   Swap ID: ${swapResult.swapId}`);
+      console.log(`   Status: ${swapResult.status}`);
+      console.log(`   Secret Hash: ${swapResult.secretHash.substring(0, 20)}...`);
+      console.log(`   Expiry: ${new Date(swapResult.expiry).toISOString()}`);
+      console.log('');
+
+      // Simulate claiming the swap after a short delay
+      console.log('⏳ Waiting 2 seconds before claiming swap...');
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      const claimResult = await adapter.claimAtomicSwap(swapResult.swapId, swapResult.secret);
+      console.log('✅ Atomic swap claimed successfully!');
+      console.log(`   Final Status: ${claimResult.status}`);
+      console.log('');
+
+    } catch (error) {
+      console.log('⚠️  Could not execute atomic swap:', (error as Error).message);
+      console.log('');
+    }
+
     // Display chain information
     console.log('🔗 Chain Information:');
     for (const chainName of supportedChains) {

@@ -1,0 +1,228 @@
+{
+  "testDate": "2025-09-07T11:07:13.968Z",
+  "duration": "N/A",
+  "overallScore": "70.00%",
+  "totalCriteria": 5,
+  "passedCriteria": 3,
+  "partialCriteria": 1,
+  "failedCriteria": 1,
+  "domain": "Security Robustness",
+  "criteria": [
+    {
+      "domain": "Security Robustness",
+      "criterion": "Formal Verification Coverage",
+      "unit": "FVC compliance score (%)",
+      "value": 0,
+      "method": "Runtime conformance to claimed invariants (black-box)",
+      "timestamp": "2025-09-07T11:06:01.055Z",
+      "details": {
+        "fvcScore": "0.0%",
+        "totalTests": 4,
+        "violations": 4,
+        "violationRate": "100.00%",
+        "individualTestScores": {
+          "replayRejection": 0,
+          "valueConservation": 0,
+          "finalizationTiming": 0,
+          "idempotencyRetries": 0
+        },
+        "note": "Tested 4 formal verification criteria with 4 violations"
+      },
+      "evidence": {
+        "proofs": [
+          {
+            "test": "idempotency_retries",
+            "passed": false,
+            "result1": false,
+            "result2": true,
+            "note": "Both retry attempts should succeed"
+          }
+        ],
+        "errors": [
+          {
+            "test": "replay_rejection",
+            "error": "could not coalesce error (error={ \"code\": 30, \"message\": \"Request timeout on the free tier, please upgrade your tier to the paid one\" }, payload={ \"id\": 10, \"jsonrpc\": \"2.0\", \"method\": \"eth_sendRawTransaction\", \"params\": [ \"0x02f87683013882818d851c016a4abe851c016a4b3c825208947b52c77f01ae2cd0a59c0b24de48f21121e6c2bc8609184e72a00080c001a01854d72a15dfb9b08b56c756d964bf908cc11ffb4f13d22b2b0a99cae4121f0ba03bec30aec4b61142e9d7a4da8b8750d13ccde1739a90bfeab34d7475ccc0544d\" ] }, code=UNKNOWN_ERROR, version=6.15.0)"
+          },
+          {
+            "test": "value_conservation",
+            "error": "could not coalesce error (error={ \"code\": 30, \"message\": \"Request timeout on the free tier, please upgrade your tier to the paid one\" }, payload={ \"id\": 14, \"jsonrpc\": \"2.0\", \"method\": \"eth_getTransactionCount\", \"params\": [ \"0x3808ab2b060d1648c3bb8fc617f9df752143dafb\", \"pending\" ] }, code=UNKNOWN_ERROR, version=6.15.0)"
+          },
+          {
+            "test": "finalization_timing",
+            "error": "could not coalesce error (error={ \"code\": 30, \"message\": \"Request timeout on the free tier, please upgrade your tier to the paid one\" }, payload={ \"id\": 25, \"jsonrpc\": \"2.0\", \"method\": \"eth_sendRawTransaction\", \"params\": [ \"0x02f87683013882818e851c016a4abe851c016a4b3c825208947b52c77f01ae2cd0a59c0b24de48f21121e6c2bc8609184e72a00080c080a0d69f78f5aac2d1b6f2acfd9b23a32cef348bc2859efc9be021f5c537c7c78ff9a00362b5736a3c36cf3c47509a55b064a07f474d4f88c042b3fe6d740697f6c53c\" ] }, code=UNKNOWN_ERROR, version=6.15.0)"
+          }
+        ],
+        "txHashes": []
+      },
+      "status": "failed"
+    },
+    {
+      "domain": "Security Robustness",
+      "criterion": "Cryptographic Robustness",
+      "unit": "Crypto compliance score (%)",
+      "value": 66.66666666666667,
+      "method": "Signature binding & tamper rejection (on-chain verifiable)",
+      "timestamp": "2025-09-07T11:06:39.159Z",
+      "details": {
+        "cryptoScore": "66.7%",
+        "totalTests": 3,
+        "mismatches": 1,
+        "mismatchRate": "33.33%",
+        "note": "Tested 3 cryptographic criteria with 1 mismatches"
+      },
+      "evidence": {
+        "proofs": [
+          {
+            "test": "sender_authenticity",
+            "passed": true,
+            "result": {
+              "success": true,
+              "sepoliaTxHash": "0xc5e0b59f75198a43e87aa1a6e0476e884378046269ecf8e8c6cd5f634974d1f0",
+              "polygonTxHash": "0xfa38391101bc34ffc2dd2ef42ecb0497ee2c4ac28b3499c9f99917583797d831"
+            }
+          },
+          {
+            "test": "domain_separation",
+            "passed": false,
+            "sepoliaAddress": "0x3808Ab2b060D1648c3Bb8fc617F9dF752143dAFB",
+            "polygonAddress": "0x3808Ab2b060D1648c3Bb8fc617F9dF752143dAFB",
+            "note": "Different chains should have separate address domains"
+          },
+          {
+            "test": "tamper_rejection",
+            "passed": true,
+            "result": {
+              "success": true,
+              "sepoliaTxHash": "0x8fbead8f4292050315d2025cd3a280ea9b027433c975e66c89a9e47af4cb8092",
+              "polygonTxHash": "0x0fe5e45ca5e5149c147d66cfcc270616852f792ebf78ace116d9b5136a50f33e"
+            },
+            "note": "Invalid transactions should be rejected"
+          }
+        ],
+        "errors": [],
+        "txHashes": []
+      },
+      "status": "partial"
+    },
+    {
+      "domain": "Security Robustness",
+      "criterion": "HSM/KMS Support",
+      "unit": "HSM compliance score (%)",
+      "value": 100,
+      "method": "Signer abstraction / external-signer compatibility (software proxy)",
+      "timestamp": "2025-09-07T11:06:39.160Z",
+      "details": {
+        "hsmScore": "100.0%",
+        "externalSignerWorks": true,
+        "rotationTime": "0s",
+        "postRevocationRate": "0%",
+        "note": "External signer compatibility confirmed - HSM integration possible"
+      },
+      "evidence": {
+        "proofs": [
+          {
+            "test": "external_signer",
+            "passed": true,
+            "note": "External signer compatibility confirmed"
+          },
+          {
+            "test": "key_rotation",
+            "passed": true,
+            "rotationTime": 0,
+            "postRevocationRate": 0,
+            "note": "Key rotation simulation completed"
+          }
+        ],
+        "errors": [],
+        "txHashes": []
+      },
+      "status": "passed"
+    },
+    {
+      "domain": "Security Robustness",
+      "criterion": "Byzantine Fault Tolerance",
+      "unit": "BFT compliance score (%)",
+      "value": 100,
+      "method": "Quorum/finality enforcement at the API boundary",
+      "timestamp": "2025-09-07T11:07:13.967Z",
+      "details": {
+        "bftScore": "100.0%",
+        "prematureFinalizationRate": "0.00%",
+        "staleStateAcceptanceRate": "0.00%",
+        "totalTests": 2,
+        "totalViolations": 0,
+        "violationRate": "0.00%",
+        "bftCompliant": true,
+        "note": "Tested 2 BFT criteria: 0 premature finalizations, 0 stale state acceptances"
+      },
+      "evidence": {
+        "proofs": [
+          {
+            "test": "finality_threshold",
+            "passed": true,
+            "result": {
+              "success": true,
+              "sepoliaTxHash": "0xff4c37957d57486ff98a30fa85e4411c742b2a5e47629bd7a285ac3eacdd9e2e",
+              "polygonTxHash": "0xfd7ce682d24e129b8b31a8216148a13ad9ce78d0fbb65654deea06b2262d888a"
+            },
+            "note": "Finality threshold respected"
+          },
+          {
+            "test": "stale_state_rejection",
+            "passed": true,
+            "result": {
+              "success": true,
+              "sepoliaTxHash": "0xb95fbfefbc3babf8c34ca23183d4a188ff5cd25da57d744a2e2d133b1946ac0f",
+              "polygonTxHash": "0x3a628f00c2741fae6d3b3b940e9c26adbaa55718ec6bc9c42a32f23254f4362b"
+            },
+            "note": "Stale state rejection working"
+          }
+        ],
+        "errors": [],
+        "txHashes": []
+      },
+      "status": "passed"
+    },
+    {
+      "domain": "Security Robustness",
+      "criterion": "Vulnerability Assessment Coverage",
+      "unit": "Vuln compliance score (%)",
+      "value": 100,
+      "method": "Surface scan of deployed components only",
+      "timestamp": "2025-09-07T11:07:13.968Z",
+      "details": {
+        "vulnScore": "100.0%",
+        "highCriticalFindings": 0,
+        "fixAvailability": "70%",
+        "scanTypes": "container, dependencies, endpoints",
+        "note": "Vulnerability assessment completed: 0 high/critical findings"
+      },
+      "evidence": {
+        "proofs": [
+          {
+            "test": "container_scan",
+            "passed": true,
+            "findings": 0,
+            "note": "Container scan completed - no high/critical findings"
+          },
+          {
+            "test": "dependency_audit",
+            "passed": true,
+            "findings": 2,
+            "fixAvailability": 70,
+            "note": "Dependency audit completed - some medium findings"
+          },
+          {
+            "test": "endpoint_scan",
+            "passed": true,
+            "findings": 0,
+            "note": "Endpoint scan completed - no critical endpoints exposed"
+          }
+        ],
+        "errors": [],
+        "txHashes": []
+      },
+      "status": "passed"
+    }
+  ]
+}

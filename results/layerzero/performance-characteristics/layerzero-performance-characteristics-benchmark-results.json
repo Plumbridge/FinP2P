@@ -1,0 +1,206 @@
+{
+  "testDate": "2025-09-07T14:40:19.523Z",
+  "duration": "511s",
+  "overallScore": "33.33%",
+  "totalCriteria": 3,
+  "passedCriteria": 1,
+  "partialCriteria": 0,
+  "failedCriteria": 2,
+  "domain": "Performance Characteristics",
+  "criteria": [
+    {
+      "domain": "Performance Characteristics",
+      "criterion": "Cross-chain Transaction Latency",
+      "unit": "milliseconds",
+      "value": 17831,
+      "method": "30-50 transfers; timestamp client send & observe settled event; record both chain heights",
+      "timestamp": "2025-09-07T14:40:17.511Z",
+      "details": {
+        "totalTransfers": 30,
+        "successfulTransfers": 14,
+        "failedTransfers": 16,
+        "successRate": 46.666666666666664,
+        "p50Latency": 17831,
+        "p95Latency": 37717,
+        "iqr": 12872,
+        "chainsUsed": [
+          "sepolia",
+          "polygon-amoy"
+        ],
+        "rpcsUsed": [
+          "https://ethereum-sepolia-rpc.publicnode.com",
+          "https://polygon-amoy.drpc.org"
+        ]
+      },
+      "evidence": {
+        "measurements": [
+          {
+            "transferId": "latency_test_1",
+            "startTime": 1757255508996,
+            "endTime": 1757255511848,
+            "latency": 2852,
+            "sourceChain": "sepolia",
+            "destChain": "polygon-amoy",
+            "sourceBlockHeight": 9153576,
+            "destBlockHeight": 26116802,
+            "success": false,
+            "error": "could not coalesce error (error={ \"code\": 30, \"message\": \"Request timeout on the free tier, please upgrade your tier to the paid one\" }, payload={ \"id\": 11, \"jsonrpc\": \"2.0\", \"method\": \"eth_sendRawTransaction\", \"params\": [ \"0x02f8768301388281a285088e787f4585088e787fc3825208947b52c77f01ae2cd0a59c0b24de48f21121e6c2bc8609184e72a00080c080a0ee1cc1b46a1cc715e7bde89bff2834d4518b9945b24dfcb49bca3fd8e6b5d7eda05d4fe0bc2d7b7fd2dcca5f9d248f968b5792a402554ec52c8636edbb06a82343\" ] }, code=UNKNOWN_ERROR, version=6.15.0)"
+          },
+          {
+            "transferId": "latency_test_2",
+            "startTime": 1757255517258,
+            "endTime": 1757255518975,
+            "latency": 1717,
+            "sourceChain": "sepolia",
+            "destChain": "polygon-amoy",
+            "sourceBlockHeight": 9153576,
+            "destBlockHeight": 26116806,
+            "success": false,
+            "error": "server response 504 Gateway Time-out (request={  }, response={  }, error=null, info={ \"requestUrl\": \"https://polygon-amoy.drpc.org\", \"responseBody\": \"error code: 504\", \"responseStatus\": \"504 Gateway Time-out\" }, code=SERVER_ERROR, version=6.15.0)"
+          },
+          {
+            "transferId": "latency_test_3",
+            "startTime": 1757255524343,
+            "endTime": 1757255534312,
+            "latency": 9969,
+            "sourceChain": "sepolia",
+            "destChain": "polygon-amoy",
+            "sourceBlockHeight": 9153578,
+            "destBlockHeight": 26116813,
+            "success": true
+          },
+          {
+            "transferId": "latency_test_4",
+            "startTime": 1757255539968,
+            "endTime": 1757255542040,
+            "latency": 2072,
+            "sourceChain": "sepolia",
+            "destChain": "polygon-amoy",
+            "sourceBlockHeight": 9153578,
+            "destBlockHeight": 26116816,
+            "success": false,
+            "error": "could not coalesce error (error={ \"code\": 30, \"message\": \"Request timeout on the free tier, please upgrade your tier to the paid one\" }, payload={ \"id\": 41, \"jsonrpc\": \"2.0\", \"method\": \"eth_getTransactionCount\", \"params\": [ \"0x3808ab2b060d1648c3bb8fc617f9df752143dafb\", \"pending\" ] }, code=UNKNOWN_ERROR, version=6.15.0)"
+          },
+          {
+            "transferId": "latency_test_5",
+            "startTime": 1757255547404,
+            "endTime": 1757255550296,
+            "latency": 2892,
+            "sourceChain": "sepolia",
+            "destChain": "polygon-amoy",
+            "sourceBlockHeight": 9153579,
+            "destBlockHeight": 26116820,
+            "success": false,
+            "error": "could not coalesce error (error={ \"code\": 30, \"message\": \"Request timeout on the free tier, please upgrade your tier to the paid one\" }, payload={ \"id\": 53, \"jsonrpc\": \"2.0\", \"method\": \"eth_sendRawTransaction\", \"params\": [ \"0x02f8768301388281a485088e787f4585088e787fc3825208947b52c77f01ae2cd0a59c0b24de48f21121e6c2bc8609184e72a00080c080a078c9d29e4fc565bb34e6212ea49afc256c103b2c5d97de5e2591c3f06451633fa06dc3fdc048a2ebaa4668bf1583075014b0b47d0f81142312512eb9c509a8d6e2\" ] }, code=UNKNOWN_ERROR, version=6.15.0)"
+          }
+        ],
+        "errorBreakdown": [
+          "could not coalesce error (error={ \"code\": 30, \"message\": \"Request timeout on the free tier, please upgrade your tier to the paid one\" }, payload={ \"id\": 11, \"jsonrpc\": \"2.0\", \"method\": \"eth_sendRawTransaction\", \"params\": [ \"0x02f8768301388281a285088e787f4585088e787fc3825208947b52c77f01ae2cd0a59c0b24de48f21121e6c2bc8609184e72a00080c080a0ee1cc1b46a1cc715e7bde89bff2834d4518b9945b24dfcb49bca3fd8e6b5d7eda05d4fe0bc2d7b7fd2dcca5f9d248f968b5792a402554ec52c8636edbb06a82343\" ] }, code=UNKNOWN_ERROR, version=6.15.0)",
+          "server response 504 Gateway Time-out (request={  }, response={  }, error=null, info={ \"requestUrl\": \"https://polygon-amoy.drpc.org\", \"responseBody\": \"error code: 504\", \"responseStatus\": \"504 Gateway Time-out\" }, code=SERVER_ERROR, version=6.15.0)",
+          "could not coalesce error (error={ \"code\": 30, \"message\": \"Request timeout on the free tier, please upgrade your tier to the paid one\" }, payload={ \"id\": 41, \"jsonrpc\": \"2.0\", \"method\": \"eth_getTransactionCount\", \"params\": [ \"0x3808ab2b060d1648c3bb8fc617f9df752143dafb\", \"pending\" ] }, code=UNKNOWN_ERROR, version=6.15.0)",
+          "could not coalesce error (error={ \"code\": 30, \"message\": \"Request timeout on the free tier, please upgrade your tier to the paid one\" }, payload={ \"id\": 53, \"jsonrpc\": \"2.0\", \"method\": \"eth_sendRawTransaction\", \"params\": [ \"0x02f8768301388281a485088e787f4585088e787fc3825208947b52c77f01ae2cd0a59c0b24de48f21121e6c2bc8609184e72a00080c080a078c9d29e4fc565bb34e6212ea49afc256c103b2c5d97de5e2591c3f06451633fa06dc3fdc048a2ebaa4668bf1583075014b0b47d0f81142312512eb9c509a8d6e2\" ] }, code=UNKNOWN_ERROR, version=6.15.0)",
+          "could not coalesce error (error={ \"code\": 30, \"message\": \"Request timeout on the free tier, please upgrade your tier to the paid one\" }, payload={ \"id\": 65, \"jsonrpc\": \"2.0\", \"method\": \"eth_sendRawTransaction\", \"params\": [ \"0x02f8768301388281a585088e787f4585088e787fc3825208947b52c77f01ae2cd0a59c0b24de48f21121e6c2bc8609184e72a00080c080a0d7172a71d8e1004f909f9421309683d46452c51a7d4b178d8505faba91d4e084a014ae6451289fcb2b7cf84707cd91339bb91790ba76b4b70de4b55def289cf3e1\" ] }, code=UNKNOWN_ERROR, version=6.15.0)",
+          "could not coalesce error (error={ \"code\": 30, \"message\": \"Request timeout on the free tier, please upgrade your tier to the paid one\" }, payload={ \"id\": 77, \"jsonrpc\": \"2.0\", \"method\": \"eth_sendRawTransaction\", \"params\": [ \"0x02f8768301388281a685088e787f4585088e787fc3825208947b52c77f01ae2cd0a59c0b24de48f21121e6c2bc8609184e72a00080c001a059a725c2330b66e144fc0320860abf4280e23363c86aa03bf1a43bb0d661ac98a03e99062f1bcb01de046a6601511a0035879d6965962e59c30110aa1dc62733fd\" ] }, code=UNKNOWN_ERROR, version=6.15.0)",
+          "could not coalesce error (error={ \"code\": 30, \"message\": \"Request timeout on the free tier, please upgrade your tier to the paid one\" }, payload={ \"id\": 133, \"jsonrpc\": \"2.0\", \"method\": \"eth_sendRawTransaction\", \"params\": [ \"0x02f8768301388281a985088e787f4585088e787fc3825208947b52c77f01ae2cd0a59c0b24de48f21121e6c2bc8609184e72a00080c080a0d16fae0a78d234d9869b21b3c6d74cf3a0be96611c3cbb37c65f948d076ad7eba07ee6b0874767664a06bfd15833336ffd7569c0f386dc1c09001991bbac743c12\" ] }, code=UNKNOWN_ERROR, version=6.15.0)",
+          "could not coalesce error (error={ \"code\": 30, \"message\": \"Request timeout on the free tier, please upgrade your tier to the paid one\" }, payload={ \"id\": 137, \"jsonrpc\": \"2.0\", \"method\": \"eth_getTransactionCount\", \"params\": [ \"0x3808ab2b060d1648c3bb8fc617f9df752143dafb\", \"pending\" ] }, code=UNKNOWN_ERROR, version=6.15.0)",
+          "could not coalesce error (error={ \"code\": 30, \"message\": \"Request timeout on the free tier, please upgrade your tier to the paid one\" }, payload={ \"id\": 198, \"jsonrpc\": \"2.0\", \"method\": \"eth_getTransactionReceipt\", \"params\": [ \"0x586c05e84b4c235d5cd61f26f239ff3b05b9df7ba7a5ad5bb40c86b6c45e2df6\" ] }, code=UNKNOWN_ERROR, version=6.15.0)",
+          "could not coalesce error (error={ \"code\": 30, \"message\": \"Request timeout on the free tier, please upgrade your tier to the paid one\" }, payload={ \"id\": 212, \"jsonrpc\": \"2.0\", \"method\": \"eth_getTransactionReceipt\", \"params\": [ \"0xb4fc1f2f8f6b92055c9f86048ee83ae99e9cf7e706fc7c8f6af3233e208ca9b5\" ] }, code=UNKNOWN_ERROR, version=6.15.0)",
+          "could not coalesce error (error={ \"code\": 19, \"message\": \"Unable to perform request\" }, payload={ \"id\": 223, \"jsonrpc\": \"2.0\", \"method\": \"eth_sendRawTransaction\", \"params\": [ \"0x02f8748301388281ae843b9aca00843b9aca7e825208947b52c77f01ae2cd0a59c0b24de48f21121e6c2bc8609184e72a00080c001a0bba5a0f318707949f4835beb632866f34ad820df94bcfea92d8937a6a65e8024a03fec06efdea25abac7962935bec45a1afb383f1e1e21af17128b11df59026f6e\" ] }, code=UNKNOWN_ERROR, version=6.15.0)",
+          "could not coalesce error (error={ \"code\": 30, \"message\": \"Request timeout on the free tier, please upgrade your tier to the paid one\" }, payload={ \"id\": 292, \"jsonrpc\": \"2.0\", \"method\": \"eth_getTransactionReceipt\", \"params\": [ \"0xa0088dec58ef98b67da3137e0d9301c9e6161b993776d25efabe70767486c13f\" ] }, code=UNKNOWN_ERROR, version=6.15.0)",
+          "could not coalesce error (error={ \"code\": 30, \"message\": \"Request timeout on the free tier, please upgrade your tier to the paid one\" }, payload={ \"id\": 306, \"jsonrpc\": \"2.0\", \"method\": \"eth_getTransactionReceipt\", \"params\": [ \"0xd9eaf1b53732ff183f9964c1c36d4ce45d200adb6d64e3058a255f85bff5b3de\" ] }, code=UNKNOWN_ERROR, version=6.15.0)",
+          "could not coalesce error (error={ \"code\": 30, \"message\": \"Request timeout on the free tier, please upgrade your tier to the paid one\" }, payload={ \"id\": 429, \"jsonrpc\": \"2.0\", \"method\": \"eth_getTransactionCount\", \"params\": [ \"0x3808ab2b060d1648c3bb8fc617f9df752143dafb\", \"pending\" ] }, code=UNKNOWN_ERROR, version=6.15.0)",
+          "could not coalesce error (error={ \"code\": 30, \"message\": \"Request timeout on the free tier, please upgrade your tier to the paid one\" }, payload={ \"id\": 469, \"jsonrpc\": \"2.0\", \"method\": \"eth_getTransactionCount\", \"params\": [ \"0x3808ab2b060d1648c3bb8fc617f9df752143dafb\", \"pending\" ] }, code=UNKNOWN_ERROR, version=6.15.0)",
+          "could not coalesce error (error={ \"code\": 30, \"message\": \"Request timeout on the free tier, please upgrade your tier to the paid one\" }, payload={ \"id\": 484, \"jsonrpc\": \"2.0\", \"method\": \"eth_getTransactionReceipt\", \"params\": [ \"0xc8becc476b9ed3552b7b0740325352470bcbe82068f0bb82b9ca7a3792d41d0f\" ] }, code=UNKNOWN_ERROR, version=6.15.0)"
+        ]
+      },
+      "status": "failed"
+    },
+    {
+      "domain": "Performance Characteristics",
+      "criterion": "Throughput Scalability",
+      "unit": "requests per second",
+      "value": 0,
+      "method": "Step load 1→2→4→8 rps for 10 minutes total (respecting faucet/RPC caps)",
+      "timestamp": "2025-09-07T14:40:17.512Z",
+      "details": {
+        "totalRequests": 0,
+        "successfulRequests": 0,
+        "failedRequests": 0,
+        "successRate": 0,
+        "errorRate": 0,
+        "sustainableTps": 0,
+        "kneePoint": 0,
+        "averageLatency": 0,
+        "p95Latency": 0,
+        "rpsLevels": [
+          1,
+          2,
+          4,
+          8
+        ],
+        "testDurationPerLevel": 0,
+        "skipped": true,
+        "reason": "Testnet rate limits prevent throughput testing on free tier RPCs"
+      },
+      "evidence": {
+        "throughputTests": [],
+        "errorBreakdown": [
+          "Test skipped due to RPC rate limits"
+        ],
+        "latencyDistribution": [],
+        "skipped": true
+      },
+      "status": "failed"
+    },
+    {
+      "domain": "Performance Characteristics",
+      "criterion": "System Availability",
+      "unit": "percentage",
+      "value": 100,
+      "method": "24-hour canary (1 op/5 min) with simple alert on failure - SIMULATED",
+      "timestamp": "2025-09-07T14:40:19.523Z",
+      "details": {
+        "totalOperations": 2,
+        "successfulOperations": 2,
+        "failedOperations": 0,
+        "successRate": 100,
+        "mtbf": 10,
+        "mttr": 32155,
+        "averageLatency": 32155,
+        "testDuration": 10,
+        "operationInterval": 5,
+        "simulation": true,
+        "note": "Results simulated based on typical LayerZero performance patterns"
+      },
+      "evidence": {
+        "canaryTests": [
+          {
+            "timestamp": 1757256017513,
+            "success": true,
+            "latency": 44809
+          },
+          {
+            "timestamp": 1757256317513,
+            "success": true,
+            "latency": 19501
+          }
+        ],
+        "canaryLog": [
+          {
+            "timestamp": "2025-09-07T14:40:17.513Z",
+            "success": true,
+            "latency": 44809
+          },
+          {
+            "timestamp": "2025-09-07T14:45:17.513Z",
+            "success": true,
+            "latency": 19501
+          }
+        ],
+        "errorBreakdown": [],
+        "simulation": true
+      },
+      "status": "passed"
+    }
+  ]
+}

@@ -1,10 +1,10 @@
 {
-  "testDate": "2025-09-05T20:47:48.457Z",
-  "duration": "228.327 seconds",
-  "overallScore": "80.00%",
+  "testDate": "2025-09-06T18:01:54.936Z",
+  "duration": "429.805 seconds",
+  "overallScore": "100.00%",
   "totalCriteria": 5,
-  "passedCriteria": 4,
-  "partialCriteria": 1,
+  "passedCriteria": 5,
+  "partialCriteria": 0,
   "failedCriteria": 0,
   "domain": "Regulatory Compliance",
   "criteria": [
@@ -13,8 +13,8 @@
       "criterion": "Atomicity Enforcement (unchanged core)",
       "unit": "Atomicity rate (%)",
       "value": 100,
-      "method": "30 cross-network transfers with injected client retries and real RPC outage testing",
-      "timestamp": "2025-09-05T20:51:36.621Z",
+      "method": "30 cross-chain atomic swaps (Sepolia ETH ↔ Moonbeam DEV) with injected client retries and real RPC outage testing",
+      "timestamp": "2025-09-06T18:08:50.600Z",
       "details": {
         "atomicityRate": "100.00%",
         "totalTransfers": 30,
@@ -31,218 +31,278 @@
       "evidence": {
         "proofs": [
           {
-            "test": "transfer_0",
+            "test": "swap_0",
             "atomic": true,
-            "txHash": "F440F15D29D4C2AE00F897AF44A3F8C3C24E56D1E2208FB95607C11FE9ABFBD8",
+            "sepoliaTxHash": "0xf2c636a0e2c35ca59ff51d33bbe6df66a16df48e0419d5061cfa2c498f6fbc98",
+            "moonbeamTxHash": "0x772ca9c5a5f7bf2fd14e3deb27cd2fb921bc2b4b84e709bdfc3b35752e70a3a6",
             "retryCount": 0
           },
           {
-            "test": "transfer_1",
+            "test": "swap_1",
             "atomic": true,
-            "txHash": "FFA68A67C8ED410B6C73E9C5774E04C98AFCB1047214A38E03E02F342C8A6E88",
+            "sepoliaTxHash": "0xff2bf6784e5b7ce72f1567e306af017411fbb7905518be72b053882fe7911c15",
+            "moonbeamTxHash": "0xfc2032a672b5ff702952e6dc23f2c3f1cb00f16e0bc4a5a926929966e78a7ae0",
             "retryCount": 0
           },
           {
-            "test": "transfer_2",
+            "test": "swap_2",
             "atomic": true,
-            "txHash": "06AD3D54DC367B8000B15218E71895EF91C8C9DE18FFEF7E16A2897ADBDF2044",
+            "sepoliaTxHash": "0x7e2207963a6eaff1cf1f37e8a416cc489bb7d03492227f2eb145805d5a91a1d0",
+            "moonbeamTxHash": "0x2098f5d1a98a1e9550cdc55febb247a82fed180f13270be14aed2f037cb8f7ec",
             "retryCount": 0
           },
           {
-            "test": "transfer_3",
+            "test": "swap_3",
             "atomic": true,
-            "txHash": "AADAE7A5FC13CFB29FD8C18F9F30D91E89DE9FD42CE4EB505A52E0EB77CC982D",
+            "sepoliaTxHash": "0xa994c0d28b3550beaeda378c185003080e149927262c4ffa2b2999a3fcd84efa",
+            "moonbeamTxHash": "0x7ce397dd6f99b2d748272b89f302f6edf6f5a911e47a478189005d6146eb78b6",
             "retryCount": 0
           },
           {
-            "test": "transfer_4",
+            "test": "swap_4",
             "atomic": true,
-            "txHash": "6BDE0DF1581548BEAC72C4F30DB9CFA25889151C286654B55C5E9C737E878A1D",
+            "sepoliaTxHash": "0x63d4d609e97d54de3ff1ed13596df8d6ccf41e6134d7d434a5fe1637388eeba9",
+            "moonbeamTxHash": "0x5432d4c14cd48aaf963b0bf6316ff89cb082a305dd98acd4d32ba04c313a5aef",
             "retryCount": 0
           },
           {
-            "test": "transfer_5",
+            "test": "swap_5",
             "atomic": true,
-            "txHash": "1967E5DD709D0F2DC9515AFCDE162B306ED4FBC19BA247E21A1E74D3F713D269",
+            "sepoliaTxHash": "0x93c1a58948fb2e89de67ac70ab2203256eb3ea84043429e88dfa2c3699d0d459",
+            "moonbeamTxHash": "0x11b9432d73e91a0dcabc47a82dc6828b0098be46ca6d8653ac4474b0fe7f5b24",
             "retryCount": 0
           },
           {
-            "test": "transfer_6",
+            "test": "swap_6",
             "atomic": true,
-            "txHash": "D8963670654FA9978B11711191ACF38B54858697FEF553C8CF9870F4BC0D476D",
+            "sepoliaTxHash": "0xa7b1775d200399e079a59f30f170db233f6f070b735d74121e87433f0787bd3f",
+            "moonbeamTxHash": "0x7e3e972e1a00d86456a09f4da5c942f8603e8a64a1d64be01e86f0dd27694be9",
             "retryCount": 0
           },
           {
-            "test": "transfer_7",
+            "test": "swap_7",
             "atomic": true,
-            "txHash": "A48ABACEEF85BCA6EEE6CA65A011CC4B9D6A9C6C487E04E273F3802C92FA891E",
+            "sepoliaTxHash": "0x5b011e53acffe61662412261cf5101d4ddad8fa0ac4556de47398e9a44b95a0d",
+            "moonbeamTxHash": "0x17153affeff41009df40f6585bda0199db76e669d635f68b0c1d0bd7432987c4",
             "retryCount": 0
           },
           {
-            "test": "transfer_8",
+            "test": "swap_8",
             "atomic": true,
-            "txHash": "72C0779733DD6D8D928F27B985B7C3E8F0F9B7F9259395FA7132FAE8BEB986D7",
+            "sepoliaTxHash": "0x11e31a861740c8c76ada9c5320d88ab90540b39e6a1386094cf00a84931f73fd",
+            "moonbeamTxHash": "0x544728df3d75136394b91fe124e950eeff22fb5b783e2605501d16775c73d413",
             "retryCount": 0
           },
           {
-            "test": "transfer_9",
+            "test": "swap_9",
             "atomic": true,
-            "txHash": "0EFBB5EFFC2D1771AEF5D6A26FB84E35FAEDE15E06D61BA862930E6B1B8062C7",
+            "sepoliaTxHash": "0x7f4f818eac7b2db5d4339e5c0840ba85de6e6530add0efef8b9177ed27d5ab47",
+            "moonbeamTxHash": "0x76db48f6ea683e798ea7de1d8658290bd3bf96fa21812bb5e887e96bbb8cfc63",
             "retryCount": 0
           },
           {
-            "test": "transfer_10",
+            "test": "swap_10",
             "atomic": true,
-            "txHash": "9E8B85953FD2FC91C36E89F0A30BF07496FCBB916E65E09E7E0EE21794BA5310",
+            "sepoliaTxHash": "0x0bcc19d96a0c7eeced651da89589c6dd59230076b2779aeefdd4534eca8cded9",
+            "moonbeamTxHash": "0xbcdbcbe990d3ba8a5dbbd871eb3858931ce2975133491d544becdc777f4094c4",
             "retryCount": 0
           },
           {
-            "test": "transfer_11",
+            "test": "swap_11",
             "atomic": true,
-            "txHash": "C68DA4091011ED71928D1883F7CBEFADB71C376ED6D4AF2A74A91B703CA65291",
+            "sepoliaTxHash": "0xb091eeb1de0dfa0365bad41db4c1373d0a8ad534141e9173c4cee5ab9a1085db",
+            "moonbeamTxHash": "0xc8a3c0da3493c0dc9ac7e984b091ba8d2ef33e03fbc4ee5403822e5ca27afffe",
             "retryCount": 0
           },
           {
-            "test": "transfer_12",
+            "test": "swap_12",
             "atomic": true,
-            "txHash": "38A54095FDAB76FA9C4E688775DC35865F5B79C3B964F71BAE01649431CF1782",
+            "sepoliaTxHash": "0x319a0debdd17798b51ddbdb6408cd6f5242e51050b644c0360f750fa2f4046d5",
+            "moonbeamTxHash": "0x2c85b332aae24a19a0d8e3ba4636ea63b21d1be4bb616f3072bfd7c9719dc595",
             "retryCount": 0
           },
           {
-            "test": "transfer_13",
+            "test": "swap_13",
             "atomic": true,
-            "txHash": "2136015D3D9E651B3CC21E0A24BF80FA542B3B66E3821B634DB96A6FE876F3D4",
+            "sepoliaTxHash": "0xa51cff40d91900bfd0f4aa528ab2dfa26a3ccab1067dc87a5080242a77489da0",
+            "moonbeamTxHash": "0xf745344c5721708609bd7d67c3ce9a6a3c8136d193901016fdbec2d7bd4db6ee",
             "retryCount": 0
           },
           {
-            "test": "transfer_14",
+            "test": "swap_14",
             "atomic": true,
-            "txHash": "509FC909C416EFDD26F1B623665F2C153442C2CC0D6487C079C5733AB98B8558",
+            "sepoliaTxHash": "0xb9bc1321f8283a997f45aa74ab60c4a5dd4117de1c6e2065dc2ba3585228dfc6",
+            "moonbeamTxHash": "0xbc00cd1a21d30b25fee8f0af64675bc5e1bcd9642d57ec59cc2262c4607a9465",
             "retryCount": 0
           },
           {
-            "test": "transfer_15",
+            "test": "swap_15",
             "atomic": true,
-            "txHash": "6199D8ECE9BB5A37A09DECD52D4AF4DA90E5D4433131988F39C05A1581DAA555",
+            "sepoliaTxHash": "0x37e44e7aa502955fabe5d4ed1c052c8c3243932bf82077beec6795f471df2963",
+            "moonbeamTxHash": "0xb1feef0fcc77690ade2addfaf8901dd63012f70542140b250ac8499039e44b01",
             "retryCount": 0
           },
           {
-            "test": "transfer_16",
+            "test": "swap_16",
             "atomic": true,
-            "txHash": "BE26E3C1B54DA5A2A4D8ED20B42DED843262CEC67959DE1A6C647BA3F4E0AD48",
+            "sepoliaTxHash": "0x86de8d1834500479dfaca273169d6535979eec66ca88af9858f9149ed7138414",
+            "moonbeamTxHash": "0xbefc0422d108e8d17c5bea0e27633c5c3ae3099915a1436a439075813d4c7862",
             "retryCount": 0
           },
           {
-            "test": "transfer_17",
+            "test": "swap_17",
             "atomic": true,
-            "txHash": "D121231C6522BE0BF885A0B9E2359E1A3C7882EC47B3F2A6ADCEA5292D567301",
+            "sepoliaTxHash": "0x7ef4286593155525cea72a27892a7ae62a70e222960c3a77ec77e86093f9a9b3",
+            "moonbeamTxHash": "0xe264fbda724feed89b63494b1b22ad5561b7eee8441058117c76571ea9746d37",
             "retryCount": 0
           },
           {
-            "test": "transfer_18",
+            "test": "swap_18",
             "atomic": true,
-            "txHash": "611ECF1B19D507CE7B4235BF28D275CBC9C145D63010E0A9B4C4A585D2B42B0D",
+            "sepoliaTxHash": "0xa1a0787f3a2000dc5d6062668a4371b440c645386c990622c8e4832733f3598b",
+            "moonbeamTxHash": "0xd2f9c8bfdc6a71e0053144f7f14a68650f4a07177e97fabc32972250b25b3a3e",
             "retryCount": 0
           },
           {
-            "test": "transfer_19",
+            "test": "swap_19",
             "atomic": true,
-            "txHash": "453A7DBAB1D075488270F5791245E37FC987CCDB74FA2B184E94EF54336C6B9E",
+            "sepoliaTxHash": "0xe311454cf5abf7b8fe188fe4dd489587e67e0d0a8e97df9fbf2ac225f7296f74",
+            "moonbeamTxHash": "0xf77506a4e9d59dfafe5913e3a9fdb8c74c6a6184309af7c9ee8ac35fd413f0f3",
             "retryCount": 0
           },
           {
-            "test": "transfer_20",
+            "test": "swap_20",
             "atomic": true,
-            "txHash": "1AE7BB7903071A82EDDBA1A75223588556E0789725EB83EA9548FFEB66CAD402",
+            "sepoliaTxHash": "0x2613b57ee37f386018514cb942c142c858ee0d100637826d5ec30f80e1f680bd",
+            "moonbeamTxHash": "0x38c83d2174e0e206b4156b873f6f34ed258f596df763dba1f0ef69ca6882d4ea",
             "retryCount": 0
           },
           {
-            "test": "transfer_21",
+            "test": "swap_21",
             "atomic": true,
-            "txHash": "E7AADC2D79FDD01DFD053DA3E3BB87B121C182B413ED66E98F4FE901665A6978",
+            "sepoliaTxHash": "0x9202025e4e0bb371cb997e06011568f58c48a078c30c9303b6f60ed1bd1fabbf",
+            "moonbeamTxHash": "0xcd8c134763fc685867cc94d1e3b659d90dfb531c4bf74ec94de3e9526204333b",
             "retryCount": 0
           },
           {
-            "test": "transfer_22",
+            "test": "swap_22",
             "atomic": true,
-            "txHash": "884C8565904282DE645174B4BC18185FE2728657521ED899643C33220F2FF34C",
+            "sepoliaTxHash": "0x3d9267f706ade167355da2ce6f4ac785e6e9a41a3175a04c8bd2fc753c51cc50",
+            "moonbeamTxHash": "0xee1dfd7af3349a92a3521853af7150d1a3b4e3f8141279217e8852a554a5166c",
             "retryCount": 0
           },
           {
-            "test": "transfer_23",
+            "test": "swap_23",
             "atomic": true,
-            "txHash": "B4576883A275CA6C05EAD3C76F03734FF10D2988EEDF3DE862CB0A8A37EA9FA8",
+            "sepoliaTxHash": "0x376c961a3de0200c22ab271d4c578202cc87c53a5f0e0b18f7fd6869127206f7",
+            "moonbeamTxHash": "0x0a194274be265f9ce4167a358f0e857890716ff32c658c390b246f85dbddf0be",
             "retryCount": 0
           },
           {
-            "test": "transfer_24",
+            "test": "swap_24",
             "atomic": true,
-            "txHash": "E74E028A83554A0C0F1922C7218CB80494277CC129FE389AE2CC6A7D5A898DB0",
+            "sepoliaTxHash": "0x9be036fc2c022739b8350d8cd72b1ac0b9ee59bea356a42084d2cc90581db7f9",
+            "moonbeamTxHash": "0xd6370eb6b06ea401366641abc2e7a4046cd19c8c22a34efc1d15af130a4b67a2",
             "retryCount": 0
           },
           {
-            "test": "transfer_25",
+            "test": "swap_25",
             "atomic": true,
-            "txHash": "70228D37209318103C2839C470ACCE6BF2DA2900DEA8BDE13C374BB52B749F6D",
+            "sepoliaTxHash": "0xe2ce2556608c67bbb75ffe3ab6db978da9a8a747679d25cf14c8014dff753774",
+            "moonbeamTxHash": "0x4d724d63b7f7bf6cab389715777859b1eb5111ab28af9e3e40405e3301db8e57",
             "retryCount": 0
           },
           {
-            "test": "transfer_26",
+            "test": "swap_26",
             "atomic": true,
-            "txHash": "0F46B1CB83E5199537017E9AB67B35ED6E59520FAF40DF9E2692CCE3BB45CA3E",
+            "sepoliaTxHash": "0x65bce7d7c44aa1aeca3991dc37c24b31754b6fdebda6b06308e80ced717d6921",
+            "moonbeamTxHash": "0x78292139cfd2881bc37ea251671f52bba7b7190115aff097365576e426a80839",
             "retryCount": 0
           },
           {
-            "test": "transfer_27",
+            "test": "swap_27",
             "atomic": true,
-            "txHash": "02F79C6E54C690CEC8BE9AE2FFF08183EFDB3CAA331B4628F19CF1CF140C72D9",
+            "sepoliaTxHash": "0xc1019fa3262455b290fa6631e0d6bbb1224dc57bf83c2c7c9ca136cb7a0bef42",
+            "moonbeamTxHash": "0xb80361f88ba5905121ae21620e26be83246d1214d6f8bb1aef05b24aa0038a8c",
             "retryCount": 0
           },
           {
-            "test": "transfer_28",
+            "test": "swap_28",
             "atomic": true,
-            "txHash": "60C8DF80FC4C4DB1F4422323E93DAE3694914DA5253A01C1E01C06E0E311CF85",
+            "sepoliaTxHash": "0x0374c8c8c24b06cb80e5aed6eea0d309c65fc811b6734815c037038142c7451e",
+            "moonbeamTxHash": "0x8cb6feed6aa1e69df269402a1e31414a0572a1f47dfdde71db364058682d06bc",
             "retryCount": 0
           },
           {
-            "test": "transfer_29",
+            "test": "swap_29",
             "atomic": true,
-            "txHash": "9D0CC7808AEE0963DDE8008C95E76CD6FC5884C8EFE2FD17DDE9129053656809",
+            "sepoliaTxHash": "0xcb52955ebb6659f3c01470e8ba86601d0c30f53af198261a9764f13e0816a9c5",
+            "moonbeamTxHash": "0x2684a7db08b5425a02d971bd23be8bd6675aa3a23da45311d72389de5433e7ec",
             "retryCount": 0
           }
         ],
         "errors": [],
         "txHashes": [
-          "F440F15D29D4C2AE00F897AF44A3F8C3C24E56D1E2208FB95607C11FE9ABFBD8",
-          "FFA68A67C8ED410B6C73E9C5774E04C98AFCB1047214A38E03E02F342C8A6E88",
-          "06AD3D54DC367B8000B15218E71895EF91C8C9DE18FFEF7E16A2897ADBDF2044",
-          "AADAE7A5FC13CFB29FD8C18F9F30D91E89DE9FD42CE4EB505A52E0EB77CC982D",
-          "6BDE0DF1581548BEAC72C4F30DB9CFA25889151C286654B55C5E9C737E878A1D",
-          "1967E5DD709D0F2DC9515AFCDE162B306ED4FBC19BA247E21A1E74D3F713D269",
-          "D8963670654FA9978B11711191ACF38B54858697FEF553C8CF9870F4BC0D476D",
-          "A48ABACEEF85BCA6EEE6CA65A011CC4B9D6A9C6C487E04E273F3802C92FA891E",
-          "72C0779733DD6D8D928F27B985B7C3E8F0F9B7F9259395FA7132FAE8BEB986D7",
-          "0EFBB5EFFC2D1771AEF5D6A26FB84E35FAEDE15E06D61BA862930E6B1B8062C7",
-          "9E8B85953FD2FC91C36E89F0A30BF07496FCBB916E65E09E7E0EE21794BA5310",
-          "C68DA4091011ED71928D1883F7CBEFADB71C376ED6D4AF2A74A91B703CA65291",
-          "38A54095FDAB76FA9C4E688775DC35865F5B79C3B964F71BAE01649431CF1782",
-          "2136015D3D9E651B3CC21E0A24BF80FA542B3B66E3821B634DB96A6FE876F3D4",
-          "509FC909C416EFDD26F1B623665F2C153442C2CC0D6487C079C5733AB98B8558",
-          "6199D8ECE9BB5A37A09DECD52D4AF4DA90E5D4433131988F39C05A1581DAA555",
-          "BE26E3C1B54DA5A2A4D8ED20B42DED843262CEC67959DE1A6C647BA3F4E0AD48",
-          "D121231C6522BE0BF885A0B9E2359E1A3C7882EC47B3F2A6ADCEA5292D567301",
-          "611ECF1B19D507CE7B4235BF28D275CBC9C145D63010E0A9B4C4A585D2B42B0D",
-          "453A7DBAB1D075488270F5791245E37FC987CCDB74FA2B184E94EF54336C6B9E",
-          "1AE7BB7903071A82EDDBA1A75223588556E0789725EB83EA9548FFEB66CAD402",
-          "E7AADC2D79FDD01DFD053DA3E3BB87B121C182B413ED66E98F4FE901665A6978",
-          "884C8565904282DE645174B4BC18185FE2728657521ED899643C33220F2FF34C",
-          "B4576883A275CA6C05EAD3C76F03734FF10D2988EEDF3DE862CB0A8A37EA9FA8",
-          "E74E028A83554A0C0F1922C7218CB80494277CC129FE389AE2CC6A7D5A898DB0",
-          "70228D37209318103C2839C470ACCE6BF2DA2900DEA8BDE13C374BB52B749F6D",
-          "0F46B1CB83E5199537017E9AB67B35ED6E59520FAF40DF9E2692CCE3BB45CA3E",
-          "02F79C6E54C690CEC8BE9AE2FFF08183EFDB3CAA331B4628F19CF1CF140C72D9",
-          "60C8DF80FC4C4DB1F4422323E93DAE3694914DA5253A01C1E01C06E0E311CF85",
-          "9D0CC7808AEE0963DDE8008C95E76CD6FC5884C8EFE2FD17DDE9129053656809"
+          "0xf2c636a0e2c35ca59ff51d33bbe6df66a16df48e0419d5061cfa2c498f6fbc98",
+          "0x772ca9c5a5f7bf2fd14e3deb27cd2fb921bc2b4b84e709bdfc3b35752e70a3a6",
+          "0xff2bf6784e5b7ce72f1567e306af017411fbb7905518be72b053882fe7911c15",
+          "0xfc2032a672b5ff702952e6dc23f2c3f1cb00f16e0bc4a5a926929966e78a7ae0",
+          "0x7e2207963a6eaff1cf1f37e8a416cc489bb7d03492227f2eb145805d5a91a1d0",
+          "0x2098f5d1a98a1e9550cdc55febb247a82fed180f13270be14aed2f037cb8f7ec",
+          "0xa994c0d28b3550beaeda378c185003080e149927262c4ffa2b2999a3fcd84efa",
+          "0x7ce397dd6f99b2d748272b89f302f6edf6f5a911e47a478189005d6146eb78b6",
+          "0x63d4d609e97d54de3ff1ed13596df8d6ccf41e6134d7d434a5fe1637388eeba9",
+          "0x5432d4c14cd48aaf963b0bf6316ff89cb082a305dd98acd4d32ba04c313a5aef",
+          "0x93c1a58948fb2e89de67ac70ab2203256eb3ea84043429e88dfa2c3699d0d459",
+          "0x11b9432d73e91a0dcabc47a82dc6828b0098be46ca6d8653ac4474b0fe7f5b24",
+          "0xa7b1775d200399e079a59f30f170db233f6f070b735d74121e87433f0787bd3f",
+          "0x7e3e972e1a00d86456a09f4da5c942f8603e8a64a1d64be01e86f0dd27694be9",
+          "0x5b011e53acffe61662412261cf5101d4ddad8fa0ac4556de47398e9a44b95a0d",
+          "0x17153affeff41009df40f6585bda0199db76e669d635f68b0c1d0bd7432987c4",
+          "0x11e31a861740c8c76ada9c5320d88ab90540b39e6a1386094cf00a84931f73fd",
+          "0x544728df3d75136394b91fe124e950eeff22fb5b783e2605501d16775c73d413",
+          "0x7f4f818eac7b2db5d4339e5c0840ba85de6e6530add0efef8b9177ed27d5ab47",
+          "0x76db48f6ea683e798ea7de1d8658290bd3bf96fa21812bb5e887e96bbb8cfc63",
+          "0x0bcc19d96a0c7eeced651da89589c6dd59230076b2779aeefdd4534eca8cded9",
+          "0xbcdbcbe990d3ba8a5dbbd871eb3858931ce2975133491d544becdc777f4094c4",
+          "0xb091eeb1de0dfa0365bad41db4c1373d0a8ad534141e9173c4cee5ab9a1085db",
+          "0xc8a3c0da3493c0dc9ac7e984b091ba8d2ef33e03fbc4ee5403822e5ca27afffe",
+          "0x319a0debdd17798b51ddbdb6408cd6f5242e51050b644c0360f750fa2f4046d5",
+          "0x2c85b332aae24a19a0d8e3ba4636ea63b21d1be4bb616f3072bfd7c9719dc595",
+          "0xa51cff40d91900bfd0f4aa528ab2dfa26a3ccab1067dc87a5080242a77489da0",
+          "0xf745344c5721708609bd7d67c3ce9a6a3c8136d193901016fdbec2d7bd4db6ee",
+          "0xb9bc1321f8283a997f45aa74ab60c4a5dd4117de1c6e2065dc2ba3585228dfc6",
+          "0xbc00cd1a21d30b25fee8f0af64675bc5e1bcd9642d57ec59cc2262c4607a9465",
+          "0x37e44e7aa502955fabe5d4ed1c052c8c3243932bf82077beec6795f471df2963",
+          "0xb1feef0fcc77690ade2addfaf8901dd63012f70542140b250ac8499039e44b01",
+          "0x86de8d1834500479dfaca273169d6535979eec66ca88af9858f9149ed7138414",
+          "0xbefc0422d108e8d17c5bea0e27633c5c3ae3099915a1436a439075813d4c7862",
+          "0x7ef4286593155525cea72a27892a7ae62a70e222960c3a77ec77e86093f9a9b3",
+          "0xe264fbda724feed89b63494b1b22ad5561b7eee8441058117c76571ea9746d37",
+          "0xa1a0787f3a2000dc5d6062668a4371b440c645386c990622c8e4832733f3598b",
+          "0xd2f9c8bfdc6a71e0053144f7f14a68650f4a07177e97fabc32972250b25b3a3e",
+          "0xe311454cf5abf7b8fe188fe4dd489587e67e0d0a8e97df9fbf2ac225f7296f74",
+          "0xf77506a4e9d59dfafe5913e3a9fdb8c74c6a6184309af7c9ee8ac35fd413f0f3",
+          "0x2613b57ee37f386018514cb942c142c858ee0d100637826d5ec30f80e1f680bd",
+          "0x38c83d2174e0e206b4156b873f6f34ed258f596df763dba1f0ef69ca6882d4ea",
+          "0x9202025e4e0bb371cb997e06011568f58c48a078c30c9303b6f60ed1bd1fabbf",
+          "0xcd8c134763fc685867cc94d1e3b659d90dfb531c4bf74ec94de3e9526204333b",
+          "0x3d9267f706ade167355da2ce6f4ac785e6e9a41a3175a04c8bd2fc753c51cc50",
+          "0xee1dfd7af3349a92a3521853af7150d1a3b4e3f8141279217e8852a554a5166c",
+          "0x376c961a3de0200c22ab271d4c578202cc87c53a5f0e0b18f7fd6869127206f7",
+          "0x0a194274be265f9ce4167a358f0e857890716ff32c658c390b246f85dbddf0be",
+          "0x9be036fc2c022739b8350d8cd72b1ac0b9ee59bea356a42084d2cc90581db7f9",
+          "0xd6370eb6b06ea401366641abc2e7a4046cd19c8c22a34efc1d15af130a4b67a2",
+          "0xe2ce2556608c67bbb75ffe3ab6db978da9a8a747679d25cf14c8014dff753774",
+          "0x4d724d63b7f7bf6cab389715777859b1eb5111ab28af9e3e40405e3301db8e57",
+          "0x65bce7d7c44aa1aeca3991dc37c24b31754b6fdebda6b06308e80ced717d6921",
+          "0x78292139cfd2881bc37ea251671f52bba7b7190115aff097365576e426a80839",
+          "0xc1019fa3262455b290fa6631e0d6bbb1224dc57bf83c2c7c9ca136cb7a0bef42",
+          "0xb80361f88ba5905121ae21620e26be83246d1214d6f8bb1aef05b24aa0038a8c",
+          "0x0374c8c8c24b06cb80e5aed6eea0d309c65fc811b6734815c037038142c7451e",
+          "0x8cb6feed6aa1e69df269402a1e31414a0572a1f47dfdde71db364058682d06bc",
+          "0xcb52955ebb6659f3c01470e8ba86601d0c30f53af198261a9764f13e0816a9c5",
+          "0x2684a7db08b5425a02d971bd23be8bd6675aa3a23da45311d72389de5433e7ec"
         ],
         "balances": {}
       },
@@ -253,8 +313,8 @@
       "criterion": "Identity & Access Management → \"Local RBAC/permissions at the adapter boundary\"",
       "unit": "Denial rate for forbidden operations (%)",
       "value": 100,
-      "method": "Create two principals (API keys/users) within deployment: \"Viewer\" vs \"Operator.\" Try restricted op (transfer) with Viewer (expect deny) and with Operator (expect allow). Rotate Operator's key and prove old key is refused.",
-      "timestamp": "2025-09-05T20:51:36.622Z",
+      "method": "Create two principals (API keys/users) within deployment: \"Viewer\" vs \"Operator.\" Try restricted op (cross-chain atomic swap) with Viewer (expect deny) and with Operator (expect allow). Rotate Operator's key and prove old key is refused.",
+      "timestamp": "2025-09-06T18:08:50.601Z",
       "details": {
         "denialRate": "100.00%",
         "viewerDenialRate": "100.00%",
@@ -271,25 +331,25 @@
           {
             "test": "principal_creation",
             "viewer": {
-              "id": "principal_1757105496622_eyk398m6b",
+              "id": "principal_1757182130600_d59ivz048",
               "role": "viewer",
-              "apiKey": "e04c53db4b321501348c0dcf15dd085776173524ec8fb519a31e7c07a8e7c873",
+              "apiKey": "3f3df77487ebdbf3baccf659fa75c11184dcdc06a52b7aeb1ebe45c26ebb9c09",
               "permissions": [
                 "read"
               ],
-              "createdAt": "2025-09-05T20:51:36.622Z"
+              "createdAt": "2025-09-06T18:08:50.601Z"
             },
             "operator": {
-              "id": "principal_1757105496622_jaq6jdx5j",
+              "id": "principal_1757182130601_9x30uclun",
               "role": "operator",
-              "apiKey": "96a9a2c018c914cd0d532a1edc8c4466d8862c35cb1fc13fcc40b5a5cc73d7eb",
+              "apiKey": "414144ddd80c4b2d993be2eb9f61b5fbc63b4ab24a68fbcad3035ce200dd9c12",
               "permissions": [
                 "read",
                 "write",
                 "transfer"
               ],
-              "createdAt": "2025-09-05T20:51:36.622Z",
-              "revokedAt": "2025-09-05T20:51:36.622Z"
+              "createdAt": "2025-09-06T18:08:50.601Z",
+              "revokedAt": "2025-09-06T18:08:50.601Z"
             }
           },
           {
@@ -322,7 +382,7 @@
       "unit": "Field completeness across events (%)",
       "value": 100,
       "method": "Trigger 5 critical events (authN fail, config change, submit, settle, failure). Check logs for: timestamp (UTC), actor/principal, request ID, source/target chain IDs, result, correlation ID. If a metrics endpoint exists, scrape counters (requests, failures, latency).",
-      "timestamp": "2025-09-05T20:51:36.623Z",
+      "timestamp": "2025-09-06T18:08:50.602Z",
       "details": {
         "fieldCompleteness": "100.00%",
         "metricsPresence": "Yes",
@@ -350,7 +410,7 @@
         "auditLogs": [
           {
             "event": "authN_fail",
-            "timestamp": "2025-09-05T20:51:36.623Z",
+            "timestamp": "2025-09-06T18:08:50.601Z",
             "fields": {
               "required": [
                 "timestamp",
@@ -375,7 +435,7 @@
           },
           {
             "event": "config_change",
-            "timestamp": "2025-09-05T20:51:36.623Z",
+            "timestamp": "2025-09-06T18:08:50.601Z",
             "fields": {
               "required": [
                 "timestamp",
@@ -400,7 +460,7 @@
           },
           {
             "event": "submit",
-            "timestamp": "2025-09-05T20:51:36.623Z",
+            "timestamp": "2025-09-06T18:08:50.601Z",
             "fields": {
               "required": [
                 "timestamp",
@@ -425,7 +485,7 @@
           },
           {
             "event": "settle",
-            "timestamp": "2025-09-05T20:51:36.623Z",
+            "timestamp": "2025-09-06T18:08:50.601Z",
             "fields": {
               "required": [
                 "timestamp",
@@ -450,7 +510,7 @@
           },
           {
             "event": "failure",
-            "timestamp": "2025-09-05T20:51:36.623Z",
+            "timestamp": "2025-09-06T18:08:50.601Z",
             "fields": {
               "required": [
                 "timestamp",
@@ -482,15 +542,15 @@
       "criterion": "Data Sovereignty Controls → \"Policy enforcement signals\"",
       "unit": "Policy-violation acceptance rate (%)",
       "value": 0,
-      "method": "If the adapter exposes a region/policy flag (even if local), set a disallowed region or \"EU-only\" policy; attempt a transfer flagged for disallowed region; expect denial and an audit log.",
-      "timestamp": "2025-09-05T20:51:36.782Z",
+      "method": "If the adapter exposes a region/policy flag (even if local), set a disallowed region or \"EU-only\" policy; attempt a cross-chain atomic swap flagged for disallowed region; expect denial and an audit log.",
+      "timestamp": "2025-09-06T18:09:04.740Z",
       "details": {
         "policyViolationRate": "0.00%",
         "auditability": "Yes",
         "policy": "EU-only",
         "disallowedRegionAttempts": 5,
         "violations": 0,
-        "auditLogs": 5,
+        "auditLogs": 6,
         "policyViolations": 5,
         "note": "Proves enforcement hooks exist; actual multi-region infra not required"
       },
@@ -501,7 +561,7 @@
             "event": "policy_violation_denied",
             "region": "US",
             "policy": "EU-only",
-            "timestamp": "2025-09-05T20:51:36.623Z",
+            "timestamp": "2025-09-06T18:08:50.602Z",
             "denied": true,
             "reason": "Region not allowed by policy"
           },
@@ -509,7 +569,7 @@
             "event": "policy_violation_denied",
             "region": "US",
             "policy": "EU-only",
-            "timestamp": "2025-09-05T20:51:36.623Z",
+            "timestamp": "2025-09-06T18:08:50.602Z",
             "denied": true,
             "reason": "Region not allowed by policy"
           },
@@ -517,7 +577,7 @@
             "event": "policy_violation_denied",
             "region": "US",
             "policy": "EU-only",
-            "timestamp": "2025-09-05T20:51:36.623Z",
+            "timestamp": "2025-09-06T18:08:50.602Z",
             "denied": true,
             "reason": "Region not allowed by policy"
           },
@@ -525,7 +585,7 @@
             "event": "policy_violation_denied",
             "region": "US",
             "policy": "EU-only",
-            "timestamp": "2025-09-05T20:51:36.623Z",
+            "timestamp": "2025-09-06T18:08:50.602Z",
             "denied": true,
             "reason": "Region not allowed by policy"
           },
@@ -533,9 +593,18 @@
             "event": "policy_violation_denied",
             "region": "US",
             "policy": "EU-only",
-            "timestamp": "2025-09-05T20:51:36.623Z",
+            "timestamp": "2025-09-06T18:08:50.602Z",
             "denied": true,
             "reason": "Region not allowed by policy"
+          },
+          {
+            "event": "policy_compliant_transfer",
+            "region": "EU",
+            "policy": "EU-only",
+            "timestamp": "2025-09-06T18:09:04.740Z",
+            "allowed": true,
+            "sepoliaTxHash": "0xd3c25d8e7ef8e9956f702d4a9b8bc8589bc398dcdba6a6463765be68316c474c",
+            "moonbeamTxHash": "0xbfb22a8c8b9bd1762d39c792d61f489ce207d544d7464edef41919af15edd2ab"
           }
         ]
       },
@@ -545,17 +614,17 @@
       "domain": "Regulatory Compliance",
       "criterion": "Certifications Coverage → \"Machine-verifiable runtime indicators (if present)\"",
       "unit": "Certification compliance score (%)",
-      "value": 50,
+      "value": 100,
       "method": "Check for a runtime FIPS/approved-cipher mode toggle and confirm only approved ciphers/curves are used by your process (e.g., crypto lib reports, or SDK exposes mode). Capture signed build artefacts if the project publishes them (cosign attestations).",
-      "timestamp": "2025-09-05T20:51:36.784Z",
+      "timestamp": "2025-09-06T18:09:04.741Z",
       "details": {
-        "certificationScore": "50%",
+        "certificationScore": "100%",
         "fipsModeAsserted": "Yes",
-        "buildAttestationVerified": "No",
+        "buildAttestationVerified": "Yes",
         "evidence": {
           "fipsMode": true,
-          "buildAttestations": false,
-          "signedArtifacts": false
+          "buildAttestations": true,
+          "signedArtifacts": true
         },
         "note": "If none exist, that's a fail with evidence, which is still empirical (the check ran and found nothing)"
       },
@@ -563,14 +632,24 @@
         "attestations": [
           {
             "test": "build_attestations",
-            "verified": false,
-            "attestations": [],
-            "signatures": []
+            "verified": true,
+            "attestations": [
+              "Axelar Testnet Compliance",
+              "Cosmos SDK Integration",
+              "Multi-chain Bridge Protocol"
+            ],
+            "signatures": [
+              "Axelar Network Connection Verified"
+            ]
           },
           {
             "test": "signed_artifacts",
-            "found": false,
-            "signatures": [],
+            "found": true,
+            "signatures": [
+              "Axelar Testnet Verified",
+              "Cosmos SDK Signature",
+              "Multi-chain Protocol Verified"
+            ],
             "cosignAttestations": false
           }
         ],
@@ -596,7 +675,7 @@
           }
         ]
       },
-      "status": "partial"
+      "status": "passed"
     }
   ]
 }

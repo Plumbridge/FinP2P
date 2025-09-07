@@ -1,34 +1,34 @@
 {
-  "testDate": "2025-09-05T20:20:29.842Z",
-  "duration": "169.753 seconds",
-  "overallScore": "60.00%",
+  "testDate": "2025-09-06T18:09:14.997Z",
+  "duration": "338.427 seconds",
+  "overallScore": "80.00%",
   "totalCriteria": 5,
-  "passedCriteria": 3,
+  "passedCriteria": 4,
   "partialCriteria": 0,
-  "failedCriteria": 2,
+  "failedCriteria": 1,
   "domain": "Security Robustness",
   "criteria": [
     {
       "domain": "Security Robustness",
       "criterion": "Formal Verification Coverage",
       "unit": "FVC compliance score (%)",
-      "value": 75,
+      "value": 100,
       "method": "Runtime conformance to claimed invariants (black-box)",
-      "timestamp": "2025-09-05T20:21:34.087Z",
+      "timestamp": "2025-09-06T18:10:56.332Z",
       "details": {
-        "fvcScore": "75.0%",
+        "fvcScore": "100.0%",
         "totalTests": 4,
-        "violations": 1,
-        "violationRate": "25.00%",
+        "violations": 0,
+        "violationRate": "0.00%",
         "individualTestScores": {
           "replayRejection": 100,
           "valueConservation": 100,
-          "finalizationTiming": 0,
+          "finalizationTiming": 100,
           "idempotencyRetries": 100
         },
         "replayRejectionScore": "100%",
         "valueConservationScore": "100%",
-        "finalizationTimingScore": "0%",
+        "finalizationTimingScore": "100%",
         "idempotencyScore": "100%",
         "note": "Finalization timing may fail due to Axelar testnet fast finality"
       },
@@ -37,27 +37,31 @@
           {
             "test": "replay_rejection",
             "passed": true,
-            "tx1": "35719C42FF51B06381E888DA6C20DB197D2DD34E698E44493B83389322E4CD66",
-            "tx2": "0F78CCD19033A1477CE96EFBB9157F652A9174F625EEB882FC18633B9D69DF55"
+            "sepoliaTx1": "0x8d08c1066629df0d1cfba64ff625de1fcf20ab2bd39bce8a23a625ce14d09805",
+            "moonbeamTx1": "0x333fb20cb61ed6c362f24e4072fd03c33f9e2c19d81d762f85e0df25be2407ea",
+            "sepoliaTx2": "0x5a02a634876b4216a7ce819944d22f9fe8486f9e59f310dd5d42fcc5940ccce0",
+            "moonbeamTx2": "0x68c05b919f5b80e88ef03d9ef6ce6d8ac58c187a17d6165a1ed3dabd8c4d465c"
           },
           {
             "test": "value_conservation",
             "passed": true,
-            "initialBalance": 2924000,
-            "finalBalance": 2918000,
+            "initialBalance": 5922000,
+            "finalBalance": 5916000,
             "totalTransferred": 1500000,
             "totalFees": 216000,
-            "expectedFinalBalance": 2708000,
+            "expectedFinalBalance": 5706000,
             "difference": 210000,
             "note": "Testing that total value is conserved: initial = final + transferred + fees"
           },
           {
             "test": "finalization_timing",
-            "passed": false,
+            "passed": true,
             "confirmations": 2,
-            "settlementTime": 4209,
+            "settlementTime": 16138,
             "settled": true,
-            "note": "May fail due to Axelar testnet fast finality - this is expected behavior"
+            "sepoliaTxHash": "0x1c50bd9cbd3ca77f293f3bd54e108798aa8b009fb4ba06b55d74d0e508f9ffbb",
+            "moonbeamTxHash": "0xa2ede0fcd4f25d926e92957d28d6ed5cd9b1237f8ca2b8ea72e5c9dede3315a1",
+            "note": "May fail due to testnet fast finality - this is expected behavior"
           },
           {
             "test": "idempotency_retries",
@@ -65,23 +69,25 @@
             "attemptedTransfers": 3,
             "successfulTransfers": 1,
             "results": [
-              "C010F56F23CCAA3A977FC567987DA9ED9937FF89D26528C36CBFA6DE1D41BD83",
-              "Transfer failed: {\"code\":-32603,\"message\":\"Internal error\",\"data\":\"tx already exists in cache\"}",
-              "Transfer failed: {\"code\":-32603,\"message\":\"Internal error\",\"data\":\"tx already exists in cache\"}"
+              "could not coalesce error (error={ \"code\": -32000, \"message\": \"already known\" }, payload={ \"id\": 99, \"jsonrpc\": \"2.0\", \"method\": \"eth_sendRawTransaction\", \"params\": [ \"0x02f87483aa36a7820261830f4240834b8f7c825208947b52c77f01ae2cd0a59c0b24de48f21121e6c2bc8702aa1efb94e00080c001a098de965b0c729df13813bba19b8dfcb92d8d883ddbf9afc8063d193053b8d56aa0257d49e1bb1439b7fb78edc08cfb2ab10ac1b4276b80708c4615f7fd71d420b9\" ] }, code=UNKNOWN_ERROR, version=6.15.0)",
+              "Success: Sepolia=0x9f7aa54313fde09dbd08910fa3b8fc811715fbe32df5cc24b2142e641f9e0a06, Moonbeam=0xd199ffa909c5ea44bbf36b8e186f86ebaa304b82aa90fabaddb537b9e2c9ea5c",
+              "could not coalesce error (error={ \"code\": -32000, \"message\": \"already known\" }, payload={ \"id\": 102, \"jsonrpc\": \"2.0\", \"method\": \"eth_sendRawTransaction\", \"params\": [ \"0x02f87483aa36a7820261830f4240834b8f7c825208947b52c77f01ae2cd0a59c0b24de48f21121e6c2bc8702aa1efb94e00080c001a098de965b0c729df13813bba19b8dfcb92d8d883ddbf9afc8063d193053b8d56aa0257d49e1bb1439b7fb78edc08cfb2ab10ac1b4276b80708c4615f7fd71d420b9\" ] }, code=UNKNOWN_ERROR, version=6.15.0)"
             ]
           }
         ],
         "errors": [],
         "txHashes": [
-          "35719C42FF51B06381E888DA6C20DB197D2DD34E698E44493B83389322E4CD66",
-          "0F78CCD19033A1477CE96EFBB9157F652A9174F625EEB882FC18633B9D69DF55",
-          "59737537AA937FDD2DCBA068909035562ADFCE8E586BD3276C42C4904AA90D2E",
-          "4A88F77AE83CA00346F2AE815A3B4C0AA4A7667E8DA0320D73A6DE3FE9E7D12E",
-          "1496108FE41787FE26859245BBA6B53EAAF59784B794ABB254EA5C5F78CE90B0"
+          "0x8d08c1066629df0d1cfba64ff625de1fcf20ab2bd39bce8a23a625ce14d09805",
+          "0x333fb20cb61ed6c362f24e4072fd03c33f9e2c19d81d762f85e0df25be2407ea",
+          "0x5a02a634876b4216a7ce819944d22f9fe8486f9e59f310dd5d42fcc5940ccce0",
+          "0x68c05b919f5b80e88ef03d9ef6ce6d8ac58c187a17d6165a1ed3dabd8c4d465c",
+          "D6EC3EEBD90DC7684145042FFA985C67A12457A0A8F570A32949F7FC58A1EB47",
+          "39C00500900B5BFCC574483326B690AB21D80C68704471D8F8DA1C8A1F729D7F",
+          "68BEBBA9436B503BBC3496238BE8756B22BEA23F56D9BFB8E1F50812D2E7E6E9"
         ],
         "balances": {}
       },
-      "status": "failed"
+      "status": "passed"
     },
     {
       "domain": "Security Robustness",
@@ -89,7 +95,7 @@
       "unit": "Crypto compliance score (%)",
       "value": 100,
       "method": "Signature binding & tamper rejection (on-chain verifiable)",
-      "timestamp": "2025-09-05T20:21:52.982Z",
+      "timestamp": "2025-09-06T18:11:15.292Z",
       "details": {
         "cryptoScore": "100.0%",
         "totalTests": 3,
@@ -112,7 +118,7 @@
             "passed": true,
             "expected": "axelar14lgyh9gcvxcs4g3qwrfhraxgrha8gnk7pqnapr",
             "actual": "axelar14lgyh9gcvxcs4g3qwrfhraxgrha8gnk7pqnapr",
-            "txHash": "FD57725C4F94A187708F25B0905A771AED3E12744CB2A6239CE082A87697B87E",
+            "txHash": "DEA71CB1F5A36AE50BFFA8E9D8D79146FF10194786A7613F76923CE7DAB6B2B5",
             "note": "Testing that transaction was properly signed by the expected Cosmos wallet"
           },
           {
@@ -124,7 +130,7 @@
           {
             "test": "tamper_rejection",
             "passed": true,
-            "validTxHash": "8999D9ADC8D00111EAC874BA354DFCA2DA00B9EA054BEBFF3D23764E4487462E",
+            "validTxHash": "DF30990BADB69B73BD22AF4C4CCF1FCF918159D660F5DA82CCA238C1E847F1DD",
             "tamperAttempted": true,
             "note": "Testing that properly signed transactions are accepted and malformed ones are rejected"
           }
@@ -139,11 +145,11 @@
       "unit": "HSM compliance score (%)",
       "value": 100,
       "method": "Signer abstraction / external-signer compatibility (software proxy)",
-      "timestamp": "2025-09-05T20:21:53.101Z",
+      "timestamp": "2025-09-06T18:11:15.412Z",
       "details": {
         "hsmScore": "100.0%",
         "externalSignerWorks": true,
-        "rotationTimeSeconds": 0.004,
+        "rotationTimeSeconds": 0.003,
         "postRevocationAcceptanceRate": "0%",
         "individualTestScores": {
           "externalSignerCompatibility": 100,
@@ -167,7 +173,7 @@
             "passed": true,
             "oldAddress": "axelar14lgyh9gcvxcs4g3qwrfhraxgrha8gnk7pqnapr",
             "newAddress": "axelar14lgyh9gcvxcs4g3qwrfhraxgrha8gnk7pqnapr",
-            "rotationTimeMs": 4,
+            "rotationTimeMs": 3,
             "revocationWorks": true
           }
         ],
@@ -179,17 +185,17 @@
       "domain": "Security Robustness",
       "criterion": "Byzantine Fault Tolerance",
       "unit": "BFT compliance score (%)",
-      "value": 41.666666666666664,
+      "value": 66.66666666666667,
       "method": "Quorum/finality enforcement at the API boundary",
-      "timestamp": "2025-09-05T20:23:00.609Z",
+      "timestamp": "2025-09-06T18:14:31.451Z",
       "details": {
-        "bftScore": "41.7%",
-        "prematureFinalizationRate": "44.44%",
+        "bftScore": "66.7%",
+        "prematureFinalizationRate": "11.11%",
         "staleStateAcceptanceRate": "100.00%",
         "totalTests": 12,
-        "totalViolations": 7,
-        "violationRate": "58.3%",
-        "prematureCount": 4,
+        "totalViolations": 4,
+        "violationRate": "33.3%",
+        "prematureCount": 1,
         "staleAccepted": 3,
         "finalityThresholdTests": 9,
         "staleStateTests": 3,
@@ -201,65 +207,65 @@
           {
             "test": "finality_0_conf",
             "confirmations": 0,
-            "settlementTime": 3205,
+            "settlementTime": 19237,
             "expectedMinTime": 0,
             "premature": false
           },
           {
             "test": "finality_0_conf",
             "confirmations": 0,
-            "settlementTime": 6394,
+            "settlementTime": 35272,
             "expectedMinTime": 0,
             "premature": false
           },
           {
             "test": "finality_0_conf",
             "confirmations": 0,
-            "settlementTime": 6799,
+            "settlementTime": 22867,
             "expectedMinTime": 0,
             "premature": false
           },
           {
             "test": "finality_1_conf",
             "confirmations": 1,
-            "settlementTime": 6290,
+            "settlementTime": 10460,
             "expectedMinTime": 6000,
             "premature": false
           },
           {
             "test": "finality_1_conf",
             "confirmations": 1,
-            "settlementTime": 3234,
+            "settlementTime": 14640,
             "expectedMinTime": 6000,
-            "premature": true
+            "premature": false
           },
           {
             "test": "finality_1_conf",
             "confirmations": 1,
-            "settlementTime": 6281,
+            "settlementTime": 10461,
             "expectedMinTime": 6000,
             "premature": false
           },
           {
             "test": "finality_2_conf",
             "confirmations": 2,
-            "settlementTime": 6437,
+            "settlementTime": 10348,
             "expectedMinTime": 12000,
             "premature": true
           },
           {
             "test": "finality_2_conf",
             "confirmations": 2,
-            "settlementTime": 6421,
+            "settlementTime": 14840,
             "expectedMinTime": 12000,
-            "premature": true
+            "premature": false
           },
           {
             "test": "finality_2_conf",
             "confirmations": 2,
-            "settlementTime": 3279,
+            "settlementTime": 22829,
             "expectedMinTime": 12000,
-            "premature": true
+            "premature": false
           },
           {
             "test": "stale_state_rejection",
@@ -279,7 +285,7 @@
       "unit": "Vuln compliance score (%)",
       "value": 100,
       "method": "Surface scan of deployed components only",
-      "timestamp": "2025-09-05T20:23:19.595Z",
+      "timestamp": "2025-09-06T18:14:53.424Z",
       "details": {
         "vulnScore": "100.0%",
         "highCriticalFindings": 0,

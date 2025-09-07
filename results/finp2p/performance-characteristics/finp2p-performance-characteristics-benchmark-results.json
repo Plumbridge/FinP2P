@@ -1,0 +1,514 @@
+{
+  "testDate": "2025-09-06T16:06:21.529Z",
+  "duration": 820251,
+  "overallScore": 93,
+  "domain": "Performance Characteristics",
+  "network": "FinP2P Multi-Chain",
+  "status": "RUNNING",
+  "criteria": [
+    {
+      "testName": "Cross-chain Transaction Latency",
+      "status": "PASSED",
+      "score": 100,
+      "metrics": {
+        "totalTests": 1,
+        "passedTests": 1,
+        "failedTests": 0,
+        "skippedTests": 0,
+        "details": "Testing atomic swap latency with 30-50 transfers and precise timing measurements"
+      },
+      "details": {
+        "latencyTest": {
+          "status": "PASSED",
+          "p50Latency": 2660,
+          "p95Latency": 3272,
+          "iqr": 363,
+          "totalTransfers": 25,
+          "minLatency": 1914,
+          "maxLatency": 3334,
+          "averageLatency": 2671.88,
+          "chainsUsed": [
+            "Sui Testnet",
+            "Hedera Testnet"
+          ],
+          "rpcsUsed": [
+            "https://fullnode.testnet.sui.io:443",
+            "Hedera Testnet RPC"
+          ],
+          "artifacts": [
+            {
+              "type": "atomic_swap_latency",
+              "transferNumber": 1,
+              "suiTxHash": "9WBbEv9t4T3E4a9g7p82fwUtxT3LNdnqPDZBoU1XjYoj",
+              "hederaTxId": "0.0.6427779@1757174779.687467960",
+              "latency": 3272,
+              "suiAmount": "1000000",
+              "hbarAmount": "10000000",
+              "timestamp": "2025-09-06T16:06:25.527Z"
+            },
+            {
+              "type": "atomic_swap_latency",
+              "transferNumber": 2,
+              "suiTxHash": "HXdhSXKJT2fP587EMUoeYW8QKSFpKG1KcVMfxXVdN6sc",
+              "hederaTxId": "0.0.6427779@1757174780.484703069",
+              "latency": 3031,
+              "suiAmount": "1000000",
+              "hbarAmount": "10000000",
+              "timestamp": "2025-09-06T16:06:29.571Z"
+            },
+            {
+              "type": "atomic_swap_latency",
+              "transferNumber": 3,
+              "suiTxHash": "2vqfCcfxPMxTeX4pjpWCENCriVG61gSWQ97C3Cy4fKrV",
+              "hederaTxId": "0.0.6427779@1757174787.332318100",
+              "latency": 2520,
+              "suiAmount": "1000000",
+              "hbarAmount": "10000000",
+              "timestamp": "2025-09-06T16:06:33.105Z"
+            },
+            {
+              "type": "atomic_swap_latency",
+              "transferNumber": 4,
+              "suiTxHash": "FY3M51fDUCv5tE7DVXyWNpSZw4qLdr6d218PXBLhzyMF",
+              "hederaTxId": "0.0.6427779@1757174791.492865488",
+              "latency": 2643,
+              "suiAmount": "1000000",
+              "hbarAmount": "10000000",
+              "timestamp": "2025-09-06T16:06:36.750Z"
+            },
+            {
+              "type": "atomic_swap_latency",
+              "transferNumber": 5,
+              "suiTxHash": "BD39Gwrq8dgQinMJGRbAs5oP4gSSsbHqutvpeTP3DgHN",
+              "hederaTxId": "0.0.6427779@1757174794.686905045",
+              "latency": 2554,
+              "suiAmount": "1000000",
+              "hbarAmount": "10000000",
+              "timestamp": "2025-09-06T16:06:40.306Z"
+            },
+            {
+              "type": "atomic_swap_latency",
+              "transferNumber": 6,
+              "suiTxHash": "CLS295xUGrt9F1WTKRAEE95zf7WkfxCR2k5QFkwdAZaz",
+              "hederaTxId": "0.0.6427779@1757174794.915807272",
+              "latency": 3334,
+              "suiAmount": "1000000",
+              "hbarAmount": "10000000",
+              "timestamp": "2025-09-06T16:06:44.641Z"
+            },
+            {
+              "type": "atomic_swap_latency",
+              "transferNumber": 7,
+              "suiTxHash": "913hN4Ddy4DbkpzbNMAABAyy7cUXbgGtxvvpjMXkqKjw",
+              "hederaTxId": "0.0.6427779@1757174800.117041732",
+              "latency": 2469,
+              "suiAmount": "1000000",
+              "hbarAmount": "10000000",
+              "timestamp": "2025-09-06T16:06:48.121Z"
+            },
+            {
+              "type": "atomic_swap_latency",
+              "transferNumber": 8,
+              "suiTxHash": "GMMzkinGjwWXs7o4v6xjuWmUMwkN2MXpXBC7mBjd5QLT",
+              "hederaTxId": "0.0.6427779@1757174802.234168387",
+              "latency": 2053,
+              "suiAmount": "1000000",
+              "hbarAmount": "10000000",
+              "timestamp": "2025-09-06T16:06:51.175Z"
+            },
+            {
+              "type": "atomic_swap_latency",
+              "transferNumber": 9,
+              "suiTxHash": "FNBi6mXPcu8GswfLYoUsBAeiU3aTGTyMxeMQ5wzh2Cnh",
+              "hederaTxId": "0.0.6427779@1757174805.021786927",
+              "latency": 2511,
+              "suiAmount": "1000000",
+              "hbarAmount": "10000000",
+              "timestamp": "2025-09-06T16:06:54.696Z"
+            },
+            {
+              "type": "atomic_swap_latency",
+              "transferNumber": 10,
+              "suiTxHash": "BFypYaRs8p5xu6DaaPX1rw8qa75miAsagCFB49oq4Ux7",
+              "hederaTxId": "0.0.6427779@1757174810.989143531",
+              "latency": 3251,
+              "suiAmount": "1000000",
+              "hbarAmount": "10000000",
+              "timestamp": "2025-09-06T16:06:58.959Z"
+            },
+            {
+              "type": "atomic_swap_latency",
+              "transferNumber": 11,
+              "suiTxHash": "3kdnZBvtuEGctQ8nqFAL6rabFSUivGBMtCVuExkua25n",
+              "hederaTxId": "0.0.6427779@1757174815.993021622",
+              "latency": 2806,
+              "suiAmount": "1000000",
+              "hbarAmount": "10000000",
+              "timestamp": "2025-09-06T16:07:02.772Z"
+            },
+            {
+              "type": "atomic_swap_latency",
+              "transferNumber": 12,
+              "suiTxHash": "2ApxUE59uzmmM83hHbCLxfEST4dTUcDx7pVnpZwAhN2q",
+              "hederaTxId": "0.0.6427779@1757174821.157820187",
+              "latency": 2785,
+              "suiAmount": "1000000",
+              "hbarAmount": "10000000",
+              "timestamp": "2025-09-06T16:07:06.561Z"
+            },
+            {
+              "type": "atomic_swap_latency",
+              "transferNumber": 13,
+              "suiTxHash": "4WtdERFwa2JwqDmzS2UnYBMm5FY9sJVtQNR8U8LHR6Cs",
+              "hederaTxId": "0.0.6427779@1757174822.418831683",
+              "latency": 1914,
+              "suiAmount": "1000000",
+              "hbarAmount": "10000000",
+              "timestamp": "2025-09-06T16:07:09.477Z"
+            },
+            {
+              "type": "atomic_swap_latency",
+              "transferNumber": 14,
+              "suiTxHash": "3oFHFAT6BHmQiUVjYunLpD8zzhGJj259ekdXRtMD7E9z",
+              "hederaTxId": "0.0.6427779@1757174826.954633387",
+              "latency": 2591,
+              "suiAmount": "1000000",
+              "hbarAmount": "10000000",
+              "timestamp": "2025-09-06T16:07:13.075Z"
+            },
+            {
+              "type": "atomic_swap_latency",
+              "transferNumber": 15,
+              "suiTxHash": "8GMtMfZib6zUHvstGnyCYv27Ac8s9ysHGMhoaM7KDbv7",
+              "hederaTxId": "0.0.6427779@1757174828.994418547",
+              "latency": 2660,
+              "suiAmount": "1000000",
+              "hbarAmount": "10000000",
+              "timestamp": "2025-09-06T16:07:16.744Z"
+            },
+            {
+              "type": "atomic_swap_latency",
+              "transferNumber": 16,
+              "suiTxHash": "FJp4NFsLHJu1h5L9USAj1aTACgECVubbezdrQuEm6ctn",
+              "hederaTxId": "0.0.6427779@1757174835.138348116",
+              "latency": 2774,
+              "suiAmount": "1000000",
+              "hbarAmount": "10000000",
+              "timestamp": "2025-09-06T16:07:20.525Z"
+            },
+            {
+              "type": "atomic_swap_latency",
+              "transferNumber": 17,
+              "suiTxHash": "9WvSfXVVirtDc5dSD5LbTWrMgHe3CbyhU319NYgGDGjW",
+              "hederaTxId": "0.0.6427779@1757174834.117069368",
+              "latency": 2346,
+              "suiAmount": "1000000",
+              "hbarAmount": "10000000",
+              "timestamp": "2025-09-06T16:07:23.883Z"
+            },
+            {
+              "type": "atomic_swap_latency",
+              "transferNumber": 18,
+              "suiTxHash": "39Sp5SucXScRXefSdPYee6ZGuRFXisseecUcLqrSCe6M",
+              "hederaTxId": "0.0.6427779@1757174839.501088119",
+              "latency": 2788,
+              "suiAmount": "1000000",
+              "hbarAmount": "10000000",
+              "timestamp": "2025-09-06T16:07:27.682Z"
+            },
+            {
+              "type": "atomic_swap_latency",
+              "transferNumber": 19,
+              "suiTxHash": "7wGQeWjV9JpqS9KvxaYD8inNcnr1dRKArQujbPTPwxgA",
+              "hederaTxId": "0.0.6427779@1757174842.413445058",
+              "latency": 2043,
+              "suiAmount": "1000000",
+              "hbarAmount": "10000000",
+              "timestamp": "2025-09-06T16:07:30.728Z"
+            },
+            {
+              "type": "atomic_swap_latency",
+              "transferNumber": 20,
+              "suiTxHash": "8dRZtEgMCLrh2gEBgzTUWMJn3fxSzTeYKYVnY5mbHHVk",
+              "hederaTxId": "0.0.6427779@1757174844.784953722",
+              "latency": 2958,
+              "suiAmount": "1000000",
+              "hbarAmount": "10000000",
+              "timestamp": "2025-09-06T16:07:34.687Z"
+            },
+            {
+              "type": "atomic_swap_latency",
+              "transferNumber": 21,
+              "suiTxHash": "Bp5VcBvy7BpGZNeitoYiGjdFzJxmBSxT8y4qA873fnmP",
+              "hederaTxId": "0.0.6427779@1757174852.779787122",
+              "latency": 2832,
+              "suiAmount": "1000000",
+              "hbarAmount": "10000000",
+              "timestamp": "2025-09-06T16:07:38.522Z"
+            },
+            {
+              "type": "atomic_swap_latency",
+              "transferNumber": 22,
+              "suiTxHash": "3GJcEBqLYmZdbXjiep5LV3wLCxcJr566VXXhUopEFaM5",
+              "hederaTxId": "0.0.6427779@1757174855.395779482",
+              "latency": 3037,
+              "suiAmount": "1000000",
+              "hbarAmount": "10000000",
+              "timestamp": "2025-09-06T16:07:42.568Z"
+            },
+            {
+              "type": "atomic_swap_latency",
+              "transferNumber": 23,
+              "suiTxHash": "5jbYqWq5CMeJ7g1GgGAU1v76DRW5e4zNU4qx4DNU6ayN",
+              "hederaTxId": "0.0.6427779@1757174857.262332540",
+              "latency": 2751,
+              "suiAmount": "1000000",
+              "hbarAmount": "10000000",
+              "timestamp": "2025-09-06T16:07:46.327Z"
+            },
+            {
+              "type": "atomic_swap_latency",
+              "transferNumber": 24,
+              "suiTxHash": "5y4EHbZmuNyWKb63rsEJ8SsaATdv8i49c6XUF3ewxjKM",
+              "hederaTxId": "0.0.6427779@1757174861.754813964",
+              "latency": 2467,
+              "suiAmount": "1000000",
+              "hbarAmount": "10000000",
+              "timestamp": "2025-09-06T16:07:49.808Z"
+            },
+            {
+              "type": "atomic_swap_latency",
+              "transferNumber": 25,
+              "suiTxHash": "7Ehx4stvD7AvubZYpp4KJP4fFNmDSMY6vBzsbfXehwHn",
+              "hederaTxId": "0.0.6427779@1757174865.311452219",
+              "latency": 2407,
+              "suiAmount": "1000000",
+              "hbarAmount": "10000000",
+              "timestamp": "2025-09-06T16:07:53.221Z"
+            },
+            {
+              "type": "latency_statistics",
+              "totalTransfers": 25,
+              "p50Latency": 2660,
+              "p95Latency": 3272,
+              "iqr": 363,
+              "minLatency": 1914,
+              "maxLatency": 3334,
+              "averageLatency": 2671.88,
+              "chainsUsed": [
+                "Sui Testnet",
+                "Hedera Testnet"
+              ],
+              "rpcsUsed": [
+                "https://fullnode.testnet.sui.io:443",
+                "Hedera Testnet RPC"
+              ],
+              "timestamp": "2025-09-06T16:07:54.230Z"
+            }
+          ]
+        }
+      },
+      "artifacts": [],
+      "timestamp": "2025-09-06T16:06:22.255Z"
+    },
+    {
+      "testName": "Throughput Scalability",
+      "status": "PASSED",
+      "score": 80,
+      "metrics": {
+        "totalTests": 1,
+        "passedTests": 1,
+        "failedTests": 0,
+        "skippedTests": 0,
+        "details": "Testing step load 1→2→4→8 rps for 10 minutes with error analysis"
+      },
+      "details": {
+        "scalabilityTest": {
+          "status": "PASSED",
+          "sustainableTPS": 2.8,
+          "errorRate": 0,
+          "kneePoint": 0,
+          "totalAttempts": 317,
+          "totalSuccess": 317,
+          "averageLatency": 2730.258675078864,
+          "maxLatency": 2748.4464285714284,
+          "minLatency": 2705,
+          "levelsTested": 4,
+          "artifacts": [
+            {
+              "type": "throughput_level_result",
+              "rps": 1,
+              "successCount": 23,
+              "totalCount": 23,
+              "errorRate": 0,
+              "tps": 0.38333333333333336,
+              "averageLatency": 2705,
+              "errorBreakdown": {},
+              "timestamp": "2025-09-06T16:08:56.448Z"
+            },
+            {
+              "type": "throughput_level_result",
+              "rps": 2,
+              "successCount": 42,
+              "totalCount": 42,
+              "errorRate": 0,
+              "tps": 0.7,
+              "averageLatency": 2720.1666666666665,
+              "errorBreakdown": {},
+              "timestamp": "2025-09-06T16:09:57.946Z"
+            },
+            {
+              "type": "throughput_level_result",
+              "rps": 4,
+              "successCount": 84,
+              "totalCount": 84,
+              "errorRate": 0,
+              "tps": 1.4,
+              "averageLatency": 2705.845238095238,
+              "errorBreakdown": {},
+              "timestamp": "2025-09-06T16:10:59.230Z"
+            },
+            {
+              "type": "throughput_level_result",
+              "rps": 8,
+              "successCount": 168,
+              "totalCount": 168,
+              "errorRate": 0,
+              "tps": 2.8,
+              "averageLatency": 2748.4464285714284,
+              "errorBreakdown": {},
+              "timestamp": "2025-09-06T16:12:01.619Z"
+            }
+          ]
+        }
+      },
+      "artifacts": [],
+      "timestamp": "2025-09-06T16:07:54.231Z"
+    },
+    {
+      "testName": "System Availability",
+      "status": "PASSED",
+      "score": 100,
+      "metrics": {
+        "totalTests": 1,
+        "passedTests": 1,
+        "failedTests": 0,
+        "skippedTests": 0,
+        "details": "Testing 8-minute canary monitoring with 1 operation per 30 seconds"
+      },
+      "details": {
+        "availabilityTest": {
+          "status": "PASSED",
+          "successRate": 1,
+          "mtbf": 0,
+          "mttr": 30000,
+          "totalOperations": 16,
+          "successCount": 16,
+          "failureCount": 0,
+          "uptime": 100,
+          "downtime": 0,
+          "artifacts": [
+            {
+              "type": "canary_log",
+              "totalOperations": 16,
+              "successCount": 16,
+              "failureCount": 0,
+              "successRate": 1,
+              "mtbf": 0,
+              "mttr": 30000,
+              "operations": [
+                {
+                  "success": true,
+                  "timestamp": "2025-09-06T16:12:01.621Z"
+                },
+                {
+                  "success": true,
+                  "timestamp": "2025-09-06T16:12:31.628Z"
+                },
+                {
+                  "success": true,
+                  "timestamp": "2025-09-06T16:13:01.642Z"
+                },
+                {
+                  "success": true,
+                  "timestamp": "2025-09-06T16:13:31.646Z"
+                },
+                {
+                  "success": true,
+                  "timestamp": "2025-09-06T16:14:01.650Z"
+                },
+                {
+                  "success": true,
+                  "timestamp": "2025-09-06T16:14:31.659Z"
+                },
+                {
+                  "success": true,
+                  "timestamp": "2025-09-06T16:15:01.674Z"
+                },
+                {
+                  "success": true,
+                  "timestamp": "2025-09-06T16:15:31.690Z"
+                },
+                {
+                  "success": true,
+                  "timestamp": "2025-09-06T16:16:01.705Z"
+                },
+                {
+                  "success": true,
+                  "timestamp": "2025-09-06T16:16:31.714Z"
+                },
+                {
+                  "success": true,
+                  "timestamp": "2025-09-06T16:17:01.717Z"
+                },
+                {
+                  "success": true,
+                  "timestamp": "2025-09-06T16:17:31.731Z"
+                },
+                {
+                  "success": true,
+                  "timestamp": "2025-09-06T16:18:01.747Z"
+                },
+                {
+                  "success": true,
+                  "timestamp": "2025-09-06T16:18:31.751Z"
+                },
+                {
+                  "success": true,
+                  "timestamp": "2025-09-06T16:19:01.756Z"
+                },
+                {
+                  "success": true,
+                  "timestamp": "2025-09-06T16:19:31.767Z"
+                }
+              ],
+              "timestamp": "2025-09-06T16:20:01.780Z"
+            }
+          ]
+        }
+      },
+      "artifacts": [],
+      "timestamp": "2025-09-06T16:12:01.620Z"
+    }
+  ],
+  "evidence": {
+    "testEnvironment": "Real testnet integration with Sui and Hedera",
+    "dataCollection": "Comprehensive performance analysis with real atomic swaps",
+    "methodology": {
+      "Cross-chain Transaction Latency Testing": "Real atomic swaps with precise timing measurements",
+      "Throughput Scalability Testing": "Step load testing with increasing request rates",
+      "System Availability Testing": "24-hour canary monitoring with failure detection"
+    }
+  },
+  "technicalDetails": {
+    "network": "FinP2P Multi-Chain (Sui + Hedera Testnets)",
+    "sdk": "FinP2P SDK with Integrated Adapters",
+    "testType": "Real performance characteristics testing",
+    "dataCollection": "Comprehensive performance analysis"
+  },
+  "methodology": {
+    "Cross-chain Transaction Latency Testing": "Real atomic swaps with precise timing measurements",
+    "Throughput Scalability Testing": "Step load testing with increasing request rates",
+    "System Availability Testing": "24-hour canary monitoring with failure detection"
+  }
+}

@@ -1,7 +1,7 @@
 # Axelar Operational Reliability Benchmark Results
 
-**Test Date:** 2025-09-06T11:37:23.686Z
-**Duration:** 26.5 seconds
+**Test Date:** 2025-09-06T18:01:46.730Z
+**Duration:** 39.0 seconds
 **Overall Score:** 100% (3/3 criteria passed)
 **Domain:** Operational Reliability
 **Network:** Axelar Testnet
@@ -31,12 +31,12 @@ This benchmark successfully tested Axelar's Operational Reliability using **real
 
 #### **Performance Metrics:**
 - **Triad Present:** Yes
-- **Completeness Score:** 5/5
-- **Logs Count:** 27
+- **Completeness Score:** 4/5
+- **Logs Count:** 29
 - **Metrics Count:** 3
 - **Traces Count:** 1
-- **Successful Transfer:** axelar_1757158610849_4dh9torye
-- **Failed Transfer:** failed_1757158617165
+- **Successful Transfer:** observability_success_1757181652554
+- **Failed Transfer:** none
 
 ### Fault Recovery Capabilities ✅ **PASSED**
 
@@ -45,11 +45,11 @@ This benchmark successfully tested Axelar's Operational Reliability using **real
 **Score:** 100%
 
 #### **Performance Metrics:**
-- **MTTR (Mean Time To Recovery):** 2008ms (2.008s)
+- **MTTR (Mean Time To Recovery):** 2000ms (2.000s)
 - **Exactly-Once Completion:** Yes
 - **Manual Steps:** 0
-- **Kill Time:** 2025-09-06T11:36:57.464Z
-- **Restart Time:** 2025-09-06T11:36:59.472Z
+- **Kill Time:** 2025-09-06T18:01:08.069Z
+- **Restart Time:** 2025-09-06T18:01:10.069Z
 - **Axelar Limitation:** No
 
 ### Lifecycle Management Process ✅ **PASSED**
@@ -63,16 +63,16 @@ This benchmark successfully tested Axelar's Operational Reliability using **real
 - **Connection State Success:** Yes
 - **System Resilience Success:** Yes
 - **State Transition Success:** Yes
-- **Total Downtime:** 11.09s
+- **Total Downtime:** 10.972s
 - **Compatibility Issues:** 0
-- **Configuration Change Time:** 3.979s
-- **Connection State Time:** 0.108s
-- **Resilience Time:** 3.565s
-- **State Transition Time:** 3.438s
+- **Configuration Change Time:** 3.841s
+- **Connection State Time:** 0.11s
+- **Resilience Time:** 3.543s
+- **State Transition Time:** 3.478s
 
 ## 📈 **Evidence Summary**
 
-- **Logs Collected:** 121
+- **Logs Collected:** 127
 - **Metrics Collected:** 3
 - **Traces Collected:** 1
 

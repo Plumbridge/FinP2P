@@ -1,7 +1,7 @@
 # Axelar Performance Characteristics Benchmark Results
 
 **Test Date:** December 2024
-**Duration:** 318.3 seconds (5.3 minutes)
+**Duration:** 189.0 seconds (3.2 minutes)
 **Overall Score:** 66.67% (2/3 criteria passed)
 **Domain:** Performance Characteristics
 **Network:** Axelar Testnet (axelar-testnet-lisbon-3)
@@ -25,34 +25,34 @@ This benchmark successfully tested Axelar's Performance Characteristics using **
 
 ### Cross-chain Transaction Latency ✅ **PASSED**
 
-**Method:** 20 transfers executed with real Cosmos SDK integration
+**Method:** 5 cross-chain atomic swaps executed (Sepolia ETH ↔ Moonbeam DEV)
 **Status:** ✅ **PASSED**
 **Score:** 100%
 
 #### **Performance Metrics:**
-- **P50 Latency:** 3255msms (NaN seconds)
-- **P95 Latency:** 6888msms (NaN seconds)
+- **P50 Latency:** 10584msms (NaN seconds)
+- **P95 Latency:** 11291msms (NaN seconds)
 - **Success Rate:** 100.00%%
-- **IQR (Interquartile Range):** 878msms
-- **Min Latency:** 3173msms
-- **Max Latency:** 13148msms
+- **IQR (Interquartile Range):** 407msms
+- **Min Latency:** 10458msms
+- **Max Latency:** 11373msms
 
 ### Throughput Scalability ❌ **FAILED**
 
-**Method:** Step load testing 1→2 RPS (stopped at first failure point)
+**Method:** Step load testing 1 RPS cross-chain atomic swaps (30 seconds duration)
 **Status:** ❌ **FAILED**
 **Score:** 0%
 
 #### **Performance Metrics:**
-- **Sustainable TPS:** 0 RPS (testnet limitations)
-- **Performance "Knee":** 1 RPS with 79.78%% error rate
-- **Error Rate at 1 RPS:** 79.78%%
+- **Sustainable TPS:** 1 RPS (testnet limitations)
+- **Performance "Knee":** Not reached RPS with 0.00%% error rate
+- **Error Rate at 1 RPS:** 0.00%%
 - **Root Cause:** Axelar testnet rate limiting and transaction caching
 
 #### **Error Analysis:**
 - **Primary Error:** `{"code":-32603,"message":"Internal error","data":"tx already exists in cache"}`
 - **Secondary Error:** `Broadcasting transaction failed with code 32 (codespace: sdk). Log: account sequence mismatch`
-- **Error Rate at 1 RPS:** 79.78%%
+- **Error Rate at 1 RPS:** 0.00%%
 - **Root Cause:** Axelar testnet rate limiting and transaction caching
 
 ### System Availability (lab proxy) ✅ **PASSED**
@@ -94,8 +94,8 @@ This benchmark successfully tested Axelar's Performance Characteristics using **
 
 | Metric | Value | Status | Notes |
 |--------|-------|--------|-------|
-| **Cross-chain Latency (P50)** | 3255msms | ✅ Excellent | Consistent sub-10s performance |
-| **Cross-chain Latency (P95)** | 6888msms | ✅ Good | 95% of transactions < 10s |
+| **Cross-chain Latency (P50)** | 10584msms | ✅ Excellent | Consistent sub-10s performance |
+| **Cross-chain Latency (P95)** | 11291msms | ✅ Good | 95% of transactions < 10s |
 | **Success Rate (Latency)** | 100.00%% | ✅ Perfect | No failed transactions |
 | **Sustainable TPS** | < 1 RPS | ❌ Limited | Testnet rate limiting |
 | **System Availability** | 100.00%% | ✅ Perfect | No downtime observed |
@@ -144,7 +144,7 @@ This benchmark successfully tested Axelar's Performance Characteristics using **
 - **Network:** Axelar Testnet (axelar-testnet-lisbon-3)
 - **SDK Version:** Cosmos SDK integration
 - **RPC Endpoint:** `https://axelart.tendermintrpc.lava.build`
-- **Test Duration:** 318.3 seconds
+- **Test Duration:** 189.0 seconds
 - **Data Points:** 0+ successful transactions, 100+ error samples
 
 ---
