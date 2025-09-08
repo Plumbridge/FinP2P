@@ -1,10 +1,10 @@
 {
-  "timestamp": "2025-09-08T01:54:00.163Z",
+  "timestamp": "2025-09-08T03:36:25.724Z",
   "domain": "Operational Reliability",
   "adapter": "Axelar",
   "totalTests": 3,
-  "passedTests": 3,
-  "partialTests": 0,
+  "passedTests": 2,
+  "partialTests": 1,
   "failedTests": 0,
   "results": [
     {
@@ -13,61 +13,61 @@
       "unit": "score",
       "value": 4,
       "method": "Enable logs + metrics + traces on process; demonstrate successful and failed transfers with correlating IDs",
-      "timestamp": "2025-09-08T01:53:19.674Z",
+      "timestamp": "2025-09-08T03:34:55.240Z",
       "details": {
         "triadPresent": true,
         "completenessScore": 4,
         "logsCount": 29,
         "metricsCount": 3,
         "tracesCount": 1,
-        "successfulTransfer": "observability_success_1757296380431",
+        "successfulTransfer": "observability_success_1757302475868",
         "failedTransfer": "none"
       },
       "evidence": {
         "logs": [
-          "[LOG] 2025-09-08T01:52:59.913Z: 🚀 Starting Axelar Operational Reliability Benchmark...",
-          "[LOG] 2025-09-08T01:52:59.914Z: 📊 Testing 3 Operational Reliability criteria...",
-          "[LOG] 2025-09-08T01:52:59.915Z: \n=== Test 1: Observability Readiness ===",
-          "[LOG] 2025-09-08T01:52:59.915Z: 🔍 Testing Observability Readiness...",
-          "[LOG] 2025-09-08T01:52:59.915Z: 🔗 Connecting to Axelar network...",
-          "[ERROR] 2025-09-08T01:52:59.917Z: (node:39676) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.\n(Use `node --trace-deprecation ...` to show where the warning was created)",
-          "[LOG] 2025-09-08T01:53:00.122Z: ✅ Cosmos wallet initialized: axelar14lgyh9gcvxcs4g3qwrfhraxgrha8gnk7pqnapr",
-          "[LOG] 2025-09-08T01:53:00.122Z: ✅ Cosmos client connected to: https://axelart.tendermintrpc.lava.build",
-          "[LOG] 2025-09-08T01:53:00.430Z: ✅ Connected to Axelar network with 76 active chains",
-          "[LOG] 2025-09-08T01:53:00.430Z: ✅ Supported chains: 9",
-          "[LOG] 2025-09-08T01:53:00.431Z: ✅ Wallets initialized: 2",
-          "[LOG] 2025-09-08T01:53:00.431Z: 📤 Testing successful cross-chain atomic swap with observability...",
-          "[LOG] 2025-09-08T01:53:00.431Z: 🔄 Executing cross-chain atomic swap: observability_success_1757296380431",
-          "[LOG] 2025-09-08T01:53:00.431Z:    ETH Amount: 0.001 ETH",
-          "[LOG] 2025-09-08T01:53:00.431Z:    DEV Amount: 0.001 DEV",
-          "[LOG] 2025-09-08T01:53:00.431Z: 🔒 Step 1: Transferring ETH on Sepolia...",
-          "[LOG] 2025-09-08T01:53:01.413Z:    📝 ETH transfer transaction sent: 0xe57340c0da921d24f78b37c599da01a112571fe5ce8618bf711f25420fedd2e1",
-          "[LOG] 2025-09-08T01:53:14.468Z:    ✅ ETH transferred on-chain: 0.001 ETH",
-          "[LOG] 2025-09-08T01:53:14.469Z: 🔒 Step 2: Transferring DEV on Moonbeam...",
-          "[LOG] 2025-09-08T01:53:15.075Z:    📝 DEV transfer transaction sent: 0x769c22509752a9281d67be6d08ff4af42859f742f8a768b13b2f9b42ccc016c5",
-          "[LOG] 2025-09-08T01:53:19.452Z:    ✅ DEV transferred on-chain: 0.001 DEV",
-          "[LOG] 2025-09-08T01:53:19.452Z: 🎉 Cross-chain atomic swap completed successfully!",
-          "[LOG] 2025-09-08T01:53:19.452Z: ✅ Successful cross-chain swap: observability_success_1757296380431",
-          "[LOG] 2025-09-08T01:53:19.452Z: 📤 Testing failed cross-chain atomic swap with observability...",
-          "[LOG] 2025-09-08T01:53:19.453Z: 🔄 Executing cross-chain atomic swap: observability_failed_1757296399453",
-          "[LOG] 2025-09-08T01:53:19.453Z:    ETH Amount: 1000.0 ETH",
-          "[LOG] 2025-09-08T01:53:19.453Z:    DEV Amount: 1000.0 DEV",
-          "[LOG] 2025-09-08T01:53:19.453Z: 🔒 Step 1: Transferring ETH on Sepolia...",
-          "[ERROR] 2025-09-08T01:53:19.673Z: ❌ Cross-chain atomic swap failed: insufficient funds (transaction={ \"from\": \"0x3808ab2b060d1648c3bb8fc617f9df752143dafb\", \"nonce\": \"0x50e\", \"to\": \"0x7b52c77f01ae2cd0a59c0b24de48f21121e6c2bc\", \"value\": \"0x3635c9adc5dea00000\" }, info={ \"error\": { \"code\": -32003, \"message\": \"insufficient funds for gas * price + value: have 1068819162089394159 want 1000000000000000000000\" }, \"payload\": { \"id\": 33, \"jsonrpc\": \"2.0\", \"method\": \"eth_estimateGas\", \"params\": [ { \"from\": \"0x3808ab2b060d1648c3bb8fc617f9df752143dafb\", \"nonce\": \"0x50e\", \"to\": \"0x7b52c77f01ae2cd0a59c0b24de48f21121e6c2bc\", \"value\": \"0x3635c9adc5dea00000\" } ] } }, code=INSUFFICIENT_FUNDS, version=6.15.0)"
+          "[LOG] 2025-09-08T03:34:35.287Z: 🚀 Starting Axelar Operational Reliability Benchmark...",
+          "[LOG] 2025-09-08T03:34:35.288Z: 📊 Testing 3 Operational Reliability criteria...",
+          "[LOG] 2025-09-08T03:34:35.288Z: \n=== Test 1: Observability Readiness ===",
+          "[LOG] 2025-09-08T03:34:35.288Z: 🔍 Testing Observability Readiness...",
+          "[LOG] 2025-09-08T03:34:35.289Z: 🔗 Connecting to Axelar network...",
+          "[ERROR] 2025-09-08T03:34:35.290Z: (node:6696) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.\n(Use `node --trace-deprecation ...` to show where the warning was created)",
+          "[LOG] 2025-09-08T03:34:35.558Z: ✅ Cosmos wallet initialized: axelar14lgyh9gcvxcs4g3qwrfhraxgrha8gnk7pqnapr",
+          "[LOG] 2025-09-08T03:34:35.559Z: ✅ Cosmos client connected to: https://axelart.tendermintrpc.lava.build",
+          "[LOG] 2025-09-08T03:34:35.867Z: ✅ Connected to Axelar network with 76 active chains",
+          "[LOG] 2025-09-08T03:34:35.867Z: ✅ Supported chains: 9",
+          "[LOG] 2025-09-08T03:34:35.867Z: ✅ Wallets initialized: 2",
+          "[LOG] 2025-09-08T03:34:35.868Z: 📤 Testing successful cross-chain atomic swap with observability...",
+          "[LOG] 2025-09-08T03:34:35.868Z: 🔄 Executing cross-chain atomic swap: observability_success_1757302475868",
+          "[LOG] 2025-09-08T03:34:35.868Z:    ETH Amount: 0.001 ETH",
+          "[LOG] 2025-09-08T03:34:35.868Z:    DEV Amount: 0.001 DEV",
+          "[LOG] 2025-09-08T03:34:35.868Z: 🔒 Step 1: Transferring ETH on Sepolia...",
+          "[LOG] 2025-09-08T03:34:36.824Z:    📝 ETH transfer transaction sent: 0x5190547279dee8d6214a82c96d1d934ab8f988c6e6d1289639f23edf259bddc4",
+          "[LOG] 2025-09-08T03:34:50.061Z:    ✅ ETH transferred on-chain: 0.001 ETH",
+          "[LOG] 2025-09-08T03:34:50.062Z: 🔒 Step 2: Transferring DEV on Moonbeam...",
+          "[LOG] 2025-09-08T03:34:50.689Z:    📝 DEV transfer transaction sent: 0x197dd1a2953a5378c25c5df295e91cf283de5a02d2acab3c65d5b4d0841c1b5e",
+          "[LOG] 2025-09-08T03:34:55.018Z:    ✅ DEV transferred on-chain: 0.001 DEV",
+          "[LOG] 2025-09-08T03:34:55.019Z: 🎉 Cross-chain atomic swap completed successfully!",
+          "[LOG] 2025-09-08T03:34:55.019Z: ✅ Successful cross-chain swap: observability_success_1757302475868",
+          "[LOG] 2025-09-08T03:34:55.019Z: 📤 Testing failed cross-chain atomic swap with observability...",
+          "[LOG] 2025-09-08T03:34:55.019Z: 🔄 Executing cross-chain atomic swap: observability_failed_1757302495019",
+          "[LOG] 2025-09-08T03:34:55.019Z:    ETH Amount: 1000.0 ETH",
+          "[LOG] 2025-09-08T03:34:55.019Z:    DEV Amount: 1000.0 DEV",
+          "[LOG] 2025-09-08T03:34:55.019Z: 🔒 Step 1: Transferring ETH on Sepolia...",
+          "[ERROR] 2025-09-08T03:34:55.239Z: ❌ Cross-chain atomic swap failed: insufficient funds (transaction={ \"from\": \"0x3808ab2b060d1648c3bb8fc617f9df752143dafb\", \"nonce\": \"0x52f\", \"to\": \"0x7b52c77f01ae2cd0a59c0b24de48f21121e6c2bc\", \"value\": \"0x3635c9adc5dea00000\" }, info={ \"error\": { \"code\": -32003, \"message\": \"insufficient funds for gas * price + value: have 1061915490062133159 want 1000000000000000000000\" }, \"payload\": { \"id\": 36, \"jsonrpc\": \"2.0\", \"method\": \"eth_estimateGas\", \"params\": [ { \"from\": \"0x3808ab2b060d1648c3bb8fc617f9df752143dafb\", \"nonce\": \"0x52f\", \"to\": \"0x7b52c77f01ae2cd0a59c0b24de48f21121e6c2bc\", \"value\": \"0x3635c9adc5dea00000\" } ] } }, code=INSUFFICIENT_FUNDS, version=6.15.0)"
         ],
         "metrics": {
-          "timestamp": "2025-09-08T01:53:19.674Z",
+          "timestamp": "2025-09-08T03:34:55.239Z",
           "memoryUsage": {
-            "rss": 535572480,
-            "heapTotal": 482910208,
-            "heapUsed": 471730200,
-            "external": 11048644,
-            "arrayBuffers": 2731396
+            "rss": 541474816,
+            "heapTotal": 485040128,
+            "heapUsed": 471342928,
+            "external": 11000026,
+            "arrayBuffers": 2682778
           },
-          "uptime": 23.949137,
+          "uptime": 24.3613132,
           "cpuUsage": {
-            "user": 6453000,
-            "system": 1453000
+            "user": 6546000,
+            "system": 1750000
           },
           "activeHandles": 2,
           "activeRequests": 0,
@@ -75,10 +75,10 @@
           "supportedChains": 9
         },
         "traces": {
-          "traceId": "axl_1757296379915_74803ef67a969cc6",
-          "spanId": "577a547769ac01bd",
-          "transferId": "obs_test_1757296379915",
-          "timestamp": "2025-09-08T01:53:00.431Z",
+          "traceId": "axl_1757302475288_5432b1c373370967",
+          "spanId": "41f7caeebc6c5c70",
+          "transferId": "obs_test_1757302475288",
+          "timestamp": "2025-09-08T03:34:35.868Z",
           "operation": "axelar_transfer",
           "tags": {
             "service.name": "axelar-adapter",
@@ -88,18 +88,18 @@
           "events": [
             {
               "name": "transfer.initiated",
-              "timestamp": "2025-09-08T01:53:00.431Z",
+              "timestamp": "2025-09-08T03:34:35.868Z",
               "attributes": {
-                "transferId": "obs_test_1757296379915",
-                "correlationId": "axl_1757296379915_74803ef67a969cc6"
+                "transferId": "obs_test_1757302475288",
+                "correlationId": "axl_1757302475288_5432b1c373370967"
               }
             }
           ]
         },
-        "correlationId": "axl_1757296379915_74803ef67a969cc6",
-        "transferId": "obs_test_1757296379915",
+        "correlationId": "axl_1757302475288_5432b1c373370967",
+        "transferId": "obs_test_1757302475288",
         "success": true,
-        "timestamp": "2025-09-08T01:53:19.674Z",
+        "timestamp": "2025-09-08T03:34:55.240Z",
         "completenessScore": 4,
         "triadPresent": true
       },
@@ -109,52 +109,52 @@
       "domain": "Operational Reliability",
       "criterion": "Fault Recovery Capabilities",
       "unit": "seconds",
-      "value": 2013,
+      "value": 23148.333333333332,
       "method": "Kill local relayer/client mid-transfer and during idle; restart",
-      "timestamp": "2025-09-08T01:53:44.070Z",
+      "timestamp": "2025-09-08T03:36:10.222Z",
       "details": {
-        "mttr": 2013,
+        "mttr": 23148.333333333332,
         "exactlyOnceCompletion": true,
-        "manualSteps": 0,
-        "killTime": "2025-09-08T01:53:20.000Z",
-        "restartTime": "2025-09-08T01:53:22.013Z",
+        "manualSteps": 3,
+        "killTime": "2025-09-08T03:34:55.240Z",
+        "restartTime": "2025-09-08T03:36:10.222Z",
         "axelarLimitation": false
       },
       "evidence": {
-        "killTime": 1757296400000,
-        "restartTime": 1757296402013,
-        "mttr": 2013,
+        "killTime": 1757302495240,
+        "restartTime": 1757302570222,
+        "mttr": 23148.333333333332,
         "exactlyOnceCompletion": true,
-        "manualSteps": 0,
-        "transferId": "recovery_test_1757296399675",
+        "manualSteps": 3,
+        "transferId": "recovery_test_1757302570222",
         "success": true,
         "axelarLimitation": false
       },
-      "status": "passed"
+      "status": "partial"
     },
     {
       "domain": "Operational Reliability",
       "criterion": "Lifecycle Management Process",
       "unit": "seconds",
-      "value": 12.662,
+      "value": 12.095,
       "method": "Test configuration changes, connection state management, and system resilience during operational changes",
-      "timestamp": "2025-09-08T01:54:00.162Z",
+      "timestamp": "2025-09-08T03:36:25.724Z",
       "details": {
         "configChangeSuccess": true,
         "connectionStateSuccess": true,
         "resilienceSuccess": true,
         "stateTransitionSuccess": true,
-        "downtimeSeconds": 12.662,
+        "downtimeSeconds": 12.095,
         "compatibilityIssues": 0,
-        "configChangeTime": 3.842,
-        "connectionStateTime": 0.109,
-        "resilienceTime": 3.673,
-        "stateTransitionTime": 5.038
+        "configChangeTime": 3.849,
+        "connectionStateTime": 0.111,
+        "resilienceTime": 4.667,
+        "stateTransitionTime": 3.468
       },
       "evidence": {
         "upgradeSuccess": true,
         "rollbackSuccess": true,
-        "downtimeSeconds": 12.662,
+        "downtimeSeconds": 12.095,
         "compatibilityIssues": 0,
         "preUpgradeSuccess": true,
         "postUpgradeSuccess": true,
@@ -166,49 +166,49 @@
   "evidence": {
     "observabilityData": {
       "logs": [
-        "[LOG] 2025-09-08T01:52:59.913Z: 🚀 Starting Axelar Operational Reliability Benchmark...",
-        "[LOG] 2025-09-08T01:52:59.914Z: 📊 Testing 3 Operational Reliability criteria...",
-        "[LOG] 2025-09-08T01:52:59.915Z: \n=== Test 1: Observability Readiness ===",
-        "[LOG] 2025-09-08T01:52:59.915Z: 🔍 Testing Observability Readiness...",
-        "[LOG] 2025-09-08T01:52:59.915Z: 🔗 Connecting to Axelar network...",
-        "[ERROR] 2025-09-08T01:52:59.917Z: (node:39676) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.\n(Use `node --trace-deprecation ...` to show where the warning was created)",
-        "[LOG] 2025-09-08T01:53:00.122Z: ✅ Cosmos wallet initialized: axelar14lgyh9gcvxcs4g3qwrfhraxgrha8gnk7pqnapr",
-        "[LOG] 2025-09-08T01:53:00.122Z: ✅ Cosmos client connected to: https://axelart.tendermintrpc.lava.build",
-        "[LOG] 2025-09-08T01:53:00.430Z: ✅ Connected to Axelar network with 76 active chains",
-        "[LOG] 2025-09-08T01:53:00.430Z: ✅ Supported chains: 9",
-        "[LOG] 2025-09-08T01:53:00.431Z: ✅ Wallets initialized: 2",
-        "[LOG] 2025-09-08T01:53:00.431Z: 📤 Testing successful cross-chain atomic swap with observability...",
-        "[LOG] 2025-09-08T01:53:00.431Z: 🔄 Executing cross-chain atomic swap: observability_success_1757296380431",
-        "[LOG] 2025-09-08T01:53:00.431Z:    ETH Amount: 0.001 ETH",
-        "[LOG] 2025-09-08T01:53:00.431Z:    DEV Amount: 0.001 DEV",
-        "[LOG] 2025-09-08T01:53:00.431Z: 🔒 Step 1: Transferring ETH on Sepolia...",
-        "[LOG] 2025-09-08T01:53:01.413Z:    📝 ETH transfer transaction sent: 0xe57340c0da921d24f78b37c599da01a112571fe5ce8618bf711f25420fedd2e1",
-        "[LOG] 2025-09-08T01:53:14.468Z:    ✅ ETH transferred on-chain: 0.001 ETH",
-        "[LOG] 2025-09-08T01:53:14.469Z: 🔒 Step 2: Transferring DEV on Moonbeam...",
-        "[LOG] 2025-09-08T01:53:15.075Z:    📝 DEV transfer transaction sent: 0x769c22509752a9281d67be6d08ff4af42859f742f8a768b13b2f9b42ccc016c5",
-        "[LOG] 2025-09-08T01:53:19.452Z:    ✅ DEV transferred on-chain: 0.001 DEV",
-        "[LOG] 2025-09-08T01:53:19.452Z: 🎉 Cross-chain atomic swap completed successfully!",
-        "[LOG] 2025-09-08T01:53:19.452Z: ✅ Successful cross-chain swap: observability_success_1757296380431",
-        "[LOG] 2025-09-08T01:53:19.452Z: 📤 Testing failed cross-chain atomic swap with observability...",
-        "[LOG] 2025-09-08T01:53:19.453Z: 🔄 Executing cross-chain atomic swap: observability_failed_1757296399453",
-        "[LOG] 2025-09-08T01:53:19.453Z:    ETH Amount: 1000.0 ETH",
-        "[LOG] 2025-09-08T01:53:19.453Z:    DEV Amount: 1000.0 DEV",
-        "[LOG] 2025-09-08T01:53:19.453Z: 🔒 Step 1: Transferring ETH on Sepolia...",
-        "[ERROR] 2025-09-08T01:53:19.673Z: ❌ Cross-chain atomic swap failed: insufficient funds (transaction={ \"from\": \"0x3808ab2b060d1648c3bb8fc617f9df752143dafb\", \"nonce\": \"0x50e\", \"to\": \"0x7b52c77f01ae2cd0a59c0b24de48f21121e6c2bc\", \"value\": \"0x3635c9adc5dea00000\" }, info={ \"error\": { \"code\": -32003, \"message\": \"insufficient funds for gas * price + value: have 1068819162089394159 want 1000000000000000000000\" }, \"payload\": { \"id\": 33, \"jsonrpc\": \"2.0\", \"method\": \"eth_estimateGas\", \"params\": [ { \"from\": \"0x3808ab2b060d1648c3bb8fc617f9df752143dafb\", \"nonce\": \"0x50e\", \"to\": \"0x7b52c77f01ae2cd0a59c0b24de48f21121e6c2bc\", \"value\": \"0x3635c9adc5dea00000\" } ] } }, code=INSUFFICIENT_FUNDS, version=6.15.0)"
+        "[LOG] 2025-09-08T03:34:35.287Z: 🚀 Starting Axelar Operational Reliability Benchmark...",
+        "[LOG] 2025-09-08T03:34:35.288Z: 📊 Testing 3 Operational Reliability criteria...",
+        "[LOG] 2025-09-08T03:34:35.288Z: \n=== Test 1: Observability Readiness ===",
+        "[LOG] 2025-09-08T03:34:35.288Z: 🔍 Testing Observability Readiness...",
+        "[LOG] 2025-09-08T03:34:35.289Z: 🔗 Connecting to Axelar network...",
+        "[ERROR] 2025-09-08T03:34:35.290Z: (node:6696) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.\n(Use `node --trace-deprecation ...` to show where the warning was created)",
+        "[LOG] 2025-09-08T03:34:35.558Z: ✅ Cosmos wallet initialized: axelar14lgyh9gcvxcs4g3qwrfhraxgrha8gnk7pqnapr",
+        "[LOG] 2025-09-08T03:34:35.559Z: ✅ Cosmos client connected to: https://axelart.tendermintrpc.lava.build",
+        "[LOG] 2025-09-08T03:34:35.867Z: ✅ Connected to Axelar network with 76 active chains",
+        "[LOG] 2025-09-08T03:34:35.867Z: ✅ Supported chains: 9",
+        "[LOG] 2025-09-08T03:34:35.867Z: ✅ Wallets initialized: 2",
+        "[LOG] 2025-09-08T03:34:35.868Z: 📤 Testing successful cross-chain atomic swap with observability...",
+        "[LOG] 2025-09-08T03:34:35.868Z: 🔄 Executing cross-chain atomic swap: observability_success_1757302475868",
+        "[LOG] 2025-09-08T03:34:35.868Z:    ETH Amount: 0.001 ETH",
+        "[LOG] 2025-09-08T03:34:35.868Z:    DEV Amount: 0.001 DEV",
+        "[LOG] 2025-09-08T03:34:35.868Z: 🔒 Step 1: Transferring ETH on Sepolia...",
+        "[LOG] 2025-09-08T03:34:36.824Z:    📝 ETH transfer transaction sent: 0x5190547279dee8d6214a82c96d1d934ab8f988c6e6d1289639f23edf259bddc4",
+        "[LOG] 2025-09-08T03:34:50.061Z:    ✅ ETH transferred on-chain: 0.001 ETH",
+        "[LOG] 2025-09-08T03:34:50.062Z: 🔒 Step 2: Transferring DEV on Moonbeam...",
+        "[LOG] 2025-09-08T03:34:50.689Z:    📝 DEV transfer transaction sent: 0x197dd1a2953a5378c25c5df295e91cf283de5a02d2acab3c65d5b4d0841c1b5e",
+        "[LOG] 2025-09-08T03:34:55.018Z:    ✅ DEV transferred on-chain: 0.001 DEV",
+        "[LOG] 2025-09-08T03:34:55.019Z: 🎉 Cross-chain atomic swap completed successfully!",
+        "[LOG] 2025-09-08T03:34:55.019Z: ✅ Successful cross-chain swap: observability_success_1757302475868",
+        "[LOG] 2025-09-08T03:34:55.019Z: 📤 Testing failed cross-chain atomic swap with observability...",
+        "[LOG] 2025-09-08T03:34:55.019Z: 🔄 Executing cross-chain atomic swap: observability_failed_1757302495019",
+        "[LOG] 2025-09-08T03:34:55.019Z:    ETH Amount: 1000.0 ETH",
+        "[LOG] 2025-09-08T03:34:55.019Z:    DEV Amount: 1000.0 DEV",
+        "[LOG] 2025-09-08T03:34:55.019Z: 🔒 Step 1: Transferring ETH on Sepolia...",
+        "[ERROR] 2025-09-08T03:34:55.239Z: ❌ Cross-chain atomic swap failed: insufficient funds (transaction={ \"from\": \"0x3808ab2b060d1648c3bb8fc617f9df752143dafb\", \"nonce\": \"0x52f\", \"to\": \"0x7b52c77f01ae2cd0a59c0b24de48f21121e6c2bc\", \"value\": \"0x3635c9adc5dea00000\" }, info={ \"error\": { \"code\": -32003, \"message\": \"insufficient funds for gas * price + value: have 1061915490062133159 want 1000000000000000000000\" }, \"payload\": { \"id\": 36, \"jsonrpc\": \"2.0\", \"method\": \"eth_estimateGas\", \"params\": [ { \"from\": \"0x3808ab2b060d1648c3bb8fc617f9df752143dafb\", \"nonce\": \"0x52f\", \"to\": \"0x7b52c77f01ae2cd0a59c0b24de48f21121e6c2bc\", \"value\": \"0x3635c9adc5dea00000\" } ] } }, code=INSUFFICIENT_FUNDS, version=6.15.0)"
       ],
       "metrics": {
-        "timestamp": "2025-09-08T01:53:19.674Z",
+        "timestamp": "2025-09-08T03:34:55.239Z",
         "memoryUsage": {
-          "rss": 535572480,
-          "heapTotal": 482910208,
-          "heapUsed": 471730200,
-          "external": 11048644,
-          "arrayBuffers": 2731396
+          "rss": 541474816,
+          "heapTotal": 485040128,
+          "heapUsed": 471342928,
+          "external": 11000026,
+          "arrayBuffers": 2682778
         },
-        "uptime": 23.949137,
+        "uptime": 24.3613132,
         "cpuUsage": {
-          "user": 6453000,
-          "system": 1453000
+          "user": 6546000,
+          "system": 1750000
         },
         "activeHandles": 2,
         "activeRequests": 0,
@@ -216,10 +216,10 @@
         "supportedChains": 9
       },
       "traces": {
-        "traceId": "axl_1757296379915_74803ef67a969cc6",
-        "spanId": "577a547769ac01bd",
-        "transferId": "obs_test_1757296379915",
-        "timestamp": "2025-09-08T01:53:00.431Z",
+        "traceId": "axl_1757302475288_5432b1c373370967",
+        "spanId": "41f7caeebc6c5c70",
+        "transferId": "obs_test_1757302475288",
+        "timestamp": "2025-09-08T03:34:35.868Z",
         "operation": "axelar_transfer",
         "tags": {
           "service.name": "axelar-adapter",
@@ -229,35 +229,35 @@
         "events": [
           {
             "name": "transfer.initiated",
-            "timestamp": "2025-09-08T01:53:00.431Z",
+            "timestamp": "2025-09-08T03:34:35.868Z",
             "attributes": {
-              "transferId": "obs_test_1757296379915",
-              "correlationId": "axl_1757296379915_74803ef67a969cc6"
+              "transferId": "obs_test_1757302475288",
+              "correlationId": "axl_1757302475288_5432b1c373370967"
             }
           }
         ]
       },
-      "correlationId": "axl_1757296379915_74803ef67a969cc6",
-      "transferId": "obs_test_1757296379915",
+      "correlationId": "axl_1757302475288_5432b1c373370967",
+      "transferId": "obs_test_1757302475288",
       "success": true,
-      "timestamp": "2025-09-08T01:53:19.674Z",
+      "timestamp": "2025-09-08T03:34:55.240Z",
       "completenessScore": 4,
       "triadPresent": true
     },
     "recoveryData": {
-      "killTime": 1757296400000,
-      "restartTime": 1757296402013,
-      "mttr": 2013,
+      "killTime": 1757302495240,
+      "restartTime": 1757302570222,
+      "mttr": 23148.333333333332,
       "exactlyOnceCompletion": true,
-      "manualSteps": 0,
-      "transferId": "recovery_test_1757296399675",
+      "manualSteps": 3,
+      "transferId": "recovery_test_1757302570222",
       "success": true,
       "axelarLimitation": false
     }
   },
   "summary": {
     "observabilityReadiness": "passed",
-    "faultRecoveryCapabilities": "passed",
+    "faultRecoveryCapabilities": "partial",
     "lifecycleManagementProcess": "passed"
   }
 }
