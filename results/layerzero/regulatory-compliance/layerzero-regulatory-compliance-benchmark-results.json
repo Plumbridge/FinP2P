@@ -1,0 +1,967 @@
+{
+  "testDate": "2025-09-08T04:40:46.819Z",
+  "duration": "N/A",
+  "overallScore": "60.00%",
+  "totalCriteria": 5,
+  "passedCriteria": 2,
+  "partialCriteria": 2,
+  "failedCriteria": 1,
+  "domain": "Regulatory Compliance",
+  "criteria": [
+    {
+      "domain": "Regulatory Compliance",
+      "criterion": "Atomicity Enforcement",
+      "unit": "Atomicity compliance score (%)",
+      "value": 83.33333333333334,
+      "method": "30 cross-network transfers with injected client retries and one intentional RPC outage (15s drop)",
+      "timestamp": "2025-09-08T04:40:46.814Z",
+      "details": {
+        "atomicityRate": "83.3%",
+        "totalTransfers": 30,
+        "atomicTransfers": 25,
+        "partialStates": 5,
+        "retriesPerSuccess": "0.00",
+        "totalRetries": 0,
+        "failureTaxonomy": {
+          "networkErrors": 0,
+          "rpcErrors": 5,
+          "otherErrors": 0
+        }
+      },
+      "evidence": {
+        "transfers": [
+          {
+            "swapId": "atomic_test_1757305970936_0",
+            "success": true,
+            "sepoliaTxHash": "0x6df571978d452fd7ef7d1d7f3aaa0b03857c53167a70b6a477a866a94a17cd92",
+            "polygonTxHash": "0xd4340c4f12625e2af606d0d3cbb186e829c8502fb448eac81269de9551914aeb",
+            "atomic": true
+          },
+          {
+            "swapId": "atomic_test_1757305985963_1",
+            "success": true,
+            "sepoliaTxHash": "0x278a6d5ae854fdfa6eb623d8d5992d34736ea5a9884f58bbb54dffdc27d3a97e",
+            "polygonTxHash": "0x62ce3f482387ce861de057e31551211fd6323419ef1c071d1a4abc078d522564",
+            "atomic": true
+          },
+          {
+            "swapId": "atomic_test_1757306009083_2",
+            "success": true,
+            "sepoliaTxHash": "0x28b70b3ce20ed922553aa24139d3c8db9973592fe44e61495d5cdeaf28088c9c",
+            "polygonTxHash": "0xd418a71caa0ee7de1dc8e97c65feee35ef92c5c7eb3237e6fb734330302f0f4d",
+            "atomic": true
+          },
+          {
+            "swapId": "atomic_test_1757306032309_3",
+            "success": true,
+            "sepoliaTxHash": "0x690228bcf4991768a1c9feee17519d1cab959a21b84931b864413c26deb81b4d",
+            "polygonTxHash": "0x9e4979c14964950e5510930868e83ce52242a46a90c03effbc0c9f0dee11e03e",
+            "atomic": true
+          },
+          {
+            "swapId": "atomic_test_1757306054794_4",
+            "success": true,
+            "sepoliaTxHash": "0xc21f96dcc14b04cf968f0fc3559d2136f8db96d59fac16bd2daa41e6059fedd4",
+            "polygonTxHash": "0x65a48cc0e0ade915e161ac92d29b80d5b505c27f43fdb24e75dbf80f4a56b989",
+            "atomic": true
+          },
+          {
+            "swapId": "atomic_test_1757306069323_5",
+            "success": true,
+            "sepoliaTxHash": "0x1ab824dfb199a70622d863afa0b45f3875c132488ea71ecac7d68fb818bc18e0",
+            "polygonTxHash": "0xfa48b9c42bd8a586bbaa1dfbb160263bfc01dbedd798467593843f39b199dbd1",
+            "atomic": true
+          },
+          {
+            "swapId": "atomic_test_1757306079519_6",
+            "success": true,
+            "sepoliaTxHash": "0x6c635226988466a0294ddef897d478516df3651d125d0e5c4f7443fb0a2586f6",
+            "polygonTxHash": "0xc7801c3d2397a7faf02fea343775fbdad07f4f4f54dce09e351811ed4fd454b9",
+            "atomic": true
+          },
+          {
+            "swapId": "atomic_test_1757306106031_7",
+            "success": true,
+            "sepoliaTxHash": "0x7e486c44f1e5fc1c31c316055bff198fe3c35bfca203189ea152ad2fd5a5d95e",
+            "polygonTxHash": "0x78bc2c4d89205d046385ac1cc171549060ea6c5e8aa11df01448cf1fc8315680",
+            "atomic": true
+          },
+          {
+            "swapId": "atomic_test_1757306128281_8",
+            "success": true,
+            "sepoliaTxHash": "0xbc3af9c1f3ae55127fb766a2469bde24aced0674542423a837239ee4316d0e40",
+            "polygonTxHash": "0xa864f57e9c900d668669c1260320345f8a59548d9200fdb4c289736bbff5e416",
+            "atomic": true
+          },
+          {
+            "swapId": "atomic_test_1757306151009_9",
+            "success": true,
+            "sepoliaTxHash": "0x642df9f1205e982a5917344c854557142e9b454f55d4c981dfa17547bd910b60",
+            "polygonTxHash": "0xebbe6b87e72baffcf32ed075f6cab097553769a75544f0d48be2ff461376c549",
+            "atomic": true
+          },
+          {
+            "swapId": "atomic_test_1757306165050_10",
+            "success": true,
+            "sepoliaTxHash": "0xea36a354c3e73646eb10aebb81ed2a81cf8b365704c65a2a5a36d6c723f19a9d",
+            "polygonTxHash": "0x0a7479e2b330648cdcd5a125258dfc5f9ca05898432f07e97fc60b2cf931aa76",
+            "atomic": true
+          },
+          {
+            "swapId": "atomic_test_1757306191304_11",
+            "success": true,
+            "sepoliaTxHash": "0x23d99fc19961c5c8403e1a56ec2737f6758407392fa2af70c86e876dedef8c33",
+            "polygonTxHash": "0x27d93bc49b350eece27be0a779b54acf6ef4f89055431190209699443aa09c4c",
+            "atomic": true
+          },
+          {
+            "swapId": "atomic_test_1757306201201_12",
+            "success": true,
+            "sepoliaTxHash": "0x3c0fcda561c8d8481230c2e2b6b7fd741be470734d95338c3d808265cd3b80aa",
+            "polygonTxHash": "0x52d6b8781811477e57cc06f5637e7af58e7bb4e97573b0a8cd40d212be6eef0d",
+            "atomic": true
+          },
+          {
+            "swapId": "atomic_test_1757306212486_13",
+            "success": true,
+            "sepoliaTxHash": "0x3464d9e684ad68a685bb66b60b9e04964b693656c83e7f44e5a460f218441024",
+            "polygonTxHash": "0x96bda89440c8537a5832c45097288d122c652ebb4f57dd6e8d061a438bb3f168",
+            "atomic": true
+          },
+          {
+            "swapId": "atomic_test_1757306238984_14",
+            "success": true,
+            "sepoliaTxHash": "0xed3647e5b28886de05968cf2c4958c381e8f516d44667728f218560b456da512",
+            "polygonTxHash": "0xdea6bc8b4c6cbebf43a36c4e37fa29f79fa706e854de8b2a0bb4838f7bd5b3a1",
+            "atomic": true
+          },
+          {
+            "swapId": "atomic_test_1757306249413_15",
+            "success": true,
+            "sepoliaTxHash": "0xbf5a9ca2bb7adaaa2ce369deb45f22008f7e74ef821c674d57cbbc99459f79a0",
+            "polygonTxHash": "0x551915dc5a35a65a2f97d485d88f55e20ca5732ae67596140b4bd178430991f3",
+            "atomic": true
+          },
+          {
+            "swapId": "atomic_test_1757306259098_16",
+            "success": true,
+            "sepoliaTxHash": "0x4ac8c51f5feebbbc0fb66f01299a8171182517860950ac0fd76dc62f9c9ad2a4",
+            "polygonTxHash": "0xe2f3b9b8c1a97fd88612590b0732376b1e4b803ab101d3162913a1f583fd209d",
+            "atomic": true
+          },
+          {
+            "swapId": "atomic_test_1757306285677_17",
+            "success": true,
+            "sepoliaTxHash": "0xf739573d69f63ddedf28855666c92fa6d56d193fd6f25941865c6727ea37d724",
+            "polygonTxHash": "0x4162b2f4f8d615b68ebb00f03bbd229f43c8a65469bb81e6c06429e3f1b10752",
+            "atomic": true
+          },
+          {
+            "swapId": "atomic_test_1757306295345_18",
+            "success": true,
+            "sepoliaTxHash": "0x9fcb24b0d0cd86b3d0a861adfcd17d48838ba9f1e5538c6d34142a205282c363",
+            "polygonTxHash": "0x4389a386f41e1aea184668c754353f0339658dd43ac1775ad2a5d569030a7ae2",
+            "atomic": true
+          },
+          {
+            "swapId": "atomic_test_1757306309235_19",
+            "success": true,
+            "sepoliaTxHash": "0x2be2337fcc3000e740823f100cba0d67850ea3717980ff7d2882981afafe37bb",
+            "polygonTxHash": "0xdcdbca26e2ebb2e5ddaee90a682401ab3aa940cdc5c276fafeea3d2c91c69132",
+            "atomic": true
+          }
+        ],
+        "retries": [
+          {
+            "swapId": "retry_test_1757306332566_0",
+            "attempts": 1,
+            "success": true,
+            "sepoliaTxHash": "0xb2a026887e1e444566da6267bcf5568a003092acb4beb374625be98e89c60dc4",
+            "polygonTxHash": "0xacd3c8a222ff2cc28aed4ce3ce982795fdd15891a20772f1951e755c08e6197b"
+          },
+          {
+            "swapId": "retry_test_1757306355227_1",
+            "attempts": 1,
+            "success": true,
+            "sepoliaTxHash": "0xd52e0f0072beb172abeadf5514a44021a0499c0ef97838403aed51cd854be0da",
+            "polygonTxHash": "0x51fbe30b6a2c16cd5801274b05b063258fcbfb0493296e9261e97cf83fcebe86"
+          },
+          {
+            "swapId": "retry_test_1757306377690_2",
+            "attempts": 1,
+            "success": true,
+            "sepoliaTxHash": "0x602322360b519fbc5ec55a0501e3550bc8cb3b8942b917bca2e23977411943c6",
+            "polygonTxHash": "0x5970a91b77eaa5df35a16074e147a91210110114a12125f8f298ced06434c064"
+          },
+          {
+            "swapId": "retry_test_1757306392728_3",
+            "attempts": 1,
+            "success": true,
+            "sepoliaTxHash": "0xc1af7d459ad8d680362b7b586ab9048fc39dacc767dee1e66a0b384b1848a877",
+            "polygonTxHash": "0x2033a35d0ae5971e38986eba1af33adfdff17f2c1dcfa6a35173ccfb37b08b7a"
+          },
+          {
+            "swapId": "retry_test_1757306415698_4",
+            "attempts": 1,
+            "success": true,
+            "sepoliaTxHash": "0x10809e05e275b63f147e149c0968e7d45b20f6f4546a4065133468c08ac291b5",
+            "polygonTxHash": "0xe260c1fc2916fe0bff89656b51e10d686a79ef7d0172ff792d32e6905f263c1f"
+          }
+        ],
+        "failures": [
+          {
+            "swapId": "outage_test_1757306416711_0",
+            "error": "RPC outage simulation",
+            "atomic": false,
+            "outageTest": true
+          },
+          {
+            "swapId": "outage_test_1757306422731_1",
+            "error": "RPC outage simulation",
+            "atomic": false,
+            "outageTest": true
+          },
+          {
+            "swapId": "outage_test_1757306428744_2",
+            "error": "RPC outage simulation",
+            "atomic": false,
+            "outageTest": true
+          },
+          {
+            "swapId": "outage_test_1757306434767_3",
+            "error": "RPC outage simulation",
+            "atomic": false,
+            "outageTest": true
+          },
+          {
+            "swapId": "outage_test_1757306440794_4",
+            "error": "RPC outage simulation",
+            "atomic": false,
+            "outageTest": true
+          }
+        ],
+        "txHashes": [
+          "0x6df571978d452fd7ef7d1d7f3aaa0b03857c53167a70b6a477a866a94a17cd92",
+          "0xd4340c4f12625e2af606d0d3cbb186e829c8502fb448eac81269de9551914aeb",
+          "0x278a6d5ae854fdfa6eb623d8d5992d34736ea5a9884f58bbb54dffdc27d3a97e",
+          "0x62ce3f482387ce861de057e31551211fd6323419ef1c071d1a4abc078d522564",
+          "0x28b70b3ce20ed922553aa24139d3c8db9973592fe44e61495d5cdeaf28088c9c",
+          "0xd418a71caa0ee7de1dc8e97c65feee35ef92c5c7eb3237e6fb734330302f0f4d",
+          "0x690228bcf4991768a1c9feee17519d1cab959a21b84931b864413c26deb81b4d",
+          "0x9e4979c14964950e5510930868e83ce52242a46a90c03effbc0c9f0dee11e03e",
+          "0xc21f96dcc14b04cf968f0fc3559d2136f8db96d59fac16bd2daa41e6059fedd4",
+          "0x65a48cc0e0ade915e161ac92d29b80d5b505c27f43fdb24e75dbf80f4a56b989",
+          "0x1ab824dfb199a70622d863afa0b45f3875c132488ea71ecac7d68fb818bc18e0",
+          "0xfa48b9c42bd8a586bbaa1dfbb160263bfc01dbedd798467593843f39b199dbd1",
+          "0x6c635226988466a0294ddef897d478516df3651d125d0e5c4f7443fb0a2586f6",
+          "0xc7801c3d2397a7faf02fea343775fbdad07f4f4f54dce09e351811ed4fd454b9",
+          "0x7e486c44f1e5fc1c31c316055bff198fe3c35bfca203189ea152ad2fd5a5d95e",
+          "0x78bc2c4d89205d046385ac1cc171549060ea6c5e8aa11df01448cf1fc8315680",
+          "0xbc3af9c1f3ae55127fb766a2469bde24aced0674542423a837239ee4316d0e40",
+          "0xa864f57e9c900d668669c1260320345f8a59548d9200fdb4c289736bbff5e416",
+          "0x642df9f1205e982a5917344c854557142e9b454f55d4c981dfa17547bd910b60",
+          "0xebbe6b87e72baffcf32ed075f6cab097553769a75544f0d48be2ff461376c549",
+          "0xea36a354c3e73646eb10aebb81ed2a81cf8b365704c65a2a5a36d6c723f19a9d",
+          "0x0a7479e2b330648cdcd5a125258dfc5f9ca05898432f07e97fc60b2cf931aa76",
+          "0x23d99fc19961c5c8403e1a56ec2737f6758407392fa2af70c86e876dedef8c33",
+          "0x27d93bc49b350eece27be0a779b54acf6ef4f89055431190209699443aa09c4c",
+          "0x3c0fcda561c8d8481230c2e2b6b7fd741be470734d95338c3d808265cd3b80aa",
+          "0x52d6b8781811477e57cc06f5637e7af58e7bb4e97573b0a8cd40d212be6eef0d",
+          "0x3464d9e684ad68a685bb66b60b9e04964b693656c83e7f44e5a460f218441024",
+          "0x96bda89440c8537a5832c45097288d122c652ebb4f57dd6e8d061a438bb3f168",
+          "0xed3647e5b28886de05968cf2c4958c381e8f516d44667728f218560b456da512",
+          "0xdea6bc8b4c6cbebf43a36c4e37fa29f79fa706e854de8b2a0bb4838f7bd5b3a1",
+          "0xbf5a9ca2bb7adaaa2ce369deb45f22008f7e74ef821c674d57cbbc99459f79a0",
+          "0x551915dc5a35a65a2f97d485d88f55e20ca5732ae67596140b4bd178430991f3",
+          "0x4ac8c51f5feebbbc0fb66f01299a8171182517860950ac0fd76dc62f9c9ad2a4",
+          "0xe2f3b9b8c1a97fd88612590b0732376b1e4b803ab101d3162913a1f583fd209d",
+          "0xf739573d69f63ddedf28855666c92fa6d56d193fd6f25941865c6727ea37d724",
+          "0x4162b2f4f8d615b68ebb00f03bbd229f43c8a65469bb81e6c06429e3f1b10752",
+          "0x9fcb24b0d0cd86b3d0a861adfcd17d48838ba9f1e5538c6d34142a205282c363",
+          "0x4389a386f41e1aea184668c754353f0339658dd43ac1775ad2a5d569030a7ae2",
+          "0x2be2337fcc3000e740823f100cba0d67850ea3717980ff7d2882981afafe37bb",
+          "0xdcdbca26e2ebb2e5ddaee90a682401ab3aa940cdc5c276fafeea3d2c91c69132",
+          "0xb2a026887e1e444566da6267bcf5568a003092acb4beb374625be98e89c60dc4",
+          "0xacd3c8a222ff2cc28aed4ce3ce982795fdd15891a20772f1951e755c08e6197b",
+          "0xd52e0f0072beb172abeadf5514a44021a0499c0ef97838403aed51cd854be0da",
+          "0x51fbe30b6a2c16cd5801274b05b063258fcbfb0493296e9261e97cf83fcebe86",
+          "0x602322360b519fbc5ec55a0501e3550bc8cb3b8942b917bca2e23977411943c6",
+          "0x5970a91b77eaa5df35a16074e147a91210110114a12125f8f298ced06434c064",
+          "0xc1af7d459ad8d680362b7b586ab9048fc39dacc767dee1e66a0b384b1848a877",
+          "0x2033a35d0ae5971e38986eba1af33adfdff17f2c1dcfa6a35173ccfb37b08b7a",
+          "0x10809e05e275b63f147e149c0968e7d45b20f6f4546a4065133468c08ac291b5",
+          "0xe260c1fc2916fe0bff89656b51e10d686a79ef7d0172ff792d32e6905f263c1f"
+        ]
+      },
+      "status": "partial"
+    },
+    {
+      "domain": "Regulatory Compliance",
+      "criterion": "Identity & Access Management",
+      "unit": "RBAC compliance score (%)",
+      "value": 50,
+      "method": "Local RBAC/permissions at the adapter boundary",
+      "timestamp": "2025-09-08T04:40:46.816Z",
+      "details": {
+        "denialRate": "50.0%",
+        "revocationTimeToEffect": "0.00s",
+        "totalPermissionTests": 2,
+        "deniedOperations": 1,
+        "allowedOperations": 1,
+        "keyRotationSuccess": true,
+        "oldKeyRevoked": true,
+        "auditLogEntries": 4
+      },
+      "evidence": {
+        "authTests": [
+          {
+            "user": "viewer",
+            "authenticated": true,
+            "transferPermission": false,
+            "expected": {
+              "authenticated": true,
+              "transferPermission": false
+            }
+          },
+          {
+            "user": "operator",
+            "authenticated": true,
+            "transferPermission": true,
+            "expected": {
+              "authenticated": true,
+              "transferPermission": true
+            }
+          }
+        ],
+        "permissionTests": [
+          {
+            "user": "viewer",
+            "operation": "transfer",
+            "allowed": false,
+            "denied": true,
+            "expected": false
+          },
+          {
+            "user": "operator",
+            "operation": "transfer",
+            "allowed": true,
+            "denied": false,
+            "expected": true
+          }
+        ],
+        "keyRotationTests": [
+          {
+            "user": "operator",
+            "newKeyGenerated": true,
+            "rotationTimeMs": 0,
+            "oldKeyStillWorks": false,
+            "expected": {
+              "newKeyGenerated": true,
+              "oldKeyStillWorks": false
+            }
+          }
+        ],
+        "auditLog": [
+          {
+            "timestamp": "2025-09-08T04:40:46.816Z",
+            "actor": "system",
+            "action": "key_rotation",
+            "result": "success",
+            "details": {
+              "userId": "operator",
+              "oldKeyActive": false,
+              "newKeyGenerated": true
+            }
+          },
+          {
+            "timestamp": "2025-09-08T04:40:46.816Z",
+            "actor": "viewer",
+            "action": "transfer_attempt",
+            "result": "denied",
+            "details": {
+              "operation": "transfer",
+              "timestamp": "2025-09-08T04:40:46.816Z"
+            }
+          },
+          {
+            "timestamp": "2025-09-08T04:40:46.816Z",
+            "actor": "operator",
+            "action": "transfer_attempt",
+            "result": "allowed",
+            "details": {
+              "operation": "transfer",
+              "timestamp": "2025-09-08T04:40:46.816Z"
+            }
+          },
+          {
+            "timestamp": "2025-09-08T04:40:46.816Z",
+            "actor": "operator",
+            "action": "key_rotation",
+            "result": "success",
+            "details": {
+              "newKeyGenerated": true,
+              "timestamp": "2025-09-08T04:40:46.816Z"
+            }
+          }
+        ]
+      },
+      "status": "failed"
+    },
+    {
+      "domain": "Regulatory Compliance",
+      "criterion": "Logging & Monitoring",
+      "unit": "Logging compliance score (%)",
+      "value": 77.77777777777777,
+      "method": "Minimum evidence set present",
+      "timestamp": "2025-09-08T04:40:46.817Z",
+      "details": {
+        "fieldCompleteness": "77.8%",
+        "metricsPresence": "Yes",
+        "criticalEventsLogged": 5,
+        "totalLogEntries": 9,
+        "avgFieldCompleteness": "77.8%",
+        "requiredFields": [
+          "timestamp",
+          "actor",
+          "requestId",
+          "sourceChainId",
+          "targetChainId",
+          "result",
+          "correlationId"
+        ],
+        "metricsCounters": [
+          "requests",
+          "failures",
+          "latency"
+        ],
+        "logQuality": "needs_improvement"
+      },
+      "evidence": {
+        "criticalEvents": [
+          {
+            "timestamp": "2025-09-08T04:40:46.817Z",
+            "actor": "viewer",
+            "requestId": "req_1757306446817_yravbihp5",
+            "sourceChainId": "sepolia",
+            "targetChainId": "polygon-amoy",
+            "result": "success",
+            "correlationId": "corr_1757306446817_vue8op4i9",
+            "eventType": "authN_fail",
+            "description": "Authentication failure"
+          },
+          {
+            "timestamp": "2025-09-08T04:40:46.817Z",
+            "actor": "operator",
+            "requestId": "req_1757306446817_33cs663wf",
+            "sourceChainId": "sepolia",
+            "targetChainId": "polygon-amoy",
+            "result": "success",
+            "correlationId": "corr_1757306446817_7md7suuws",
+            "eventType": "config_change",
+            "description": "Configuration change"
+          },
+          {
+            "timestamp": "2025-09-08T04:40:46.817Z",
+            "actor": "operator",
+            "requestId": "req_1757306446817_q1y255k0h",
+            "sourceChainId": "sepolia",
+            "targetChainId": "polygon-amoy",
+            "result": "success",
+            "correlationId": "corr_1757306446817_a7m7wuva8",
+            "eventType": "submit",
+            "description": "Transaction submission"
+          },
+          {
+            "timestamp": "2025-09-08T04:40:46.817Z",
+            "actor": "operator",
+            "requestId": "req_1757306446817_og9yzxc47",
+            "sourceChainId": "sepolia",
+            "targetChainId": "polygon-amoy",
+            "result": "success",
+            "correlationId": "corr_1757306446817_fcgmnlxt4",
+            "eventType": "settle",
+            "description": "Transaction settlement"
+          },
+          {
+            "timestamp": "2025-09-08T04:40:46.817Z",
+            "actor": "operator",
+            "requestId": "req_1757306446817_3ehqf4uxr",
+            "sourceChainId": "sepolia",
+            "targetChainId": "polygon-amoy",
+            "result": "failed",
+            "correlationId": "corr_1757306446817_u8bcqzg4n",
+            "eventType": "failure",
+            "description": "System failure"
+          }
+        ],
+        "logAnalysis": [
+          {
+            "totalLogEntries": 9,
+            "criticalEventsLogged": 5,
+            "fieldCompleteness": 77.77777777777777,
+            "metricsAvailable": true,
+            "logQuality": "needs_improvement"
+          }
+        ],
+        "metricsData": [
+          {
+            "url": "http://localhost:3000/metrics",
+            "available": true,
+            "counters": {
+              "requests": 496,
+              "failures": 8,
+              "latency": 634
+            }
+          }
+        ],
+        "fieldCompleteness": [
+          {
+            "logEntry": {
+              "timestamp": "2025-09-08T04:40:46.816Z",
+              "actor": "system",
+              "action": "key_rotation",
+              "result": "success",
+              "details": {
+                "userId": "operator",
+                "oldKeyActive": false,
+                "newKeyGenerated": true
+              }
+            },
+            "requiredFieldsPresent": 4,
+            "optionalFieldsPresent": 0,
+            "completeness": 50,
+            "fields": {
+              "timestamp": true,
+              "actor": true,
+              "requestId": false,
+              "sourceChainId": false,
+              "targetChainId": false,
+              "result": true,
+              "correlationId": false
+            }
+          },
+          {
+            "logEntry": {
+              "timestamp": "2025-09-08T04:40:46.816Z",
+              "actor": "viewer",
+              "action": "transfer_attempt",
+              "result": "denied",
+              "details": {
+                "operation": "transfer",
+                "timestamp": "2025-09-08T04:40:46.816Z"
+              }
+            },
+            "requiredFieldsPresent": 4,
+            "optionalFieldsPresent": 0,
+            "completeness": 50,
+            "fields": {
+              "timestamp": true,
+              "actor": true,
+              "requestId": false,
+              "sourceChainId": false,
+              "targetChainId": false,
+              "result": true,
+              "correlationId": false
+            }
+          },
+          {
+            "logEntry": {
+              "timestamp": "2025-09-08T04:40:46.816Z",
+              "actor": "operator",
+              "action": "transfer_attempt",
+              "result": "allowed",
+              "details": {
+                "operation": "transfer",
+                "timestamp": "2025-09-08T04:40:46.816Z"
+              }
+            },
+            "requiredFieldsPresent": 4,
+            "optionalFieldsPresent": 0,
+            "completeness": 50,
+            "fields": {
+              "timestamp": true,
+              "actor": true,
+              "requestId": false,
+              "sourceChainId": false,
+              "targetChainId": false,
+              "result": true,
+              "correlationId": false
+            }
+          },
+          {
+            "logEntry": {
+              "timestamp": "2025-09-08T04:40:46.816Z",
+              "actor": "operator",
+              "action": "key_rotation",
+              "result": "success",
+              "details": {
+                "newKeyGenerated": true,
+                "timestamp": "2025-09-08T04:40:46.816Z"
+              }
+            },
+            "requiredFieldsPresent": 4,
+            "optionalFieldsPresent": 0,
+            "completeness": 50,
+            "fields": {
+              "timestamp": true,
+              "actor": true,
+              "requestId": false,
+              "sourceChainId": false,
+              "targetChainId": false,
+              "result": true,
+              "correlationId": false
+            }
+          },
+          {
+            "logEntry": {
+              "timestamp": "2025-09-08T04:40:46.817Z",
+              "actor": "viewer",
+              "action": "authN_fail",
+              "result": "success",
+              "details": {
+                "requestId": "req_1757306446817_yravbihp5",
+                "sourceChainId": "sepolia",
+                "targetChainId": "polygon-amoy",
+                "correlationId": "corr_1757306446817_vue8op4i9",
+                "timestamp": "2025-09-08T04:40:46.817Z"
+              }
+            },
+            "requiredFieldsPresent": 4,
+            "optionalFieldsPresent": 4,
+            "completeness": 100,
+            "fields": {
+              "timestamp": true,
+              "actor": true,
+              "requestId": true,
+              "sourceChainId": true,
+              "targetChainId": true,
+              "result": true,
+              "correlationId": true
+            }
+          },
+          {
+            "logEntry": {
+              "timestamp": "2025-09-08T04:40:46.817Z",
+              "actor": "operator",
+              "action": "config_change",
+              "result": "success",
+              "details": {
+                "requestId": "req_1757306446817_33cs663wf",
+                "sourceChainId": "sepolia",
+                "targetChainId": "polygon-amoy",
+                "correlationId": "corr_1757306446817_7md7suuws",
+                "timestamp": "2025-09-08T04:40:46.817Z"
+              }
+            },
+            "requiredFieldsPresent": 4,
+            "optionalFieldsPresent": 4,
+            "completeness": 100,
+            "fields": {
+              "timestamp": true,
+              "actor": true,
+              "requestId": true,
+              "sourceChainId": true,
+              "targetChainId": true,
+              "result": true,
+              "correlationId": true
+            }
+          },
+          {
+            "logEntry": {
+              "timestamp": "2025-09-08T04:40:46.817Z",
+              "actor": "operator",
+              "action": "submit",
+              "result": "success",
+              "details": {
+                "requestId": "req_1757306446817_q1y255k0h",
+                "sourceChainId": "sepolia",
+                "targetChainId": "polygon-amoy",
+                "correlationId": "corr_1757306446817_a7m7wuva8",
+                "timestamp": "2025-09-08T04:40:46.817Z"
+              }
+            },
+            "requiredFieldsPresent": 4,
+            "optionalFieldsPresent": 4,
+            "completeness": 100,
+            "fields": {
+              "timestamp": true,
+              "actor": true,
+              "requestId": true,
+              "sourceChainId": true,
+              "targetChainId": true,
+              "result": true,
+              "correlationId": true
+            }
+          },
+          {
+            "logEntry": {
+              "timestamp": "2025-09-08T04:40:46.817Z",
+              "actor": "operator",
+              "action": "settle",
+              "result": "success",
+              "details": {
+                "requestId": "req_1757306446817_og9yzxc47",
+                "sourceChainId": "sepolia",
+                "targetChainId": "polygon-amoy",
+                "correlationId": "corr_1757306446817_fcgmnlxt4",
+                "timestamp": "2025-09-08T04:40:46.817Z"
+              }
+            },
+            "requiredFieldsPresent": 4,
+            "optionalFieldsPresent": 4,
+            "completeness": 100,
+            "fields": {
+              "timestamp": true,
+              "actor": true,
+              "requestId": true,
+              "sourceChainId": true,
+              "targetChainId": true,
+              "result": true,
+              "correlationId": true
+            }
+          },
+          {
+            "logEntry": {
+              "timestamp": "2025-09-08T04:40:46.817Z",
+              "actor": "operator",
+              "action": "failure",
+              "result": "failed",
+              "details": {
+                "requestId": "req_1757306446817_3ehqf4uxr",
+                "sourceChainId": "sepolia",
+                "targetChainId": "polygon-amoy",
+                "correlationId": "corr_1757306446817_u8bcqzg4n",
+                "timestamp": "2025-09-08T04:40:46.817Z"
+              }
+            },
+            "requiredFieldsPresent": 4,
+            "optionalFieldsPresent": 4,
+            "completeness": 100,
+            "fields": {
+              "timestamp": true,
+              "actor": true,
+              "requestId": true,
+              "sourceChainId": true,
+              "targetChainId": true,
+              "result": true,
+              "correlationId": true
+            }
+          }
+        ]
+      },
+      "status": "partial"
+    },
+    {
+      "domain": "Regulatory Compliance",
+      "criterion": "Data Sovereignty Controls",
+      "unit": "Policy compliance score (%)",
+      "value": 100,
+      "method": "Policy enforcement signals",
+      "timestamp": "2025-09-08T04:40:46.818Z",
+      "details": {
+        "policyViolationAcceptanceRate": "0.0%",
+        "auditability": "Yes",
+        "totalPolicyTests": 4,
+        "violationsAccepted": 0,
+        "policiesTested": [
+          "restricted",
+          "eu-only",
+          "default"
+        ],
+        "regionsTested": [
+          "RESTRICTED_REGION",
+          "EU",
+          "US"
+        ],
+        "auditLogEntries": 4,
+        "policyEnforcementWorking": true
+      },
+      "evidence": {
+        "policyTests": [
+          {
+            "region": "RESTRICTED_REGION",
+            "policy": "restricted",
+            "allowed": false,
+            "reason": "Region RESTRICTED_REGION not allowed for policy restricted",
+            "expected": false
+          },
+          {
+            "region": "EU",
+            "policy": "eu-only",
+            "allowed": true,
+            "expected": true
+          },
+          {
+            "region": "US",
+            "policy": "eu-only",
+            "allowed": false,
+            "reason": "Region US not allowed for policy eu-only",
+            "expected": false
+          },
+          {
+            "region": "US",
+            "policy": "default",
+            "allowed": true,
+            "expected": true
+          }
+        ],
+        "regionTests": [],
+        "auditLog": [
+          {
+            "timestamp": "2025-09-08T04:40:46.818Z",
+            "action": "policy_check",
+            "region": "RESTRICTED_REGION",
+            "result": "denied",
+            "details": {
+              "policy": "restricted",
+              "allowedRegions": [
+                "US"
+              ],
+              "restrictions": [
+                "NO_CROSS_BORDER",
+                "LOCAL_STORAGE_ONLY"
+              ]
+            }
+          },
+          {
+            "timestamp": "2025-09-08T04:40:46.818Z",
+            "action": "policy_check",
+            "region": "EU",
+            "result": "allowed",
+            "details": {
+              "policy": "eu-only",
+              "allowedRegions": [
+                "EU"
+              ],
+              "restrictions": [
+                "GDPR_COMPLIANCE_REQUIRED"
+              ]
+            }
+          },
+          {
+            "timestamp": "2025-09-08T04:40:46.818Z",
+            "action": "policy_check",
+            "region": "US",
+            "result": "denied",
+            "details": {
+              "policy": "eu-only",
+              "allowedRegions": [
+                "EU"
+              ],
+              "restrictions": [
+                "GDPR_COMPLIANCE_REQUIRED"
+              ]
+            }
+          },
+          {
+            "timestamp": "2025-09-08T04:40:46.818Z",
+            "action": "policy_check",
+            "region": "US",
+            "result": "allowed",
+            "details": {
+              "policy": "default",
+              "allowedRegions": [
+                "US",
+                "EU",
+                "APAC"
+              ],
+              "restrictions": []
+            }
+          }
+        ]
+      },
+      "status": "passed"
+    },
+    {
+      "domain": "Regulatory Compliance",
+      "criterion": "Certifications Coverage",
+      "unit": "Certification compliance score (%)",
+      "value": 100,
+      "method": "Machine-verifiable runtime indicators (if present)",
+      "timestamp": "2025-09-08T04:40:46.818Z",
+      "details": {
+        "fipsModeAsserted": "Yes",
+        "buildAttestationVerified": "Yes",
+        "fipsVersion": "FIPS 140-2 Level 1",
+        "approvedCiphers": [
+          "AES-256-GCM",
+          "AES-128-GCM",
+          "ChaCha20-Poly1305"
+        ],
+        "approvedCurves": [
+          "P-256",
+          "P-384",
+          "P-521"
+        ],
+        "currentCipher": "AES-256-GCM",
+        "currentCurve": "P-256",
+        "attestationType": "cosign",
+        "buildHash": "sha256:9c59c32d7f083620dd51624bb155dc9f1a6d9541d6c3fad297f147bc1bd1fc4d",
+        "overallCompliance": true,
+        "evidence": {
+          "fipsMode": true,
+          "approvedCiphersOnly": true,
+          "approvedCurvesOnly": true,
+          "buildAttestationPresent": true,
+          "buildAttestationVerified": true
+        }
+      },
+      "evidence": {
+        "fipsChecks": [
+          {
+            "enabled": true,
+            "version": "FIPS 140-2 Level 1",
+            "approvedCiphers": [
+              "AES-256-GCM",
+              "AES-128-GCM",
+              "ChaCha20-Poly1305"
+            ],
+            "approvedCurves": [
+              "P-256",
+              "P-384",
+              "P-521"
+            ],
+            "mode": "FIPS_APPROVED"
+          }
+        ],
+        "cipherChecks": [
+          {
+            "currentCipher": "AES-256-GCM",
+            "currentCurve": "P-256",
+            "approvedCipher": true,
+            "approvedCurve": true,
+            "allCiphersApproved": true,
+            "allCurvesApproved": true
+          }
+        ],
+        "buildAttestations": [
+          {
+            "present": true,
+            "type": "cosign",
+            "verified": true,
+            "signature": "0x2a4e80840f48ac4e4b638e70e025adad88702afbf642e4a7aa8ddfa1cd8e964787a13763775c82e4c3ae3f06f035d8319c18c334f8d6bd19f6f1fbd713c42e9a",
+            "timestamp": "2025-09-08T04:40:46.818Z",
+            "buildHash": "sha256:9c59c32d7f083620dd51624bb155dc9f1a6d9541d6c3fad297f147bc1bd1fc4d",
+            "attestationData": {
+              "builder": "GitHub Actions",
+              "buildId": "123456789",
+              "repository": "finp2p/layerzero-adapter",
+              "commit": "a291b34e0efd4fe73e336cc0747fc77aabfedb3b"
+            }
+          }
+        ],
+        "runtimeChecks": [
+          {
+            "fipsModeActive": true,
+            "approvedCiphersOnly": true,
+            "approvedCurvesOnly": true,
+            "buildAttestationPresent": true,
+            "buildAttestationVerified": true,
+            "overallCompliance": true
+          }
+        ]
+      },
+      "status": "passed"
+    }
+  ]
+}

@@ -270,9 +270,9 @@ class LayerZeroRegulatoryComplianceBenchmark {
           const swapId = `atomic_test_${Date.now()}_${i}`;
           const result = await this.executeCrossChainAtomicSwap(swapId, '0.00001', '0.00001');
           
-          if (result.success) {
+          if (result.success && result.sepoliaTxHash && result.polygonTxHash) {
             atomicTransfers++;
-            evidence.txHashes.push(result.sepoliaTxHash!, result.polygonTxHash!);
+            evidence.txHashes.push(result.sepoliaTxHash, result.polygonTxHash);
             evidence.transfers.push({
               swapId,
               success: true,
@@ -312,10 +312,10 @@ class LayerZeroRegulatoryComplianceBenchmark {
             const swapId = `retry_test_${Date.now()}_${i}_attempt_${retryCount}`;
             const result = await this.executeCrossChainAtomicSwap(swapId, '0.00001', '0.00001');
             
-            if (result.success) {
+            if (result.success && result.sepoliaTxHash && result.polygonTxHash) {
               success = true;
               atomicTransfers++;
-              evidence.txHashes.push(result.sepoliaTxHash!, result.polygonTxHash!);
+              evidence.txHashes.push(result.sepoliaTxHash, result.polygonTxHash);
               evidence.retries.push({
                 swapId: `retry_test_${Date.now()}_${i}`,
                 attempts: retryCount + 1,
@@ -352,16 +352,21 @@ class LayerZeroRegulatoryComplianceBenchmark {
           const swapId = `outage_test_${Date.now()}_${i}`;
           
           // Simulate RPC outage by using a short timeout
-          const result = await Promise.race([
-            this.executeCrossChainAtomicSwap(swapId, '0.00001', '0.00001'),
-            new Promise<{ success: boolean; error?: string }>((_, reject) => 
-              setTimeout(() => reject(new Error('RPC outage simulation')), 5000)
-            )
-          ]);
+          let result: { success: boolean; sepoliaTxHash?: string; polygonTxHash?: string; error?: string };
+          try {
+            result = await Promise.race([
+              this.executeCrossChainAtomicSwap(swapId, '0.00001', '0.00001'),
+              new Promise<{ success: boolean; sepoliaTxHash?: string; polygonTxHash?: string; error?: string }>((_, reject) => 
+                setTimeout(() => reject(new Error('RPC outage simulation')), 5000)
+              )
+            ]);
+          } catch (error) {
+            result = { success: false, error: 'RPC outage simulation' };
+          }
           
-          if (result.success) {
+          if (result.success && result.sepoliaTxHash && result.polygonTxHash) {
             atomicTransfers++;
-            evidence.txHashes.push(result.sepoliaTxHash!, result.polygonTxHash!);
+            evidence.txHashes.push(result.sepoliaTxHash, result.polygonTxHash);
             evidence.transfers.push({
               swapId,
               success: true,
@@ -644,7 +649,7 @@ class LayerZeroRegulatoryComplianceBenchmark {
         const requiredFields = ['timestamp', 'actor', 'action', 'result'];
         const optionalFields = ['requestId', 'sourceChainId', 'targetChainId', 'correlationId'];
         
-        const presentFields = requiredFields.filter(field => logEntry[field] !== undefined);
+        const presentFields = requiredFields.filter(field => (logEntry as any)[field] !== undefined);
         const presentOptionalFields = optionalFields.filter(field => 
           logEntry.details && logEntry.details[field] !== undefined
         );
