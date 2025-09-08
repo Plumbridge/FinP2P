@@ -1,7 +1,7 @@
 {
   "benchmark": "LayerZero Operational Reliability",
-  "timestamp": "2025-09-06T23:07:44.275Z",
-  "duration": 165.061,
+  "timestamp": "2025-09-08T02:16:12.268Z",
+  "duration": 223.588,
   "criteria": 3,
   "results": [
     {
@@ -10,7 +10,7 @@
       "unit": "completeness_score",
       "value": 5,
       "method": "Enable logs + metrics + traces, demonstrate successful and failed transfers with correlating IDs",
-      "timestamp": "2025-09-06T23:07:54.429Z",
+      "timestamp": "2025-09-08T02:17:43.359Z",
       "details": {
         "triadPresent": true,
         "completenessScore": 5,
@@ -23,52 +23,38 @@
         },
         "successfulTransfer": "completed",
         "failedTransfer": "failed",
-        "logCount": 5,
+        "logCount": 4,
         "metricCount": 6,
-        "traceCount": 5
+        "traceCount": 4
       },
       "evidence": {
         "observabilityData": {
           "logs": [
-            "{\"timestamp\":\"2025-09-06T23:07:44.325Z\",\"level\":\"INFO\",\"message\":\"LayerZero transfer_initiated\",\"correlationId\":\"obs_1757200064324_pi8xkt5hp\",\"transferId\":\"transfer_1757200064325_288g2yof4\",\"data\":{\"id\":\"transfer_1757200064325_288g2yof4\",\"correlationId\":\"obs_1757200064324_pi8xkt5hp\",\"sourceChain\":\"sepolia\",\"destChain\":\"polygon-amoy\",\"amount\":\"0.001\",\"tokenSymbol\":\"ETH\"}}",
-            "{\"timestamp\":\"2025-09-06T23:07:54.429Z\",\"level\":\"INFO\",\"message\":\"LayerZero transfer_initiated\",\"correlationId\":\"obs_1757200064324_pi8xkt5hp\",\"transferId\":\"lz_1757200064942_5ahwza9x8\",\"data\":{\"id\":\"lz_1757200064942_5ahwza9x8\",\"sourceChain\":\"sepolia\",\"destChain\":\"polygon-amoy\",\"tokenSymbol\":\"ETH\",\"amount\":\"0.001\",\"destinationAddress\":\"0x3808Ab2b060D1648c3Bb8fc617F9dF752143dAFB\",\"status\":\"completed\",\"txHash\":\"0x0fe672303e1498b7502f8eb0e48f2a90aa471e9b4312d42ce080242c7d106794,0x99cb1fd4bbbc84679a6b3471fc7ccee8c43b27293a7fde1cf348c734f8c40c3a\",\"layerZeroMessageId\":\"lz_atomic_1757200074429\",\"fee\":\"0.001648105516659\",\"timestamp\":\"2025-09-06T23:07:44.942Z\"}}",
-            "{\"timestamp\":\"2025-09-06T23:07:54.429Z\",\"level\":\"INFO\",\"message\":\"LayerZero transfer_completed\",\"correlationId\":\"obs_1757200064324_pi8xkt5hp\",\"transferId\":\"transfer_1757200064325_288g2yof4\",\"data\":{\"id\":\"transfer_1757200064325_288g2yof4\",\"correlationId\":\"obs_1757200064324_pi8xkt5hp\",\"status\":\"completed\",\"txHash\":\"0x0fe672303e1498b7502f8eb0e48f2a90aa471e9b4312d42ce080242c7d106794,0x99cb1fd4bbbc84679a6b3471fc7ccee8c43b27293a7fde1cf348c734f8c40c3a\",\"fee\":\"0.001648105516659\"}}",
-            "{\"timestamp\":\"2025-09-06T23:07:54.429Z\",\"level\":\"INFO\",\"message\":\"LayerZero transfer_initiated\",\"correlationId\":\"obs_1757200064324_pi8xkt5hp\",\"transferId\":\"transfer_1757200074429_ek92dhlun\",\"data\":{\"id\":\"transfer_1757200074429_ek92dhlun\",\"correlationId\":\"obs_1757200064324_pi8xkt5hp\",\"sourceChain\":\"sepolia\",\"destChain\":\"polygon-amoy\",\"amount\":\"0.001\",\"tokenSymbol\":\"ETH\"}}",
-            "{\"timestamp\":\"2025-09-06T23:07:54.429Z\",\"level\":\"ERROR\",\"message\":\"LayerZero transfer_failed\",\"correlationId\":\"obs_1757200064324_pi8xkt5hp\",\"transferId\":\"transfer_1757200074429_ek92dhlun\",\"data\":{\"id\":\"transfer_1757200074429_ek92dhlun\",\"correlationId\":\"obs_1757200064324_pi8xkt5hp\",\"error\":\"Unsupported chain: invalid-chain or polygon-amoy\"}}",
-            "{\"timestamp\":\"2025-09-06T23:07:55.444Z\",\"level\":\"INFO\",\"message\":\"LayerZero transfer_initiated\",\"correlationId\":\"obs_1757200064324_pi8xkt5hp\",\"transferId\":\"transfer_1757200075444_rbe428gea\",\"data\":{\"id\":\"transfer_1757200075444_rbe428gea\",\"correlationId\":\"obs_1757200064324_pi8xkt5hp\",\"sourceChain\":\"sepolia\",\"destChain\":\"polygon-amoy\",\"amount\":\"0.001\",\"tokenSymbol\":\"ETH\"}}",
-            "{\"timestamp\":\"2025-09-06T23:08:02.190Z\",\"level\":\"INFO\",\"message\":\"LayerZero transfer_error\",\"correlationId\":\"obs_1757200064324_pi8xkt5hp\",\"transferId\":\"transfer_1757200075444_rbe428gea\",\"data\":{\"id\":\"transfer_1757200075444_rbe428gea\",\"correlationId\":\"obs_1757200064324_pi8xkt5hp\",\"error\":\"could not coalesce error (error={ \\\"code\\\": 26, \\\"message\\\": \\\"Unknown block\\\" }, payload={ \\\"id\\\": 17, \\\"jsonrpc\\\": \\\"2.0\\\", \\\"method\\\": \\\"eth_getTransactionByHash\\\", \\\"params\\\": [ \\\"0x7d6751bf9712a6b00380667b4059e34708a126ae1de4b03b56dbffb7a6323522\\\" ] }, code=UNKNOWN_ERROR, version=6.15.0)\"}}",
-            "{\"timestamp\":\"2025-09-06T23:08:02.190Z\",\"level\":\"INFO\",\"message\":\"LayerZero transfer_initiated\",\"correlationId\":\"obs_1757200064324_pi8xkt5hp\",\"transferId\":\"transfer_1757200082190_ry8xpmddw\",\"data\":{\"id\":\"transfer_1757200082190_ry8xpmddw\",\"correlationId\":\"obs_1757200064324_pi8xkt5hp\",\"sourceChain\":\"sepolia\",\"destChain\":\"polygon-amoy\",\"amount\":\"0.001\",\"tokenSymbol\":\"ETH\"}}",
-            "{\"timestamp\":\"2025-09-06T23:08:21.597Z\",\"level\":\"INFO\",\"message\":\"LayerZero transfer_initiated\",\"correlationId\":\"obs_1757200064324_pi8xkt5hp\",\"transferId\":\"lz_1757200082430_evbpvupwo\",\"data\":{\"id\":\"lz_1757200082430_evbpvupwo\",\"sourceChain\":\"sepolia\",\"destChain\":\"polygon-amoy\",\"tokenSymbol\":\"ETH\",\"amount\":\"0.001\",\"destinationAddress\":\"0x3808Ab2b060D1648c3Bb8fc617F9dF752143dAFB\",\"status\":\"completed\",\"txHash\":\"0x4ea758818fcc865084c74b990e51487f0445664fda0818a3c3c6b5deca90917f,0xebe2b431bfee3177224d9cea7b0b24ef02779772aa216b3eb3492d18f31f926d\",\"layerZeroMessageId\":\"lz_atomic_1757200101597\",\"fee\":\"0.001648103102961\",\"timestamp\":\"2025-09-06T23:08:02.430Z\"}}",
-            "{\"timestamp\":\"2025-09-06T23:08:21.598Z\",\"level\":\"INFO\",\"message\":\"LayerZero transfer_completed\",\"correlationId\":\"obs_1757200064324_pi8xkt5hp\",\"transferId\":\"transfer_1757200082190_ry8xpmddw\",\"data\":{\"id\":\"transfer_1757200082190_ry8xpmddw\",\"correlationId\":\"obs_1757200064324_pi8xkt5hp\",\"status\":\"completed\",\"txHash\":\"0x4ea758818fcc865084c74b990e51487f0445664fda0818a3c3c6b5deca90917f,0xebe2b431bfee3177224d9cea7b0b24ef02779772aa216b3eb3492d18f31f926d\",\"fee\":\"0.001648103102961\"}}",
-            "{\"timestamp\":\"2025-09-06T23:08:24.614Z\",\"level\":\"INFO\",\"message\":\"LayerZero transfer_initiated\",\"correlationId\":\"obs_1757200064324_pi8xkt5hp\",\"transferId\":\"transfer_1757200104614_y3cjitf4h\",\"data\":{\"id\":\"transfer_1757200104614_y3cjitf4h\",\"correlationId\":\"obs_1757200064324_pi8xkt5hp\",\"sourceChain\":\"sepolia\",\"destChain\":\"polygon-amoy\",\"amount\":\"0.001\",\"tokenSymbol\":\"ETH\"}}",
-            "{\"timestamp\":\"2025-09-06T23:08:40.561Z\",\"level\":\"INFO\",\"message\":\"LayerZero transfer_initiated\",\"correlationId\":\"obs_1757200064324_pi8xkt5hp\",\"transferId\":\"lz_1757200105013_sj0wam2yp\",\"data\":{\"id\":\"lz_1757200105013_sj0wam2yp\",\"sourceChain\":\"sepolia\",\"destChain\":\"polygon-amoy\",\"tokenSymbol\":\"ETH\",\"amount\":\"0.001\",\"destinationAddress\":\"0x3808Ab2b060D1648c3Bb8fc617F9dF752143dAFB\",\"status\":\"completed\",\"txHash\":\"0x8f186505d8399701474a07f8453385d86ada1cc109cd827f2fefd68be502ceb8,0xac5a8d0d7815d6c932c6532bda925dce5667ed58c3f02db20110c9fa1f3ab716\",\"layerZeroMessageId\":\"lz_atomic_1757200120561\",\"fee\":\"0.001648099960143\",\"timestamp\":\"2025-09-06T23:08:25.013Z\"}}",
-            "{\"timestamp\":\"2025-09-06T23:08:40.561Z\",\"level\":\"INFO\",\"message\":\"LayerZero transfer_completed\",\"correlationId\":\"obs_1757200064324_pi8xkt5hp\",\"transferId\":\"transfer_1757200104614_y3cjitf4h\",\"data\":{\"id\":\"transfer_1757200104614_y3cjitf4h\",\"correlationId\":\"obs_1757200064324_pi8xkt5hp\",\"status\":\"completed\",\"txHash\":\"0x8f186505d8399701474a07f8453385d86ada1cc109cd827f2fefd68be502ceb8,0xac5a8d0d7815d6c932c6532bda925dce5667ed58c3f02db20110c9fa1f3ab716\",\"fee\":\"0.001648099960143\"}}",
-            "{\"timestamp\":\"2025-09-06T23:08:43.581Z\",\"level\":\"INFO\",\"message\":\"LayerZero transfer_initiated\",\"correlationId\":\"obs_1757200064324_pi8xkt5hp\",\"transferId\":\"transfer_1757200123581_g8z8c6uco\",\"data\":{\"id\":\"transfer_1757200123581_g8z8c6uco\",\"correlationId\":\"obs_1757200064324_pi8xkt5hp\",\"sourceChain\":\"sepolia\",\"destChain\":\"polygon-amoy\",\"amount\":\"0.001\",\"tokenSymbol\":\"ETH\"}}",
-            "{\"timestamp\":\"2025-09-06T23:08:55.516Z\",\"level\":\"INFO\",\"message\":\"LayerZero transfer_initiated\",\"correlationId\":\"obs_1757200064324_pi8xkt5hp\",\"transferId\":\"lz_1757200123815_xpk0yh117\",\"data\":{\"id\":\"lz_1757200123815_xpk0yh117\",\"sourceChain\":\"sepolia\",\"destChain\":\"polygon-amoy\",\"tokenSymbol\":\"ETH\",\"amount\":\"0.001\",\"destinationAddress\":\"0x3808Ab2b060D1648c3Bb8fc617F9dF752143dAFB\",\"status\":\"completed\",\"txHash\":\"0x740265a4e7bd5d13103c24db7ee75fb8ac61c9578988832306644b716980b853,0xcf74f25d4f5827d5572e2815c352e5c9f15dc8b0f6d2a7cdb475cfc02bec4ee5\",\"layerZeroMessageId\":\"lz_atomic_1757200135516\",\"fee\":\"0.001648099322562\",\"timestamp\":\"2025-09-06T23:08:43.815Z\"}}",
-            "{\"timestamp\":\"2025-09-06T23:08:55.516Z\",\"level\":\"INFO\",\"message\":\"LayerZero transfer_completed\",\"correlationId\":\"obs_1757200064324_pi8xkt5hp\",\"transferId\":\"transfer_1757200123581_g8z8c6uco\",\"data\":{\"id\":\"transfer_1757200123581_g8z8c6uco\",\"correlationId\":\"obs_1757200064324_pi8xkt5hp\",\"status\":\"completed\",\"txHash\":\"0x740265a4e7bd5d13103c24db7ee75fb8ac61c9578988832306644b716980b853,0xcf74f25d4f5827d5572e2815c352e5c9f15dc8b0f6d2a7cdb475cfc02bec4ee5\",\"fee\":\"0.001648099322562\"}}",
-            "{\"timestamp\":\"2025-09-06T23:08:55.517Z\",\"level\":\"INFO\",\"message\":\"LayerZero transfer_initiated\",\"correlationId\":\"obs_1757200064324_pi8xkt5hp\",\"transferId\":\"transfer_1757200135517_olmslewxk\",\"data\":{\"id\":\"transfer_1757200135517_olmslewxk\",\"correlationId\":\"obs_1757200064324_pi8xkt5hp\",\"sourceChain\":\"sepolia\",\"destChain\":\"polygon-amoy\",\"amount\":\"0.001\",\"tokenSymbol\":\"ETH\"}}",
-            "{\"timestamp\":\"2025-09-06T23:09:07.349Z\",\"level\":\"INFO\",\"message\":\"LayerZero transfer_initiated\",\"correlationId\":\"obs_1757200064324_pi8xkt5hp\",\"transferId\":\"lz_1757200135884_kyuscxje8\",\"data\":{\"id\":\"lz_1757200135884_kyuscxje8\",\"sourceChain\":\"sepolia\",\"destChain\":\"polygon-amoy\",\"tokenSymbol\":\"ETH\",\"amount\":\"0.001\",\"destinationAddress\":\"0x3808Ab2b060D1648c3Bb8fc617F9dF752143dAFB\",\"status\":\"completed\",\"txHash\":\"0x0670244b3e9d8c5ee67cd8bc563b52bb2ee2b8d7fb70bffbd8ddd50ac355c1be,0xfbc2774f7a02ddf7849ca16d0d361f50de90f0eb4249ea78ed40fec65dd77672\",\"layerZeroMessageId\":\"lz_atomic_1757200147349\",\"fee\":\"0.001648096029489\",\"timestamp\":\"2025-09-06T23:08:55.884Z\"}}",
-            "{\"timestamp\":\"2025-09-06T23:09:07.350Z\",\"level\":\"INFO\",\"message\":\"LayerZero transfer_completed\",\"correlationId\":\"obs_1757200064324_pi8xkt5hp\",\"transferId\":\"transfer_1757200135517_olmslewxk\",\"data\":{\"id\":\"transfer_1757200135517_olmslewxk\",\"correlationId\":\"obs_1757200064324_pi8xkt5hp\",\"status\":\"completed\",\"txHash\":\"0x0670244b3e9d8c5ee67cd8bc563b52bb2ee2b8d7fb70bffbd8ddd50ac355c1be,0xfbc2774f7a02ddf7849ca16d0d361f50de90f0eb4249ea78ed40fec65dd77672\",\"fee\":\"0.001648096029489\"}}",
-            "{\"timestamp\":\"2025-09-06T23:09:09.364Z\",\"level\":\"INFO\",\"message\":\"LayerZero transfer_initiated\",\"correlationId\":\"obs_1757200064324_pi8xkt5hp\",\"transferId\":\"transfer_1757200149364_c2pxbu9ap\",\"data\":{\"id\":\"transfer_1757200149364_c2pxbu9ap\",\"correlationId\":\"obs_1757200064324_pi8xkt5hp\",\"sourceChain\":\"sepolia\",\"destChain\":\"polygon-amoy\",\"amount\":\"0.001\",\"tokenSymbol\":\"ETH\"}}",
-            "{\"timestamp\":\"2025-09-06T23:09:21.127Z\",\"level\":\"INFO\",\"message\":\"LayerZero transfer_initiated\",\"correlationId\":\"obs_1757200064324_pi8xkt5hp\",\"transferId\":\"lz_1757200149936_kre4cl48r\",\"data\":{\"id\":\"lz_1757200149936_kre4cl48r\",\"sourceChain\":\"sepolia\",\"destChain\":\"polygon-amoy\",\"tokenSymbol\":\"ETH\",\"amount\":\"0.001\",\"destinationAddress\":\"0x3808Ab2b060D1648c3Bb8fc617F9dF752143dAFB\",\"status\":\"completed\",\"txHash\":\"0xa03e42f3513741d5b4b45dbd8cb3217206c27476f28b4d429d1dfd0a8467c0d9,0xceae3926b1a2dfdea74d6bb89f12ab8706208ab9a4c6d46e3bc42497eff4c204\",\"layerZeroMessageId\":\"lz_atomic_1757200161127\",\"fee\":\"0.001648094101059\",\"timestamp\":\"2025-09-06T23:09:09.936Z\"}}",
-            "{\"timestamp\":\"2025-09-06T23:09:21.127Z\",\"level\":\"INFO\",\"message\":\"LayerZero transfer_completed\",\"correlationId\":\"obs_1757200064324_pi8xkt5hp\",\"transferId\":\"transfer_1757200149364_c2pxbu9ap\",\"data\":{\"id\":\"transfer_1757200149364_c2pxbu9ap\",\"correlationId\":\"obs_1757200064324_pi8xkt5hp\",\"status\":\"completed\",\"txHash\":\"0xa03e42f3513741d5b4b45dbd8cb3217206c27476f28b4d429d1dfd0a8467c0d9,0xceae3926b1a2dfdea74d6bb89f12ab8706208ab9a4c6d46e3bc42497eff4c204\",\"fee\":\"0.001648094101059\"}}",
-            "{\"timestamp\":\"2025-09-06T23:09:23.143Z\",\"level\":\"INFO\",\"message\":\"LayerZero transfer_initiated\",\"correlationId\":\"obs_1757200064324_pi8xkt5hp\",\"transferId\":\"transfer_1757200163143_6oe6rtq5p\",\"data\":{\"id\":\"transfer_1757200163143_6oe6rtq5p\",\"correlationId\":\"obs_1757200064324_pi8xkt5hp\",\"sourceChain\":\"sepolia\",\"destChain\":\"polygon-amoy\",\"amount\":\"0.001\",\"tokenSymbol\":\"ETH\"}}",
-            "{\"timestamp\":\"2025-09-06T23:09:39.186Z\",\"level\":\"INFO\",\"message\":\"LayerZero transfer_initiated\",\"correlationId\":\"obs_1757200064324_pi8xkt5hp\",\"transferId\":\"lz_1757200163528_5ezdxku6t\",\"data\":{\"id\":\"lz_1757200163528_5ezdxku6t\",\"sourceChain\":\"sepolia\",\"destChain\":\"polygon-amoy\",\"tokenSymbol\":\"ETH\",\"amount\":\"0.001\",\"destinationAddress\":\"0x3808Ab2b060D1648c3Bb8fc617F9dF752143dAFB\",\"status\":\"completed\",\"txHash\":\"0xca009521d10a792c9389960c2ef5c79edb3226d1c87dc92bd34bbe8f648bab03,0xbcc122bba5f1ea7ca8bbf95565265538fcb93b4e20da45018ad654809800a3cc\",\"layerZeroMessageId\":\"lz_atomic_1757200179186\",\"fee\":\"0.001648090813257\",\"timestamp\":\"2025-09-06T23:09:23.528Z\"}}",
-            "{\"timestamp\":\"2025-09-06T23:09:39.186Z\",\"level\":\"INFO\",\"message\":\"LayerZero transfer_completed\",\"correlationId\":\"obs_1757200064324_pi8xkt5hp\",\"transferId\":\"transfer_1757200163143_6oe6rtq5p\",\"data\":{\"id\":\"transfer_1757200163143_6oe6rtq5p\",\"correlationId\":\"obs_1757200064324_pi8xkt5hp\",\"status\":\"completed\",\"txHash\":\"0xca009521d10a792c9389960c2ef5c79edb3226d1c87dc92bd34bbe8f648bab03,0xbcc122bba5f1ea7ca8bbf95565265538fcb93b4e20da45018ad654809800a3cc\",\"fee\":\"0.001648090813257\"}}",
-            "{\"timestamp\":\"2025-09-06T23:09:39.187Z\",\"level\":\"INFO\",\"message\":\"LayerZero transfer_initiated\",\"correlationId\":\"obs_1757200064324_pi8xkt5hp\",\"transferId\":\"transfer_1757200179187_9zuya1h4i\",\"data\":{\"id\":\"transfer_1757200179187_9zuya1h4i\",\"correlationId\":\"obs_1757200064324_pi8xkt5hp\",\"sourceChain\":\"sepolia\",\"destChain\":\"polygon-amoy\",\"amount\":\"0.001\",\"tokenSymbol\":\"ETH\"}}",
-            "{\"timestamp\":\"2025-09-06T23:09:54.572Z\",\"level\":\"INFO\",\"message\":\"LayerZero transfer_initiated\",\"correlationId\":\"obs_1757200064324_pi8xkt5hp\",\"transferId\":\"lz_1757200179390_ch8oww2vw\",\"data\":{\"id\":\"lz_1757200179390_ch8oww2vw\",\"sourceChain\":\"sepolia\",\"destChain\":\"polygon-amoy\",\"tokenSymbol\":\"ETH\",\"amount\":\"0.001\",\"destinationAddress\":\"0x3808Ab2b060D1648c3Bb8fc617F9dF752143dAFB\",\"status\":\"completed\",\"txHash\":\"0x42815e24f679144d305e1650d0542339787a5229ce6671c393fde6eac320ee67,0x9c9a5e8a0ddab425b9bad2455f7c1c98232685e2ce77b67e62ecd355981c1fdd\",\"layerZeroMessageId\":\"lz_atomic_1757200194572\",\"fee\":\"0.001648089792006\",\"timestamp\":\"2025-09-06T23:09:39.390Z\"}}",
-            "{\"timestamp\":\"2025-09-06T23:09:54.572Z\",\"level\":\"INFO\",\"message\":\"LayerZero transfer_completed\",\"correlationId\":\"obs_1757200064324_pi8xkt5hp\",\"transferId\":\"transfer_1757200179187_9zuya1h4i\",\"data\":{\"id\":\"transfer_1757200179187_9zuya1h4i\",\"correlationId\":\"obs_1757200064324_pi8xkt5hp\",\"status\":\"completed\",\"txHash\":\"0x42815e24f679144d305e1650d0542339787a5229ce6671c393fde6eac320ee67,0x9c9a5e8a0ddab425b9bad2455f7c1c98232685e2ce77b67e62ecd355981c1fdd\",\"fee\":\"0.001648089792006\"}}",
-            "{\"timestamp\":\"2025-09-06T23:09:54.573Z\",\"level\":\"INFO\",\"message\":\"LayerZero transfer_initiated\",\"correlationId\":\"obs_1757200064324_pi8xkt5hp\",\"transferId\":\"transfer_1757200194572_ux0mokuxh\",\"data\":{\"id\":\"transfer_1757200194572_ux0mokuxh\",\"correlationId\":\"obs_1757200064324_pi8xkt5hp\",\"sourceChain\":\"sepolia\",\"destChain\":\"polygon-amoy\",\"amount\":\"0.001\",\"tokenSymbol\":\"ETH\"}}",
-            "{\"timestamp\":\"2025-09-06T23:10:06.286Z\",\"level\":\"INFO\",\"message\":\"LayerZero transfer_initiated\",\"correlationId\":\"obs_1757200064324_pi8xkt5hp\",\"transferId\":\"lz_1757200194760_rxvzl97zq\",\"data\":{\"id\":\"lz_1757200194760_rxvzl97zq\",\"sourceChain\":\"sepolia\",\"destChain\":\"polygon-amoy\",\"tokenSymbol\":\"ETH\",\"amount\":\"0.001\",\"destinationAddress\":\"0x3808Ab2b060D1648c3Bb8fc617F9dF752143dAFB\",\"status\":\"completed\",\"txHash\":\"0x5e8caa6d513ec46af4d9bdec10d6fc3c9cdf85afa47b8caaca8097c486ef04e1,0x7355e8c51be497713c0e6df68bbcb7c266e8c6c2fd3a1970370e032f5a9a23f5\",\"layerZeroMessageId\":\"lz_atomic_1757200206286\",\"fee\":\"0.00164808852138\",\"timestamp\":\"2025-09-06T23:09:54.760Z\"}}",
-            "{\"timestamp\":\"2025-09-06T23:10:06.286Z\",\"level\":\"INFO\",\"message\":\"LayerZero transfer_completed\",\"correlationId\":\"obs_1757200064324_pi8xkt5hp\",\"transferId\":\"transfer_1757200194572_ux0mokuxh\",\"data\":{\"id\":\"transfer_1757200194572_ux0mokuxh\",\"correlationId\":\"obs_1757200064324_pi8xkt5hp\",\"status\":\"completed\",\"txHash\":\"0x5e8caa6d513ec46af4d9bdec10d6fc3c9cdf85afa47b8caaca8097c486ef04e1,0x7355e8c51be497713c0e6df68bbcb7c266e8c6c2fd3a1970370e032f5a9a23f5\",\"fee\":\"0.00164808852138\"}}",
-            "{\"timestamp\":\"2025-09-06T23:10:06.294Z\",\"level\":\"INFO\",\"message\":\"LayerZero transfer_initiated\",\"correlationId\":\"obs_1757200064324_pi8xkt5hp\",\"transferId\":\"transfer_1757200206294_u8k0bx3a3\",\"data\":{\"id\":\"transfer_1757200206294_u8k0bx3a3\",\"correlationId\":\"obs_1757200064324_pi8xkt5hp\",\"sourceChain\":\"sepolia\",\"destChain\":\"polygon-amoy\",\"amount\":\"0.001\",\"tokenSymbol\":\"ETH\"}}",
-            "{\"timestamp\":\"2025-09-06T23:10:21.468Z\",\"level\":\"INFO\",\"message\":\"LayerZero transfer_initiated\",\"correlationId\":\"obs_1757200064324_pi8xkt5hp\",\"transferId\":\"lz_1757200206477_6u2f3xq9o\",\"data\":{\"id\":\"lz_1757200206477_6u2f3xq9o\",\"sourceChain\":\"sepolia\",\"destChain\":\"polygon-amoy\",\"tokenSymbol\":\"ETH\",\"amount\":\"0.001\",\"destinationAddress\":\"0x3808Ab2b060D1648c3Bb8fc617F9dF752143dAFB\",\"status\":\"completed\",\"txHash\":\"0x00fe37500093bb282fef45e62318586eb77029636d3c640c758219b0a87a8f74,0x33514f7e529d41a915548590a265a80e70bb6b0a316ee7748cd57317b84c9751\",\"layerZeroMessageId\":\"lz_atomic_1757200221467\",\"fee\":\"0.001648092543699\",\"timestamp\":\"2025-09-06T23:10:06.477Z\"}}",
-            "{\"timestamp\":\"2025-09-06T23:10:21.468Z\",\"level\":\"INFO\",\"message\":\"LayerZero transfer_completed\",\"correlationId\":\"obs_1757200064324_pi8xkt5hp\",\"transferId\":\"transfer_1757200206294_u8k0bx3a3\",\"data\":{\"id\":\"transfer_1757200206294_u8k0bx3a3\",\"correlationId\":\"obs_1757200064324_pi8xkt5hp\",\"status\":\"completed\",\"txHash\":\"0x00fe37500093bb282fef45e62318586eb77029636d3c640c758219b0a87a8f74,0x33514f7e529d41a915548590a265a80e70bb6b0a316ee7748cd57317b84c9751\",\"fee\":\"0.001648092543699\"}}",
-            "{\"timestamp\":\"2025-09-06T23:10:21.582Z\",\"level\":\"INFO\",\"message\":\"LayerZero transfer_initiated\",\"correlationId\":\"obs_1757200064324_pi8xkt5hp\",\"transferId\":\"transfer_1757200221582_54axyea25\",\"data\":{\"id\":\"transfer_1757200221582_54axyea25\",\"correlationId\":\"obs_1757200064324_pi8xkt5hp\",\"sourceChain\":\"sepolia\",\"destChain\":\"polygon-amoy\",\"amount\":\"0.001\",\"tokenSymbol\":\"ETH\"}}",
-            "{\"timestamp\":\"2025-09-06T23:10:29.335Z\",\"level\":\"INFO\",\"message\":\"LayerZero transfer_error\",\"correlationId\":\"obs_1757200064324_pi8xkt5hp\",\"transferId\":\"transfer_1757200221582_54axyea25\",\"data\":{\"id\":\"transfer_1757200221582_54axyea25\",\"correlationId\":\"obs_1757200064324_pi8xkt5hp\",\"error\":\"could not coalesce error (error={ \\\"code\\\": 19, \\\"message\\\": \\\"Unable to perform request\\\" }, payload={ \\\"id\\\": 9, \\\"jsonrpc\\\": \\\"2.0\\\", \\\"method\\\": \\\"eth_sendRawTransaction\\\", \\\"params\\\": [ \\\"0x02f8778301388281ca851245a30444851245a304c2825208943808ab2b060d1648c3bb8fc617f9df752143dafb87038d7ea4c6800080c080a0dc3adef67b5a199e50fb8fee6a41fab8375321c0f30fec83dbeeffa371651630a03de29a1700d480b356b83beee5937792436fc17b6ae8d2f0fe96bc6b5f64d18c\\\" ] }, code=UNKNOWN_ERROR, version=6.15.0)\"}}"
+            "{\"timestamp\":\"2025-09-08T02:16:12.316Z\",\"level\":\"INFO\",\"message\":\"LayerZero atomic_swap_initiated\",\"correlationId\":\"obs_1757297772315_2su38bqmm\",\"transferId\":\"atomic_swap_1757297772316_9k6kt6ek8\",\"data\":{\"id\":\"atomic_swap_1757297772316_9k6kt6ek8\",\"correlationId\":\"obs_1757297772315_2su38bqmm\",\"sourceChain\":\"sepolia\",\"destChain\":\"polygon-amoy\",\"amount\":\"0.001\",\"tokenSymbol\":\"ETH ↔ POL\"}}",
+            "{\"timestamp\":\"2025-09-08T02:17:43.358Z\",\"level\":\"INFO\",\"message\":\"LayerZero atomic_swap_completed\",\"correlationId\":\"obs_1757297772315_2su38bqmm\",\"transferId\":\"atomic_swap_1757297772316_9k6kt6ek8\",\"data\":{\"id\":\"atomic_swap_1757297772316_9k6kt6ek8\",\"correlationId\":\"obs_1757297772315_2su38bqmm\",\"sepoliaTxHash\":\"0x8e7b1011889531205c3c8e0074b63f2d5a982967e2c5fa27fc51bacb65f33036\",\"polygonTxHash\":\"0x7aac87792ed5ddf84acdb46b138f86c6e391dc7ba4c157ea491ff34785557493\",\"sepoliaBlock\":9157064,\"polygonBlock\":26136580}}",
+            "{\"timestamp\":\"2025-09-08T02:17:43.358Z\",\"level\":\"INFO\",\"message\":\"LayerZero atomic_swap_initiated\",\"correlationId\":\"obs_1757297772315_2su38bqmm\",\"transferId\":\"atomic_swap_1757297863358_38f68cmyb\",\"data\":{\"id\":\"atomic_swap_1757297863358_38f68cmyb\",\"correlationId\":\"obs_1757297772315_2su38bqmm\",\"sourceChain\":\"sepolia\",\"destChain\":\"polygon-amoy\",\"amount\":\"0.001\",\"tokenSymbol\":\"ETH ↔ POL\"}}",
+            "{\"timestamp\":\"2025-09-08T02:17:43.358Z\",\"level\":\"ERROR\",\"message\":\"LayerZero atomic_swap_failed\",\"correlationId\":\"obs_1757297772315_2su38bqmm\",\"transferId\":\"atomic_swap_1757297863358_38f68cmyb\",\"data\":{\"id\":\"atomic_swap_1757297863358_38f68cmyb\",\"correlationId\":\"obs_1757297772315_2su38bqmm\",\"error\":\"Unsupported chain: invalid-chain or polygon-amoy\"}}",
+            "{\"timestamp\":\"2025-09-08T02:17:44.377Z\",\"level\":\"INFO\",\"message\":\"LayerZero atomic_swap_initiated\",\"correlationId\":\"obs_1757297772315_2su38bqmm\",\"transferId\":\"atomic_swap_1757297864377_kbpkwzqng\",\"data\":{\"id\":\"atomic_swap_1757297864377_kbpkwzqng\",\"correlationId\":\"obs_1757297772315_2su38bqmm\",\"sourceChain\":\"sepolia\",\"destChain\":\"polygon-amoy\",\"amount\":\"0.001\",\"tokenSymbol\":\"ETH ↔ POL\"}}",
+            "{\"timestamp\":\"2025-09-08T02:17:55.655Z\",\"level\":\"INFO\",\"message\":\"LayerZero atomic_swap_completed\",\"correlationId\":\"obs_1757297772315_2su38bqmm\",\"transferId\":\"atomic_swap_1757297864377_kbpkwzqng\",\"data\":{\"id\":\"atomic_swap_1757297864377_kbpkwzqng\",\"correlationId\":\"obs_1757297772315_2su38bqmm\",\"sepoliaTxHash\":\"0xe2fba90c0b3ceaa86c7079ab8df874fa73c94add34b8d3765bfd0000aa13064d\",\"polygonTxHash\":\"0x70b059f7c20d861bf19de07b06eb86a53b7567bd876830d7d98b86ac15bf7204\",\"sepoliaBlock\":9157065,\"polygonBlock\":26136586}}",
+            "{\"timestamp\":\"2025-09-08T02:17:58.673Z\",\"level\":\"INFO\",\"message\":\"LayerZero atomic_swap_initiated\",\"correlationId\":\"obs_1757297772315_2su38bqmm\",\"transferId\":\"atomic_swap_1757297878673_1p3ct5ivm\",\"data\":{\"id\":\"atomic_swap_1757297878673_1p3ct5ivm\",\"correlationId\":\"obs_1757297772315_2su38bqmm\",\"sourceChain\":\"sepolia\",\"destChain\":\"polygon-amoy\",\"amount\":\"0.001\",\"tokenSymbol\":\"ETH ↔ POL\"}}",
+            "{\"timestamp\":\"2025-09-08T02:18:18.764Z\",\"level\":\"INFO\",\"message\":\"LayerZero atomic_swap_completed\",\"correlationId\":\"obs_1757297772315_2su38bqmm\",\"transferId\":\"atomic_swap_1757297878673_1p3ct5ivm\",\"data\":{\"id\":\"atomic_swap_1757297878673_1p3ct5ivm\",\"correlationId\":\"obs_1757297772315_2su38bqmm\",\"sepoliaTxHash\":\"0x09c50466e78c7b49b127bc880b59e8596f19dfa963e4daac1bef031352e3335c\",\"polygonTxHash\":\"0x57a39a7151034468db2faeeb2cb0a955c502f14e21b2fee5405943ecf51be47f\",\"sepoliaBlock\":9157067,\"polygonBlock\":26136598}}",
+            "{\"timestamp\":\"2025-09-08T02:18:21.790Z\",\"level\":\"INFO\",\"message\":\"LayerZero atomic_swap_initiated\",\"correlationId\":\"obs_1757297772315_2su38bqmm\",\"transferId\":\"atomic_swap_1757297901790_kluish6g3\",\"data\":{\"id\":\"atomic_swap_1757297901790_kluish6g3\",\"correlationId\":\"obs_1757297772315_2su38bqmm\",\"sourceChain\":\"sepolia\",\"destChain\":\"polygon-amoy\",\"amount\":\"0.001\",\"tokenSymbol\":\"ETH ↔ POL\"}}",
+            "{\"timestamp\":\"2025-09-08T02:18:33.676Z\",\"level\":\"INFO\",\"message\":\"LayerZero atomic_swap_completed\",\"correlationId\":\"obs_1757297772315_2su38bqmm\",\"transferId\":\"atomic_swap_1757297901790_kluish6g3\",\"data\":{\"id\":\"atomic_swap_1757297901790_kluish6g3\",\"correlationId\":\"obs_1757297772315_2su38bqmm\",\"sepoliaTxHash\":\"0x29a438acbf883b83937ed26bf623b744f5111871b639ddbda8c39266cf11c82d\",\"polygonTxHash\":\"0xae23728030d1e7e73e9665fb549b538f80b8fc51908a7143e820678f697eb5f5\",\"sepoliaBlock\":9157068,\"polygonBlock\":26136604}}",
+            "{\"timestamp\":\"2025-09-08T02:18:33.677Z\",\"level\":\"INFO\",\"message\":\"LayerZero atomic_swap_initiated\",\"correlationId\":\"obs_1757297772315_2su38bqmm\",\"transferId\":\"atomic_swap_1757297913677_ap1vltnbc\",\"data\":{\"id\":\"atomic_swap_1757297913677_ap1vltnbc\",\"correlationId\":\"obs_1757297772315_2su38bqmm\",\"sourceChain\":\"sepolia\",\"destChain\":\"polygon-amoy\",\"amount\":\"0.001\",\"tokenSymbol\":\"ETH ↔ POL\"}}",
+            "{\"timestamp\":\"2025-09-08T02:18:40.977Z\",\"level\":\"INFO\",\"message\":\"LayerZero atomic_swap_completed\",\"correlationId\":\"obs_1757297772315_2su38bqmm\",\"transferId\":\"atomic_swap_1757297913677_ap1vltnbc\",\"data\":{\"id\":\"atomic_swap_1757297913677_ap1vltnbc\",\"correlationId\":\"obs_1757297772315_2su38bqmm\",\"sepoliaTxHash\":\"0x0a3f106ca3778decd6aea0991f1bb6f2f8049ffbb474427c88018236059bd335\",\"polygonTxHash\":\"0xc9ad108577a57e870b87762e829cca4422d7b948b80917f85357d15c2fd680fb\",\"sepoliaBlock\":9157069,\"polygonBlock\":26136608}}",
+            "{\"timestamp\":\"2025-09-08T02:18:42.991Z\",\"level\":\"INFO\",\"message\":\"LayerZero atomic_swap_initiated\",\"correlationId\":\"obs_1757297772315_2su38bqmm\",\"transferId\":\"atomic_swap_1757297922991_hkjwchzmy\",\"data\":{\"id\":\"atomic_swap_1757297922991_hkjwchzmy\",\"correlationId\":\"obs_1757297772315_2su38bqmm\",\"sourceChain\":\"sepolia\",\"destChain\":\"polygon-amoy\",\"amount\":\"0.001\",\"tokenSymbol\":\"ETH ↔ POL\"}}",
+            "{\"timestamp\":\"2025-09-08T02:18:58.607Z\",\"level\":\"INFO\",\"message\":\"LayerZero atomic_swap_completed\",\"correlationId\":\"obs_1757297772315_2su38bqmm\",\"transferId\":\"atomic_swap_1757297922991_hkjwchzmy\",\"data\":{\"id\":\"atomic_swap_1757297922991_hkjwchzmy\",\"correlationId\":\"obs_1757297772315_2su38bqmm\",\"sepoliaTxHash\":\"0x6474252ddb463d040383ba4c71e872b2b7c9326ae5d28fa3d2515125e749c24f\",\"polygonTxHash\":\"0x1d976783e0de0bb3cc851b2a60a483ed42a62bb1b41c4592afe3ed8bebf142e8\",\"sepoliaBlock\":9157070,\"polygonBlock\":26136615}}",
+            "{\"timestamp\":\"2025-09-08T02:19:00.620Z\",\"level\":\"INFO\",\"message\":\"LayerZero atomic_swap_initiated\",\"correlationId\":\"obs_1757297772315_2su38bqmm\",\"transferId\":\"atomic_swap_1757297940620_lc11s3sq0\",\"data\":{\"id\":\"atomic_swap_1757297940620_lc11s3sq0\",\"correlationId\":\"obs_1757297772315_2su38bqmm\",\"sourceChain\":\"sepolia\",\"destChain\":\"polygon-amoy\",\"amount\":\"0.001\",\"tokenSymbol\":\"ETH ↔ POL\"}}",
+            "{\"timestamp\":\"2025-09-08T02:19:17.093Z\",\"level\":\"INFO\",\"message\":\"LayerZero atomic_swap_completed\",\"correlationId\":\"obs_1757297772315_2su38bqmm\",\"transferId\":\"atomic_swap_1757297940620_lc11s3sq0\",\"data\":{\"id\":\"atomic_swap_1757297940620_lc11s3sq0\",\"correlationId\":\"obs_1757297772315_2su38bqmm\",\"sepoliaTxHash\":\"0xc25c93d3b50cf4dcfe802aa268bfd39886757ecb63dc135bb391497f851d88c6\",\"polygonTxHash\":\"0xbb8e7aadb4f93d4528513653c04ce9d39be301ceae112c6838714ce578842003\",\"sepoliaBlock\":9157072,\"polygonBlock\":26136625}}",
+            "{\"timestamp\":\"2025-09-08T02:19:17.094Z\",\"level\":\"INFO\",\"message\":\"LayerZero atomic_swap_initiated\",\"correlationId\":\"obs_1757297772315_2su38bqmm\",\"transferId\":\"atomic_swap_1757297957094_ew82wzy58\",\"data\":{\"id\":\"atomic_swap_1757297957094_ew82wzy58\",\"correlationId\":\"obs_1757297772315_2su38bqmm\",\"sourceChain\":\"sepolia\",\"destChain\":\"polygon-amoy\",\"amount\":\"0.001\",\"tokenSymbol\":\"ETH ↔ POL\"}}",
+            "{\"timestamp\":\"2025-09-08T02:19:29.032Z\",\"level\":\"INFO\",\"message\":\"LayerZero atomic_swap_completed\",\"correlationId\":\"obs_1757297772315_2su38bqmm\",\"transferId\":\"atomic_swap_1757297957094_ew82wzy58\",\"data\":{\"id\":\"atomic_swap_1757297957094_ew82wzy58\",\"correlationId\":\"obs_1757297772315_2su38bqmm\",\"sepoliaTxHash\":\"0x363eda0c1dd24fb17d59493afcb10ed34c14a7f36717a1f1854558506ea76cb3\",\"polygonTxHash\":\"0x87feaef14e1172887d947b141678bc2401761e37a9c042b7f34fb14e4e475cb0\",\"sepoliaBlock\":9157073,\"polygonBlock\":26136631}}",
+            "{\"timestamp\":\"2025-09-08T02:19:29.032Z\",\"level\":\"INFO\",\"message\":\"LayerZero atomic_swap_initiated\",\"correlationId\":\"obs_1757297772315_2su38bqmm\",\"transferId\":\"atomic_swap_1757297969032_r63jkao5z\",\"data\":{\"id\":\"atomic_swap_1757297969032_r63jkao5z\",\"correlationId\":\"obs_1757297772315_2su38bqmm\",\"sourceChain\":\"sepolia\",\"destChain\":\"polygon-amoy\",\"amount\":\"0.001\",\"tokenSymbol\":\"ETH ↔ POL\"}}",
+            "{\"timestamp\":\"2025-09-08T02:19:40.616Z\",\"level\":\"INFO\",\"message\":\"LayerZero atomic_swap_completed\",\"correlationId\":\"obs_1757297772315_2su38bqmm\",\"transferId\":\"atomic_swap_1757297969032_r63jkao5z\",\"data\":{\"id\":\"atomic_swap_1757297969032_r63jkao5z\",\"correlationId\":\"obs_1757297772315_2su38bqmm\",\"sepoliaTxHash\":\"0x949338b8ae7a9d5918610c2cb10d136c16f6989d6dd0db21a9a860fd15040897\",\"polygonTxHash\":\"0xc2514eb8c05542a08b801fc1c869d9406de5145037c98628bcbcc07415f0c681\",\"sepoliaBlock\":9157074,\"polygonBlock\":26136637}}",
+            "{\"timestamp\":\"2025-09-08T02:19:40.624Z\",\"level\":\"INFO\",\"message\":\"LayerZero atomic_swap_initiated\",\"correlationId\":\"obs_1757297772315_2su38bqmm\",\"transferId\":\"atomic_swap_1757297980624_cj9bt29r7\",\"data\":{\"id\":\"atomic_swap_1757297980624_cj9bt29r7\",\"correlationId\":\"obs_1757297772315_2su38bqmm\",\"sourceChain\":\"sepolia\",\"destChain\":\"polygon-amoy\",\"amount\":\"0.001\",\"tokenSymbol\":\"ETH ↔ POL\"}}",
+            "{\"timestamp\":\"2025-09-08T02:19:55.740Z\",\"level\":\"INFO\",\"message\":\"LayerZero atomic_swap_completed\",\"correlationId\":\"obs_1757297772315_2su38bqmm\",\"transferId\":\"atomic_swap_1757297980624_cj9bt29r7\",\"data\":{\"id\":\"atomic_swap_1757297980624_cj9bt29r7\",\"correlationId\":\"obs_1757297772315_2su38bqmm\",\"sepoliaTxHash\":\"0x5f7744eddc0aa2e3714f0c6f7cddc3ab8f6ac4ac1da59ca0b1ae5b057fab8927\",\"polygonTxHash\":\"0xd4b12aebead6ad6c49e7085c8d897d3ba81e701ea2fbc29de4d0fc323780396e\",\"sepoliaBlock\":9157075,\"polygonBlock\":26136642}}"
           ],
           "metrics": {
-            "transferCount": 36,
+            "transferCount": 22,
             "successCount": 10,
             "failureCount": 1,
             "averageTransferTime": 0,
@@ -78,548 +64,318 @@
           "traces": {
             "transfers": [
               {
-                "eventType": "transfer_initiated",
-                "timestamp": "2025-09-06T23:07:44.325Z",
-                "correlationId": "obs_1757200064324_pi8xkt5hp",
-                "transferId": "transfer_1757200064325_288g2yof4",
+                "eventType": "atomic_swap_initiated",
+                "timestamp": "2025-09-08T02:16:12.316Z",
+                "correlationId": "obs_1757297772315_2su38bqmm",
+                "transferId": "atomic_swap_1757297772316_9k6kt6ek8",
                 "data": {
-                  "id": "transfer_1757200064325_288g2yof4",
-                  "correlationId": "obs_1757200064324_pi8xkt5hp",
+                  "id": "atomic_swap_1757297772316_9k6kt6ek8",
+                  "correlationId": "obs_1757297772315_2su38bqmm",
                   "sourceChain": "sepolia",
                   "destChain": "polygon-amoy",
                   "amount": "0.001",
-                  "tokenSymbol": "ETH"
+                  "tokenSymbol": "ETH ↔ POL"
                 }
               },
               {
-                "eventType": "transfer_initiated",
-                "timestamp": "2025-09-06T23:07:54.429Z",
-                "correlationId": "obs_1757200064324_pi8xkt5hp",
-                "transferId": "lz_1757200064942_5ahwza9x8",
+                "eventType": "atomic_swap_completed",
+                "timestamp": "2025-09-08T02:17:43.358Z",
+                "correlationId": "obs_1757297772315_2su38bqmm",
+                "transferId": "atomic_swap_1757297772316_9k6kt6ek8",
                 "data": {
-                  "id": "lz_1757200064942_5ahwza9x8",
-                  "sourceChain": "sepolia",
-                  "destChain": "polygon-amoy",
-                  "tokenSymbol": "ETH",
-                  "amount": "0.001",
-                  "destinationAddress": "0x3808Ab2b060D1648c3Bb8fc617F9dF752143dAFB",
-                  "status": "completed",
-                  "txHash": "0x0fe672303e1498b7502f8eb0e48f2a90aa471e9b4312d42ce080242c7d106794,0x99cb1fd4bbbc84679a6b3471fc7ccee8c43b27293a7fde1cf348c734f8c40c3a",
-                  "layerZeroMessageId": "lz_atomic_1757200074429",
-                  "fee": "0.001648105516659",
-                  "timestamp": "2025-09-06T23:07:44.942Z"
+                  "id": "atomic_swap_1757297772316_9k6kt6ek8",
+                  "correlationId": "obs_1757297772315_2su38bqmm",
+                  "sepoliaTxHash": "0x8e7b1011889531205c3c8e0074b63f2d5a982967e2c5fa27fc51bacb65f33036",
+                  "polygonTxHash": "0x7aac87792ed5ddf84acdb46b138f86c6e391dc7ba4c157ea491ff34785557493",
+                  "sepoliaBlock": 9157064,
+                  "polygonBlock": 26136580
                 }
               },
               {
-                "eventType": "transfer_completed",
-                "timestamp": "2025-09-06T23:07:54.429Z",
-                "correlationId": "obs_1757200064324_pi8xkt5hp",
-                "transferId": "transfer_1757200064325_288g2yof4",
+                "eventType": "atomic_swap_initiated",
+                "timestamp": "2025-09-08T02:17:43.358Z",
+                "correlationId": "obs_1757297772315_2su38bqmm",
+                "transferId": "atomic_swap_1757297863358_38f68cmyb",
                 "data": {
-                  "id": "transfer_1757200064325_288g2yof4",
-                  "correlationId": "obs_1757200064324_pi8xkt5hp",
-                  "status": "completed",
-                  "txHash": "0x0fe672303e1498b7502f8eb0e48f2a90aa471e9b4312d42ce080242c7d106794,0x99cb1fd4bbbc84679a6b3471fc7ccee8c43b27293a7fde1cf348c734f8c40c3a",
-                  "fee": "0.001648105516659"
-                }
-              },
-              {
-                "eventType": "transfer_initiated",
-                "timestamp": "2025-09-06T23:07:54.429Z",
-                "correlationId": "obs_1757200064324_pi8xkt5hp",
-                "transferId": "transfer_1757200074429_ek92dhlun",
-                "data": {
-                  "id": "transfer_1757200074429_ek92dhlun",
-                  "correlationId": "obs_1757200064324_pi8xkt5hp",
+                  "id": "atomic_swap_1757297863358_38f68cmyb",
+                  "correlationId": "obs_1757297772315_2su38bqmm",
                   "sourceChain": "sepolia",
                   "destChain": "polygon-amoy",
                   "amount": "0.001",
-                  "tokenSymbol": "ETH"
+                  "tokenSymbol": "ETH ↔ POL"
                 }
               },
               {
-                "eventType": "transfer_failed",
-                "timestamp": "2025-09-06T23:07:54.429Z",
-                "correlationId": "obs_1757200064324_pi8xkt5hp",
-                "transferId": "transfer_1757200074429_ek92dhlun",
+                "eventType": "atomic_swap_failed",
+                "timestamp": "2025-09-08T02:17:43.358Z",
+                "correlationId": "obs_1757297772315_2su38bqmm",
+                "transferId": "atomic_swap_1757297863358_38f68cmyb",
                 "data": {
-                  "id": "transfer_1757200074429_ek92dhlun",
-                  "correlationId": "obs_1757200064324_pi8xkt5hp",
+                  "id": "atomic_swap_1757297863358_38f68cmyb",
+                  "correlationId": "obs_1757297772315_2su38bqmm",
                   "error": "Unsupported chain: invalid-chain or polygon-amoy"
                 }
               },
               {
-                "eventType": "transfer_initiated",
-                "timestamp": "2025-09-06T23:07:55.444Z",
-                "correlationId": "obs_1757200064324_pi8xkt5hp",
-                "transferId": "transfer_1757200075444_rbe428gea",
+                "eventType": "atomic_swap_initiated",
+                "timestamp": "2025-09-08T02:17:44.377Z",
+                "correlationId": "obs_1757297772315_2su38bqmm",
+                "transferId": "atomic_swap_1757297864377_kbpkwzqng",
                 "data": {
-                  "id": "transfer_1757200075444_rbe428gea",
-                  "correlationId": "obs_1757200064324_pi8xkt5hp",
+                  "id": "atomic_swap_1757297864377_kbpkwzqng",
+                  "correlationId": "obs_1757297772315_2su38bqmm",
                   "sourceChain": "sepolia",
                   "destChain": "polygon-amoy",
                   "amount": "0.001",
-                  "tokenSymbol": "ETH"
+                  "tokenSymbol": "ETH ↔ POL"
                 }
               },
               {
-                "eventType": "transfer_error",
-                "timestamp": "2025-09-06T23:08:02.190Z",
-                "correlationId": "obs_1757200064324_pi8xkt5hp",
-                "transferId": "transfer_1757200075444_rbe428gea",
+                "eventType": "atomic_swap_completed",
+                "timestamp": "2025-09-08T02:17:55.655Z",
+                "correlationId": "obs_1757297772315_2su38bqmm",
+                "transferId": "atomic_swap_1757297864377_kbpkwzqng",
                 "data": {
-                  "id": "transfer_1757200075444_rbe428gea",
-                  "correlationId": "obs_1757200064324_pi8xkt5hp",
-                  "error": "could not coalesce error (error={ \"code\": 26, \"message\": \"Unknown block\" }, payload={ \"id\": 17, \"jsonrpc\": \"2.0\", \"method\": \"eth_getTransactionByHash\", \"params\": [ \"0x7d6751bf9712a6b00380667b4059e34708a126ae1de4b03b56dbffb7a6323522\" ] }, code=UNKNOWN_ERROR, version=6.15.0)"
+                  "id": "atomic_swap_1757297864377_kbpkwzqng",
+                  "correlationId": "obs_1757297772315_2su38bqmm",
+                  "sepoliaTxHash": "0xe2fba90c0b3ceaa86c7079ab8df874fa73c94add34b8d3765bfd0000aa13064d",
+                  "polygonTxHash": "0x70b059f7c20d861bf19de07b06eb86a53b7567bd876830d7d98b86ac15bf7204",
+                  "sepoliaBlock": 9157065,
+                  "polygonBlock": 26136586
                 }
               },
               {
-                "eventType": "transfer_initiated",
-                "timestamp": "2025-09-06T23:08:02.190Z",
-                "correlationId": "obs_1757200064324_pi8xkt5hp",
-                "transferId": "transfer_1757200082190_ry8xpmddw",
+                "eventType": "atomic_swap_initiated",
+                "timestamp": "2025-09-08T02:17:58.673Z",
+                "correlationId": "obs_1757297772315_2su38bqmm",
+                "transferId": "atomic_swap_1757297878673_1p3ct5ivm",
                 "data": {
-                  "id": "transfer_1757200082190_ry8xpmddw",
-                  "correlationId": "obs_1757200064324_pi8xkt5hp",
+                  "id": "atomic_swap_1757297878673_1p3ct5ivm",
+                  "correlationId": "obs_1757297772315_2su38bqmm",
                   "sourceChain": "sepolia",
                   "destChain": "polygon-amoy",
                   "amount": "0.001",
-                  "tokenSymbol": "ETH"
+                  "tokenSymbol": "ETH ↔ POL"
                 }
               },
               {
-                "eventType": "transfer_initiated",
-                "timestamp": "2025-09-06T23:08:21.597Z",
-                "correlationId": "obs_1757200064324_pi8xkt5hp",
-                "transferId": "lz_1757200082430_evbpvupwo",
+                "eventType": "atomic_swap_completed",
+                "timestamp": "2025-09-08T02:18:18.764Z",
+                "correlationId": "obs_1757297772315_2su38bqmm",
+                "transferId": "atomic_swap_1757297878673_1p3ct5ivm",
                 "data": {
-                  "id": "lz_1757200082430_evbpvupwo",
-                  "sourceChain": "sepolia",
-                  "destChain": "polygon-amoy",
-                  "tokenSymbol": "ETH",
-                  "amount": "0.001",
-                  "destinationAddress": "0x3808Ab2b060D1648c3Bb8fc617F9dF752143dAFB",
-                  "status": "completed",
-                  "txHash": "0x4ea758818fcc865084c74b990e51487f0445664fda0818a3c3c6b5deca90917f,0xebe2b431bfee3177224d9cea7b0b24ef02779772aa216b3eb3492d18f31f926d",
-                  "layerZeroMessageId": "lz_atomic_1757200101597",
-                  "fee": "0.001648103102961",
-                  "timestamp": "2025-09-06T23:08:02.430Z"
+                  "id": "atomic_swap_1757297878673_1p3ct5ivm",
+                  "correlationId": "obs_1757297772315_2su38bqmm",
+                  "sepoliaTxHash": "0x09c50466e78c7b49b127bc880b59e8596f19dfa963e4daac1bef031352e3335c",
+                  "polygonTxHash": "0x57a39a7151034468db2faeeb2cb0a955c502f14e21b2fee5405943ecf51be47f",
+                  "sepoliaBlock": 9157067,
+                  "polygonBlock": 26136598
                 }
               },
               {
-                "eventType": "transfer_completed",
-                "timestamp": "2025-09-06T23:08:21.598Z",
-                "correlationId": "obs_1757200064324_pi8xkt5hp",
-                "transferId": "transfer_1757200082190_ry8xpmddw",
+                "eventType": "atomic_swap_initiated",
+                "timestamp": "2025-09-08T02:18:21.790Z",
+                "correlationId": "obs_1757297772315_2su38bqmm",
+                "transferId": "atomic_swap_1757297901790_kluish6g3",
                 "data": {
-                  "id": "transfer_1757200082190_ry8xpmddw",
-                  "correlationId": "obs_1757200064324_pi8xkt5hp",
-                  "status": "completed",
-                  "txHash": "0x4ea758818fcc865084c74b990e51487f0445664fda0818a3c3c6b5deca90917f,0xebe2b431bfee3177224d9cea7b0b24ef02779772aa216b3eb3492d18f31f926d",
-                  "fee": "0.001648103102961"
-                }
-              },
-              {
-                "eventType": "transfer_initiated",
-                "timestamp": "2025-09-06T23:08:24.614Z",
-                "correlationId": "obs_1757200064324_pi8xkt5hp",
-                "transferId": "transfer_1757200104614_y3cjitf4h",
-                "data": {
-                  "id": "transfer_1757200104614_y3cjitf4h",
-                  "correlationId": "obs_1757200064324_pi8xkt5hp",
+                  "id": "atomic_swap_1757297901790_kluish6g3",
+                  "correlationId": "obs_1757297772315_2su38bqmm",
                   "sourceChain": "sepolia",
                   "destChain": "polygon-amoy",
                   "amount": "0.001",
-                  "tokenSymbol": "ETH"
+                  "tokenSymbol": "ETH ↔ POL"
                 }
               },
               {
-                "eventType": "transfer_initiated",
-                "timestamp": "2025-09-06T23:08:40.561Z",
-                "correlationId": "obs_1757200064324_pi8xkt5hp",
-                "transferId": "lz_1757200105013_sj0wam2yp",
+                "eventType": "atomic_swap_completed",
+                "timestamp": "2025-09-08T02:18:33.676Z",
+                "correlationId": "obs_1757297772315_2su38bqmm",
+                "transferId": "atomic_swap_1757297901790_kluish6g3",
                 "data": {
-                  "id": "lz_1757200105013_sj0wam2yp",
-                  "sourceChain": "sepolia",
-                  "destChain": "polygon-amoy",
-                  "tokenSymbol": "ETH",
-                  "amount": "0.001",
-                  "destinationAddress": "0x3808Ab2b060D1648c3Bb8fc617F9dF752143dAFB",
-                  "status": "completed",
-                  "txHash": "0x8f186505d8399701474a07f8453385d86ada1cc109cd827f2fefd68be502ceb8,0xac5a8d0d7815d6c932c6532bda925dce5667ed58c3f02db20110c9fa1f3ab716",
-                  "layerZeroMessageId": "lz_atomic_1757200120561",
-                  "fee": "0.001648099960143",
-                  "timestamp": "2025-09-06T23:08:25.013Z"
+                  "id": "atomic_swap_1757297901790_kluish6g3",
+                  "correlationId": "obs_1757297772315_2su38bqmm",
+                  "sepoliaTxHash": "0x29a438acbf883b83937ed26bf623b744f5111871b639ddbda8c39266cf11c82d",
+                  "polygonTxHash": "0xae23728030d1e7e73e9665fb549b538f80b8fc51908a7143e820678f697eb5f5",
+                  "sepoliaBlock": 9157068,
+                  "polygonBlock": 26136604
                 }
               },
               {
-                "eventType": "transfer_completed",
-                "timestamp": "2025-09-06T23:08:40.561Z",
-                "correlationId": "obs_1757200064324_pi8xkt5hp",
-                "transferId": "transfer_1757200104614_y3cjitf4h",
+                "eventType": "atomic_swap_initiated",
+                "timestamp": "2025-09-08T02:18:33.677Z",
+                "correlationId": "obs_1757297772315_2su38bqmm",
+                "transferId": "atomic_swap_1757297913677_ap1vltnbc",
                 "data": {
-                  "id": "transfer_1757200104614_y3cjitf4h",
-                  "correlationId": "obs_1757200064324_pi8xkt5hp",
-                  "status": "completed",
-                  "txHash": "0x8f186505d8399701474a07f8453385d86ada1cc109cd827f2fefd68be502ceb8,0xac5a8d0d7815d6c932c6532bda925dce5667ed58c3f02db20110c9fa1f3ab716",
-                  "fee": "0.001648099960143"
-                }
-              },
-              {
-                "eventType": "transfer_initiated",
-                "timestamp": "2025-09-06T23:08:43.581Z",
-                "correlationId": "obs_1757200064324_pi8xkt5hp",
-                "transferId": "transfer_1757200123581_g8z8c6uco",
-                "data": {
-                  "id": "transfer_1757200123581_g8z8c6uco",
-                  "correlationId": "obs_1757200064324_pi8xkt5hp",
+                  "id": "atomic_swap_1757297913677_ap1vltnbc",
+                  "correlationId": "obs_1757297772315_2su38bqmm",
                   "sourceChain": "sepolia",
                   "destChain": "polygon-amoy",
                   "amount": "0.001",
-                  "tokenSymbol": "ETH"
+                  "tokenSymbol": "ETH ↔ POL"
                 }
               },
               {
-                "eventType": "transfer_initiated",
-                "timestamp": "2025-09-06T23:08:55.516Z",
-                "correlationId": "obs_1757200064324_pi8xkt5hp",
-                "transferId": "lz_1757200123815_xpk0yh117",
+                "eventType": "atomic_swap_completed",
+                "timestamp": "2025-09-08T02:18:40.977Z",
+                "correlationId": "obs_1757297772315_2su38bqmm",
+                "transferId": "atomic_swap_1757297913677_ap1vltnbc",
                 "data": {
-                  "id": "lz_1757200123815_xpk0yh117",
-                  "sourceChain": "sepolia",
-                  "destChain": "polygon-amoy",
-                  "tokenSymbol": "ETH",
-                  "amount": "0.001",
-                  "destinationAddress": "0x3808Ab2b060D1648c3Bb8fc617F9dF752143dAFB",
-                  "status": "completed",
-                  "txHash": "0x740265a4e7bd5d13103c24db7ee75fb8ac61c9578988832306644b716980b853,0xcf74f25d4f5827d5572e2815c352e5c9f15dc8b0f6d2a7cdb475cfc02bec4ee5",
-                  "layerZeroMessageId": "lz_atomic_1757200135516",
-                  "fee": "0.001648099322562",
-                  "timestamp": "2025-09-06T23:08:43.815Z"
+                  "id": "atomic_swap_1757297913677_ap1vltnbc",
+                  "correlationId": "obs_1757297772315_2su38bqmm",
+                  "sepoliaTxHash": "0x0a3f106ca3778decd6aea0991f1bb6f2f8049ffbb474427c88018236059bd335",
+                  "polygonTxHash": "0xc9ad108577a57e870b87762e829cca4422d7b948b80917f85357d15c2fd680fb",
+                  "sepoliaBlock": 9157069,
+                  "polygonBlock": 26136608
                 }
               },
               {
-                "eventType": "transfer_completed",
-                "timestamp": "2025-09-06T23:08:55.516Z",
-                "correlationId": "obs_1757200064324_pi8xkt5hp",
-                "transferId": "transfer_1757200123581_g8z8c6uco",
+                "eventType": "atomic_swap_initiated",
+                "timestamp": "2025-09-08T02:18:42.991Z",
+                "correlationId": "obs_1757297772315_2su38bqmm",
+                "transferId": "atomic_swap_1757297922991_hkjwchzmy",
                 "data": {
-                  "id": "transfer_1757200123581_g8z8c6uco",
-                  "correlationId": "obs_1757200064324_pi8xkt5hp",
-                  "status": "completed",
-                  "txHash": "0x740265a4e7bd5d13103c24db7ee75fb8ac61c9578988832306644b716980b853,0xcf74f25d4f5827d5572e2815c352e5c9f15dc8b0f6d2a7cdb475cfc02bec4ee5",
-                  "fee": "0.001648099322562"
-                }
-              },
-              {
-                "eventType": "transfer_initiated",
-                "timestamp": "2025-09-06T23:08:55.517Z",
-                "correlationId": "obs_1757200064324_pi8xkt5hp",
-                "transferId": "transfer_1757200135517_olmslewxk",
-                "data": {
-                  "id": "transfer_1757200135517_olmslewxk",
-                  "correlationId": "obs_1757200064324_pi8xkt5hp",
+                  "id": "atomic_swap_1757297922991_hkjwchzmy",
+                  "correlationId": "obs_1757297772315_2su38bqmm",
                   "sourceChain": "sepolia",
                   "destChain": "polygon-amoy",
                   "amount": "0.001",
-                  "tokenSymbol": "ETH"
+                  "tokenSymbol": "ETH ↔ POL"
                 }
               },
               {
-                "eventType": "transfer_initiated",
-                "timestamp": "2025-09-06T23:09:07.349Z",
-                "correlationId": "obs_1757200064324_pi8xkt5hp",
-                "transferId": "lz_1757200135884_kyuscxje8",
+                "eventType": "atomic_swap_completed",
+                "timestamp": "2025-09-08T02:18:58.607Z",
+                "correlationId": "obs_1757297772315_2su38bqmm",
+                "transferId": "atomic_swap_1757297922991_hkjwchzmy",
                 "data": {
-                  "id": "lz_1757200135884_kyuscxje8",
-                  "sourceChain": "sepolia",
-                  "destChain": "polygon-amoy",
-                  "tokenSymbol": "ETH",
-                  "amount": "0.001",
-                  "destinationAddress": "0x3808Ab2b060D1648c3Bb8fc617F9dF752143dAFB",
-                  "status": "completed",
-                  "txHash": "0x0670244b3e9d8c5ee67cd8bc563b52bb2ee2b8d7fb70bffbd8ddd50ac355c1be,0xfbc2774f7a02ddf7849ca16d0d361f50de90f0eb4249ea78ed40fec65dd77672",
-                  "layerZeroMessageId": "lz_atomic_1757200147349",
-                  "fee": "0.001648096029489",
-                  "timestamp": "2025-09-06T23:08:55.884Z"
+                  "id": "atomic_swap_1757297922991_hkjwchzmy",
+                  "correlationId": "obs_1757297772315_2su38bqmm",
+                  "sepoliaTxHash": "0x6474252ddb463d040383ba4c71e872b2b7c9326ae5d28fa3d2515125e749c24f",
+                  "polygonTxHash": "0x1d976783e0de0bb3cc851b2a60a483ed42a62bb1b41c4592afe3ed8bebf142e8",
+                  "sepoliaBlock": 9157070,
+                  "polygonBlock": 26136615
                 }
               },
               {
-                "eventType": "transfer_completed",
-                "timestamp": "2025-09-06T23:09:07.350Z",
-                "correlationId": "obs_1757200064324_pi8xkt5hp",
-                "transferId": "transfer_1757200135517_olmslewxk",
+                "eventType": "atomic_swap_initiated",
+                "timestamp": "2025-09-08T02:19:00.620Z",
+                "correlationId": "obs_1757297772315_2su38bqmm",
+                "transferId": "atomic_swap_1757297940620_lc11s3sq0",
                 "data": {
-                  "id": "transfer_1757200135517_olmslewxk",
-                  "correlationId": "obs_1757200064324_pi8xkt5hp",
-                  "status": "completed",
-                  "txHash": "0x0670244b3e9d8c5ee67cd8bc563b52bb2ee2b8d7fb70bffbd8ddd50ac355c1be,0xfbc2774f7a02ddf7849ca16d0d361f50de90f0eb4249ea78ed40fec65dd77672",
-                  "fee": "0.001648096029489"
-                }
-              },
-              {
-                "eventType": "transfer_initiated",
-                "timestamp": "2025-09-06T23:09:09.364Z",
-                "correlationId": "obs_1757200064324_pi8xkt5hp",
-                "transferId": "transfer_1757200149364_c2pxbu9ap",
-                "data": {
-                  "id": "transfer_1757200149364_c2pxbu9ap",
-                  "correlationId": "obs_1757200064324_pi8xkt5hp",
+                  "id": "atomic_swap_1757297940620_lc11s3sq0",
+                  "correlationId": "obs_1757297772315_2su38bqmm",
                   "sourceChain": "sepolia",
                   "destChain": "polygon-amoy",
                   "amount": "0.001",
-                  "tokenSymbol": "ETH"
+                  "tokenSymbol": "ETH ↔ POL"
                 }
               },
               {
-                "eventType": "transfer_initiated",
-                "timestamp": "2025-09-06T23:09:21.127Z",
-                "correlationId": "obs_1757200064324_pi8xkt5hp",
-                "transferId": "lz_1757200149936_kre4cl48r",
+                "eventType": "atomic_swap_completed",
+                "timestamp": "2025-09-08T02:19:17.093Z",
+                "correlationId": "obs_1757297772315_2su38bqmm",
+                "transferId": "atomic_swap_1757297940620_lc11s3sq0",
                 "data": {
-                  "id": "lz_1757200149936_kre4cl48r",
-                  "sourceChain": "sepolia",
-                  "destChain": "polygon-amoy",
-                  "tokenSymbol": "ETH",
-                  "amount": "0.001",
-                  "destinationAddress": "0x3808Ab2b060D1648c3Bb8fc617F9dF752143dAFB",
-                  "status": "completed",
-                  "txHash": "0xa03e42f3513741d5b4b45dbd8cb3217206c27476f28b4d429d1dfd0a8467c0d9,0xceae3926b1a2dfdea74d6bb89f12ab8706208ab9a4c6d46e3bc42497eff4c204",
-                  "layerZeroMessageId": "lz_atomic_1757200161127",
-                  "fee": "0.001648094101059",
-                  "timestamp": "2025-09-06T23:09:09.936Z"
+                  "id": "atomic_swap_1757297940620_lc11s3sq0",
+                  "correlationId": "obs_1757297772315_2su38bqmm",
+                  "sepoliaTxHash": "0xc25c93d3b50cf4dcfe802aa268bfd39886757ecb63dc135bb391497f851d88c6",
+                  "polygonTxHash": "0xbb8e7aadb4f93d4528513653c04ce9d39be301ceae112c6838714ce578842003",
+                  "sepoliaBlock": 9157072,
+                  "polygonBlock": 26136625
                 }
               },
               {
-                "eventType": "transfer_completed",
-                "timestamp": "2025-09-06T23:09:21.127Z",
-                "correlationId": "obs_1757200064324_pi8xkt5hp",
-                "transferId": "transfer_1757200149364_c2pxbu9ap",
+                "eventType": "atomic_swap_initiated",
+                "timestamp": "2025-09-08T02:19:17.094Z",
+                "correlationId": "obs_1757297772315_2su38bqmm",
+                "transferId": "atomic_swap_1757297957094_ew82wzy58",
                 "data": {
-                  "id": "transfer_1757200149364_c2pxbu9ap",
-                  "correlationId": "obs_1757200064324_pi8xkt5hp",
-                  "status": "completed",
-                  "txHash": "0xa03e42f3513741d5b4b45dbd8cb3217206c27476f28b4d429d1dfd0a8467c0d9,0xceae3926b1a2dfdea74d6bb89f12ab8706208ab9a4c6d46e3bc42497eff4c204",
-                  "fee": "0.001648094101059"
-                }
-              },
-              {
-                "eventType": "transfer_initiated",
-                "timestamp": "2025-09-06T23:09:23.143Z",
-                "correlationId": "obs_1757200064324_pi8xkt5hp",
-                "transferId": "transfer_1757200163143_6oe6rtq5p",
-                "data": {
-                  "id": "transfer_1757200163143_6oe6rtq5p",
-                  "correlationId": "obs_1757200064324_pi8xkt5hp",
+                  "id": "atomic_swap_1757297957094_ew82wzy58",
+                  "correlationId": "obs_1757297772315_2su38bqmm",
                   "sourceChain": "sepolia",
                   "destChain": "polygon-amoy",
                   "amount": "0.001",
-                  "tokenSymbol": "ETH"
+                  "tokenSymbol": "ETH ↔ POL"
                 }
               },
               {
-                "eventType": "transfer_initiated",
-                "timestamp": "2025-09-06T23:09:39.186Z",
-                "correlationId": "obs_1757200064324_pi8xkt5hp",
-                "transferId": "lz_1757200163528_5ezdxku6t",
+                "eventType": "atomic_swap_completed",
+                "timestamp": "2025-09-08T02:19:29.032Z",
+                "correlationId": "obs_1757297772315_2su38bqmm",
+                "transferId": "atomic_swap_1757297957094_ew82wzy58",
                 "data": {
-                  "id": "lz_1757200163528_5ezdxku6t",
-                  "sourceChain": "sepolia",
-                  "destChain": "polygon-amoy",
-                  "tokenSymbol": "ETH",
-                  "amount": "0.001",
-                  "destinationAddress": "0x3808Ab2b060D1648c3Bb8fc617F9dF752143dAFB",
-                  "status": "completed",
-                  "txHash": "0xca009521d10a792c9389960c2ef5c79edb3226d1c87dc92bd34bbe8f648bab03,0xbcc122bba5f1ea7ca8bbf95565265538fcb93b4e20da45018ad654809800a3cc",
-                  "layerZeroMessageId": "lz_atomic_1757200179186",
-                  "fee": "0.001648090813257",
-                  "timestamp": "2025-09-06T23:09:23.528Z"
+                  "id": "atomic_swap_1757297957094_ew82wzy58",
+                  "correlationId": "obs_1757297772315_2su38bqmm",
+                  "sepoliaTxHash": "0x363eda0c1dd24fb17d59493afcb10ed34c14a7f36717a1f1854558506ea76cb3",
+                  "polygonTxHash": "0x87feaef14e1172887d947b141678bc2401761e37a9c042b7f34fb14e4e475cb0",
+                  "sepoliaBlock": 9157073,
+                  "polygonBlock": 26136631
                 }
               },
               {
-                "eventType": "transfer_completed",
-                "timestamp": "2025-09-06T23:09:39.186Z",
-                "correlationId": "obs_1757200064324_pi8xkt5hp",
-                "transferId": "transfer_1757200163143_6oe6rtq5p",
+                "eventType": "atomic_swap_initiated",
+                "timestamp": "2025-09-08T02:19:29.032Z",
+                "correlationId": "obs_1757297772315_2su38bqmm",
+                "transferId": "atomic_swap_1757297969032_r63jkao5z",
                 "data": {
-                  "id": "transfer_1757200163143_6oe6rtq5p",
-                  "correlationId": "obs_1757200064324_pi8xkt5hp",
-                  "status": "completed",
-                  "txHash": "0xca009521d10a792c9389960c2ef5c79edb3226d1c87dc92bd34bbe8f648bab03,0xbcc122bba5f1ea7ca8bbf95565265538fcb93b4e20da45018ad654809800a3cc",
-                  "fee": "0.001648090813257"
-                }
-              },
-              {
-                "eventType": "transfer_initiated",
-                "timestamp": "2025-09-06T23:09:39.187Z",
-                "correlationId": "obs_1757200064324_pi8xkt5hp",
-                "transferId": "transfer_1757200179187_9zuya1h4i",
-                "data": {
-                  "id": "transfer_1757200179187_9zuya1h4i",
-                  "correlationId": "obs_1757200064324_pi8xkt5hp",
+                  "id": "atomic_swap_1757297969032_r63jkao5z",
+                  "correlationId": "obs_1757297772315_2su38bqmm",
                   "sourceChain": "sepolia",
                   "destChain": "polygon-amoy",
                   "amount": "0.001",
-                  "tokenSymbol": "ETH"
+                  "tokenSymbol": "ETH ↔ POL"
                 }
               },
               {
-                "eventType": "transfer_initiated",
-                "timestamp": "2025-09-06T23:09:54.572Z",
-                "correlationId": "obs_1757200064324_pi8xkt5hp",
-                "transferId": "lz_1757200179390_ch8oww2vw",
+                "eventType": "atomic_swap_completed",
+                "timestamp": "2025-09-08T02:19:40.616Z",
+                "correlationId": "obs_1757297772315_2su38bqmm",
+                "transferId": "atomic_swap_1757297969032_r63jkao5z",
                 "data": {
-                  "id": "lz_1757200179390_ch8oww2vw",
-                  "sourceChain": "sepolia",
-                  "destChain": "polygon-amoy",
-                  "tokenSymbol": "ETH",
-                  "amount": "0.001",
-                  "destinationAddress": "0x3808Ab2b060D1648c3Bb8fc617F9dF752143dAFB",
-                  "status": "completed",
-                  "txHash": "0x42815e24f679144d305e1650d0542339787a5229ce6671c393fde6eac320ee67,0x9c9a5e8a0ddab425b9bad2455f7c1c98232685e2ce77b67e62ecd355981c1fdd",
-                  "layerZeroMessageId": "lz_atomic_1757200194572",
-                  "fee": "0.001648089792006",
-                  "timestamp": "2025-09-06T23:09:39.390Z"
+                  "id": "atomic_swap_1757297969032_r63jkao5z",
+                  "correlationId": "obs_1757297772315_2su38bqmm",
+                  "sepoliaTxHash": "0x949338b8ae7a9d5918610c2cb10d136c16f6989d6dd0db21a9a860fd15040897",
+                  "polygonTxHash": "0xc2514eb8c05542a08b801fc1c869d9406de5145037c98628bcbcc07415f0c681",
+                  "sepoliaBlock": 9157074,
+                  "polygonBlock": 26136637
                 }
               },
               {
-                "eventType": "transfer_completed",
-                "timestamp": "2025-09-06T23:09:54.572Z",
-                "correlationId": "obs_1757200064324_pi8xkt5hp",
-                "transferId": "transfer_1757200179187_9zuya1h4i",
+                "eventType": "atomic_swap_initiated",
+                "timestamp": "2025-09-08T02:19:40.624Z",
+                "correlationId": "obs_1757297772315_2su38bqmm",
+                "transferId": "atomic_swap_1757297980624_cj9bt29r7",
                 "data": {
-                  "id": "transfer_1757200179187_9zuya1h4i",
-                  "correlationId": "obs_1757200064324_pi8xkt5hp",
-                  "status": "completed",
-                  "txHash": "0x42815e24f679144d305e1650d0542339787a5229ce6671c393fde6eac320ee67,0x9c9a5e8a0ddab425b9bad2455f7c1c98232685e2ce77b67e62ecd355981c1fdd",
-                  "fee": "0.001648089792006"
-                }
-              },
-              {
-                "eventType": "transfer_initiated",
-                "timestamp": "2025-09-06T23:09:54.573Z",
-                "correlationId": "obs_1757200064324_pi8xkt5hp",
-                "transferId": "transfer_1757200194572_ux0mokuxh",
-                "data": {
-                  "id": "transfer_1757200194572_ux0mokuxh",
-                  "correlationId": "obs_1757200064324_pi8xkt5hp",
+                  "id": "atomic_swap_1757297980624_cj9bt29r7",
+                  "correlationId": "obs_1757297772315_2su38bqmm",
                   "sourceChain": "sepolia",
                   "destChain": "polygon-amoy",
                   "amount": "0.001",
-                  "tokenSymbol": "ETH"
+                  "tokenSymbol": "ETH ↔ POL"
                 }
               },
               {
-                "eventType": "transfer_initiated",
-                "timestamp": "2025-09-06T23:10:06.286Z",
-                "correlationId": "obs_1757200064324_pi8xkt5hp",
-                "transferId": "lz_1757200194760_rxvzl97zq",
+                "eventType": "atomic_swap_completed",
+                "timestamp": "2025-09-08T02:19:55.740Z",
+                "correlationId": "obs_1757297772315_2su38bqmm",
+                "transferId": "atomic_swap_1757297980624_cj9bt29r7",
                 "data": {
-                  "id": "lz_1757200194760_rxvzl97zq",
-                  "sourceChain": "sepolia",
-                  "destChain": "polygon-amoy",
-                  "tokenSymbol": "ETH",
-                  "amount": "0.001",
-                  "destinationAddress": "0x3808Ab2b060D1648c3Bb8fc617F9dF752143dAFB",
-                  "status": "completed",
-                  "txHash": "0x5e8caa6d513ec46af4d9bdec10d6fc3c9cdf85afa47b8caaca8097c486ef04e1,0x7355e8c51be497713c0e6df68bbcb7c266e8c6c2fd3a1970370e032f5a9a23f5",
-                  "layerZeroMessageId": "lz_atomic_1757200206286",
-                  "fee": "0.00164808852138",
-                  "timestamp": "2025-09-06T23:09:54.760Z"
-                }
-              },
-              {
-                "eventType": "transfer_completed",
-                "timestamp": "2025-09-06T23:10:06.286Z",
-                "correlationId": "obs_1757200064324_pi8xkt5hp",
-                "transferId": "transfer_1757200194572_ux0mokuxh",
-                "data": {
-                  "id": "transfer_1757200194572_ux0mokuxh",
-                  "correlationId": "obs_1757200064324_pi8xkt5hp",
-                  "status": "completed",
-                  "txHash": "0x5e8caa6d513ec46af4d9bdec10d6fc3c9cdf85afa47b8caaca8097c486ef04e1,0x7355e8c51be497713c0e6df68bbcb7c266e8c6c2fd3a1970370e032f5a9a23f5",
-                  "fee": "0.00164808852138"
-                }
-              },
-              {
-                "eventType": "transfer_initiated",
-                "timestamp": "2025-09-06T23:10:06.294Z",
-                "correlationId": "obs_1757200064324_pi8xkt5hp",
-                "transferId": "transfer_1757200206294_u8k0bx3a3",
-                "data": {
-                  "id": "transfer_1757200206294_u8k0bx3a3",
-                  "correlationId": "obs_1757200064324_pi8xkt5hp",
-                  "sourceChain": "sepolia",
-                  "destChain": "polygon-amoy",
-                  "amount": "0.001",
-                  "tokenSymbol": "ETH"
-                }
-              },
-              {
-                "eventType": "transfer_initiated",
-                "timestamp": "2025-09-06T23:10:21.468Z",
-                "correlationId": "obs_1757200064324_pi8xkt5hp",
-                "transferId": "lz_1757200206477_6u2f3xq9o",
-                "data": {
-                  "id": "lz_1757200206477_6u2f3xq9o",
-                  "sourceChain": "sepolia",
-                  "destChain": "polygon-amoy",
-                  "tokenSymbol": "ETH",
-                  "amount": "0.001",
-                  "destinationAddress": "0x3808Ab2b060D1648c3Bb8fc617F9dF752143dAFB",
-                  "status": "completed",
-                  "txHash": "0x00fe37500093bb282fef45e62318586eb77029636d3c640c758219b0a87a8f74,0x33514f7e529d41a915548590a265a80e70bb6b0a316ee7748cd57317b84c9751",
-                  "layerZeroMessageId": "lz_atomic_1757200221467",
-                  "fee": "0.001648092543699",
-                  "timestamp": "2025-09-06T23:10:06.477Z"
-                }
-              },
-              {
-                "eventType": "transfer_completed",
-                "timestamp": "2025-09-06T23:10:21.468Z",
-                "correlationId": "obs_1757200064324_pi8xkt5hp",
-                "transferId": "transfer_1757200206294_u8k0bx3a3",
-                "data": {
-                  "id": "transfer_1757200206294_u8k0bx3a3",
-                  "correlationId": "obs_1757200064324_pi8xkt5hp",
-                  "status": "completed",
-                  "txHash": "0x00fe37500093bb282fef45e62318586eb77029636d3c640c758219b0a87a8f74,0x33514f7e529d41a915548590a265a80e70bb6b0a316ee7748cd57317b84c9751",
-                  "fee": "0.001648092543699"
-                }
-              },
-              {
-                "eventType": "transfer_initiated",
-                "timestamp": "2025-09-06T23:10:21.582Z",
-                "correlationId": "obs_1757200064324_pi8xkt5hp",
-                "transferId": "transfer_1757200221582_54axyea25",
-                "data": {
-                  "id": "transfer_1757200221582_54axyea25",
-                  "correlationId": "obs_1757200064324_pi8xkt5hp",
-                  "sourceChain": "sepolia",
-                  "destChain": "polygon-amoy",
-                  "amount": "0.001",
-                  "tokenSymbol": "ETH"
-                }
-              },
-              {
-                "eventType": "transfer_error",
-                "timestamp": "2025-09-06T23:10:29.335Z",
-                "correlationId": "obs_1757200064324_pi8xkt5hp",
-                "transferId": "transfer_1757200221582_54axyea25",
-                "data": {
-                  "id": "transfer_1757200221582_54axyea25",
-                  "correlationId": "obs_1757200064324_pi8xkt5hp",
-                  "error": "could not coalesce error (error={ \"code\": 19, \"message\": \"Unable to perform request\" }, payload={ \"id\": 9, \"jsonrpc\": \"2.0\", \"method\": \"eth_sendRawTransaction\", \"params\": [ \"0x02f8778301388281ca851245a30444851245a304c2825208943808ab2b060d1648c3bb8fc617f9df752143dafb87038d7ea4c6800080c080a0dc3adef67b5a199e50fb8fee6a41fab8375321c0f30fec83dbeeffa371651630a03de29a1700d480b356b83beee5937792436fc17b6ae8d2f0fe96bc6b5f64d18c\" ] }, code=UNKNOWN_ERROR, version=6.15.0)"
+                  "id": "atomic_swap_1757297980624_cj9bt29r7",
+                  "correlationId": "obs_1757297772315_2su38bqmm",
+                  "sepoliaTxHash": "0x5f7744eddc0aa2e3714f0c6f7cddc3ab8f6ac4ac1da59ca0b1ae5b057fab8927",
+                  "polygonTxHash": "0xd4b12aebead6ad6c49e7085c8d897d3ba81e701ea2fbc29de4d0fc323780396e",
+                  "sepoliaBlock": 9157075,
+                  "polygonBlock": 26136642
                 }
               }
             ],
             "errors": [],
             "performance": []
           },
-          "correlationId": "obs_1757200064324_pi8xkt5hp",
-          "transferId": "transfer_1757200074429_ek92dhlun",
+          "correlationId": "obs_1757297772315_2su38bqmm",
+          "transferId": "atomic_swap_1757297863358_38f68cmyb",
           "success": true,
-          "timestamp": "2025-09-06T23:07:54.429Z",
+          "timestamp": "2025-09-08T02:17:43.359Z",
           "completenessScore": 5,
           "triadPresent": true,
           "fieldCompleteness": {
@@ -631,14 +387,13 @@
           }
         },
         "logs": [
-          "{\"timestamp\":\"2025-09-06T23:07:44.325Z\",\"level\":\"INFO\",\"message\":\"LayerZero transfer_initiated\",\"correlationId\":\"obs_1757200064324_pi8xkt5hp\",\"transferId\":\"transfer_1757200064325_288g2yof4\",\"data\":{\"id\":\"transfer_1757200064325_288g2yof4\",\"correlationId\":\"obs_1757200064324_pi8xkt5hp\",\"sourceChain\":\"sepolia\",\"destChain\":\"polygon-amoy\",\"amount\":\"0.001\",\"tokenSymbol\":\"ETH\"}}",
-          "{\"timestamp\":\"2025-09-06T23:07:54.429Z\",\"level\":\"INFO\",\"message\":\"LayerZero transfer_initiated\",\"correlationId\":\"obs_1757200064324_pi8xkt5hp\",\"transferId\":\"lz_1757200064942_5ahwza9x8\",\"data\":{\"id\":\"lz_1757200064942_5ahwza9x8\",\"sourceChain\":\"sepolia\",\"destChain\":\"polygon-amoy\",\"tokenSymbol\":\"ETH\",\"amount\":\"0.001\",\"destinationAddress\":\"0x3808Ab2b060D1648c3Bb8fc617F9dF752143dAFB\",\"status\":\"completed\",\"txHash\":\"0x0fe672303e1498b7502f8eb0e48f2a90aa471e9b4312d42ce080242c7d106794,0x99cb1fd4bbbc84679a6b3471fc7ccee8c43b27293a7fde1cf348c734f8c40c3a\",\"layerZeroMessageId\":\"lz_atomic_1757200074429\",\"fee\":\"0.001648105516659\",\"timestamp\":\"2025-09-06T23:07:44.942Z\"}}",
-          "{\"timestamp\":\"2025-09-06T23:07:54.429Z\",\"level\":\"INFO\",\"message\":\"LayerZero transfer_completed\",\"correlationId\":\"obs_1757200064324_pi8xkt5hp\",\"transferId\":\"transfer_1757200064325_288g2yof4\",\"data\":{\"id\":\"transfer_1757200064325_288g2yof4\",\"correlationId\":\"obs_1757200064324_pi8xkt5hp\",\"status\":\"completed\",\"txHash\":\"0x0fe672303e1498b7502f8eb0e48f2a90aa471e9b4312d42ce080242c7d106794,0x99cb1fd4bbbc84679a6b3471fc7ccee8c43b27293a7fde1cf348c734f8c40c3a\",\"fee\":\"0.001648105516659\"}}",
-          "{\"timestamp\":\"2025-09-06T23:07:54.429Z\",\"level\":\"INFO\",\"message\":\"LayerZero transfer_initiated\",\"correlationId\":\"obs_1757200064324_pi8xkt5hp\",\"transferId\":\"transfer_1757200074429_ek92dhlun\",\"data\":{\"id\":\"transfer_1757200074429_ek92dhlun\",\"correlationId\":\"obs_1757200064324_pi8xkt5hp\",\"sourceChain\":\"sepolia\",\"destChain\":\"polygon-amoy\",\"amount\":\"0.001\",\"tokenSymbol\":\"ETH\"}}",
-          "{\"timestamp\":\"2025-09-06T23:07:54.429Z\",\"level\":\"ERROR\",\"message\":\"LayerZero transfer_failed\",\"correlationId\":\"obs_1757200064324_pi8xkt5hp\",\"transferId\":\"transfer_1757200074429_ek92dhlun\",\"data\":{\"id\":\"transfer_1757200074429_ek92dhlun\",\"correlationId\":\"obs_1757200064324_pi8xkt5hp\",\"error\":\"Unsupported chain: invalid-chain or polygon-amoy\"}}"
+          "{\"timestamp\":\"2025-09-08T02:16:12.316Z\",\"level\":\"INFO\",\"message\":\"LayerZero atomic_swap_initiated\",\"correlationId\":\"obs_1757297772315_2su38bqmm\",\"transferId\":\"atomic_swap_1757297772316_9k6kt6ek8\",\"data\":{\"id\":\"atomic_swap_1757297772316_9k6kt6ek8\",\"correlationId\":\"obs_1757297772315_2su38bqmm\",\"sourceChain\":\"sepolia\",\"destChain\":\"polygon-amoy\",\"amount\":\"0.001\",\"tokenSymbol\":\"ETH ↔ POL\"}}",
+          "{\"timestamp\":\"2025-09-08T02:17:43.358Z\",\"level\":\"INFO\",\"message\":\"LayerZero atomic_swap_completed\",\"correlationId\":\"obs_1757297772315_2su38bqmm\",\"transferId\":\"atomic_swap_1757297772316_9k6kt6ek8\",\"data\":{\"id\":\"atomic_swap_1757297772316_9k6kt6ek8\",\"correlationId\":\"obs_1757297772315_2su38bqmm\",\"sepoliaTxHash\":\"0x8e7b1011889531205c3c8e0074b63f2d5a982967e2c5fa27fc51bacb65f33036\",\"polygonTxHash\":\"0x7aac87792ed5ddf84acdb46b138f86c6e391dc7ba4c157ea491ff34785557493\",\"sepoliaBlock\":9157064,\"polygonBlock\":26136580}}",
+          "{\"timestamp\":\"2025-09-08T02:17:43.358Z\",\"level\":\"INFO\",\"message\":\"LayerZero atomic_swap_initiated\",\"correlationId\":\"obs_1757297772315_2su38bqmm\",\"transferId\":\"atomic_swap_1757297863358_38f68cmyb\",\"data\":{\"id\":\"atomic_swap_1757297863358_38f68cmyb\",\"correlationId\":\"obs_1757297772315_2su38bqmm\",\"sourceChain\":\"sepolia\",\"destChain\":\"polygon-amoy\",\"amount\":\"0.001\",\"tokenSymbol\":\"ETH ↔ POL\"}}",
+          "{\"timestamp\":\"2025-09-08T02:17:43.358Z\",\"level\":\"ERROR\",\"message\":\"LayerZero atomic_swap_failed\",\"correlationId\":\"obs_1757297772315_2su38bqmm\",\"transferId\":\"atomic_swap_1757297863358_38f68cmyb\",\"data\":{\"id\":\"atomic_swap_1757297863358_38f68cmyb\",\"correlationId\":\"obs_1757297772315_2su38bqmm\",\"error\":\"Unsupported chain: invalid-chain or polygon-amoy\"}}"
         ],
         "metrics": {
-          "transferCount": 36,
+          "transferCount": 22,
           "successCount": 10,
           "failureCount": 1,
           "averageTransferTime": 0,
@@ -647,73 +402,55 @@
         },
         "traces": [
           {
-            "eventType": "transfer_initiated",
-            "timestamp": "2025-09-06T23:07:44.325Z",
-            "correlationId": "obs_1757200064324_pi8xkt5hp",
-            "transferId": "transfer_1757200064325_288g2yof4",
+            "eventType": "atomic_swap_initiated",
+            "timestamp": "2025-09-08T02:16:12.316Z",
+            "correlationId": "obs_1757297772315_2su38bqmm",
+            "transferId": "atomic_swap_1757297772316_9k6kt6ek8",
             "data": {
-              "id": "transfer_1757200064325_288g2yof4",
-              "correlationId": "obs_1757200064324_pi8xkt5hp",
+              "id": "atomic_swap_1757297772316_9k6kt6ek8",
+              "correlationId": "obs_1757297772315_2su38bqmm",
               "sourceChain": "sepolia",
               "destChain": "polygon-amoy",
               "amount": "0.001",
-              "tokenSymbol": "ETH"
+              "tokenSymbol": "ETH ↔ POL"
             }
           },
           {
-            "eventType": "transfer_initiated",
-            "timestamp": "2025-09-06T23:07:54.429Z",
-            "correlationId": "obs_1757200064324_pi8xkt5hp",
-            "transferId": "lz_1757200064942_5ahwza9x8",
+            "eventType": "atomic_swap_completed",
+            "timestamp": "2025-09-08T02:17:43.358Z",
+            "correlationId": "obs_1757297772315_2su38bqmm",
+            "transferId": "atomic_swap_1757297772316_9k6kt6ek8",
             "data": {
-              "id": "lz_1757200064942_5ahwza9x8",
-              "sourceChain": "sepolia",
-              "destChain": "polygon-amoy",
-              "tokenSymbol": "ETH",
-              "amount": "0.001",
-              "destinationAddress": "0x3808Ab2b060D1648c3Bb8fc617F9dF752143dAFB",
-              "status": "completed",
-              "txHash": "0x0fe672303e1498b7502f8eb0e48f2a90aa471e9b4312d42ce080242c7d106794,0x99cb1fd4bbbc84679a6b3471fc7ccee8c43b27293a7fde1cf348c734f8c40c3a",
-              "layerZeroMessageId": "lz_atomic_1757200074429",
-              "fee": "0.001648105516659",
-              "timestamp": "2025-09-06T23:07:44.942Z"
+              "id": "atomic_swap_1757297772316_9k6kt6ek8",
+              "correlationId": "obs_1757297772315_2su38bqmm",
+              "sepoliaTxHash": "0x8e7b1011889531205c3c8e0074b63f2d5a982967e2c5fa27fc51bacb65f33036",
+              "polygonTxHash": "0x7aac87792ed5ddf84acdb46b138f86c6e391dc7ba4c157ea491ff34785557493",
+              "sepoliaBlock": 9157064,
+              "polygonBlock": 26136580
             }
           },
           {
-            "eventType": "transfer_completed",
-            "timestamp": "2025-09-06T23:07:54.429Z",
-            "correlationId": "obs_1757200064324_pi8xkt5hp",
-            "transferId": "transfer_1757200064325_288g2yof4",
+            "eventType": "atomic_swap_initiated",
+            "timestamp": "2025-09-08T02:17:43.358Z",
+            "correlationId": "obs_1757297772315_2su38bqmm",
+            "transferId": "atomic_swap_1757297863358_38f68cmyb",
             "data": {
-              "id": "transfer_1757200064325_288g2yof4",
-              "correlationId": "obs_1757200064324_pi8xkt5hp",
-              "status": "completed",
-              "txHash": "0x0fe672303e1498b7502f8eb0e48f2a90aa471e9b4312d42ce080242c7d106794,0x99cb1fd4bbbc84679a6b3471fc7ccee8c43b27293a7fde1cf348c734f8c40c3a",
-              "fee": "0.001648105516659"
-            }
-          },
-          {
-            "eventType": "transfer_initiated",
-            "timestamp": "2025-09-06T23:07:54.429Z",
-            "correlationId": "obs_1757200064324_pi8xkt5hp",
-            "transferId": "transfer_1757200074429_ek92dhlun",
-            "data": {
-              "id": "transfer_1757200074429_ek92dhlun",
-              "correlationId": "obs_1757200064324_pi8xkt5hp",
+              "id": "atomic_swap_1757297863358_38f68cmyb",
+              "correlationId": "obs_1757297772315_2su38bqmm",
               "sourceChain": "sepolia",
               "destChain": "polygon-amoy",
               "amount": "0.001",
-              "tokenSymbol": "ETH"
+              "tokenSymbol": "ETH ↔ POL"
             }
           },
           {
-            "eventType": "transfer_failed",
-            "timestamp": "2025-09-06T23:07:54.429Z",
-            "correlationId": "obs_1757200064324_pi8xkt5hp",
-            "transferId": "transfer_1757200074429_ek92dhlun",
+            "eventType": "atomic_swap_failed",
+            "timestamp": "2025-09-08T02:17:43.358Z",
+            "correlationId": "obs_1757297772315_2su38bqmm",
+            "transferId": "atomic_swap_1757297863358_38f68cmyb",
             "data": {
-              "id": "transfer_1757200074429_ek92dhlun",
-              "correlationId": "obs_1757200064324_pi8xkt5hp",
+              "id": "atomic_swap_1757297863358_38f68cmyb",
+              "correlationId": "obs_1757297772315_2su38bqmm",
               "error": "Unsupported chain: invalid-chain or polygon-amoy"
             }
           }
@@ -725,24 +462,24 @@
       "domain": "Operational Reliability",
       "criterion": "Fault Recovery Capabilities",
       "unit": "mttr_seconds",
-      "value": 16118.833333333334,
+      "value": 7.666666666666667,
       "method": "Crash the process during a transfer and when idle; restart three times; measure time to healthy and check that each transfer completes only once; count any manual steps",
-      "timestamp": "2025-09-06T23:09:39.186Z",
+      "timestamp": "2025-09-08T02:19:17.093Z",
       "details": {
-        "avgMttr": 16118.833333333334,
+        "avgMttr": 7.666666666666667,
         "exactlyOnceCompletion": true,
         "totalManualSteps": 12,
         "totalRestarts": 6,
         "idleRecovery": {
           "success": true,
-          "avgMttr": 19024.666666666668,
+          "avgMttr": 8.333333333333334,
           "restartCount": 3,
           "manualSteps": 6,
           "exactlyOnceCompletion": true
         },
         "midTransferRecovery": {
           "success": true,
-          "avgMttr": 13213,
+          "avgMttr": 7,
           "restartCount": 3,
           "manualSteps": 6,
           "exactlyOnceCompletion": true
@@ -752,20 +489,20 @@
       "evidence": {
         "recoveryData": {
           "idleRecovery": {
-            "avgMttr": 19024.666666666668,
+            "avgMttr": 8.333333333333334,
             "exactlyOnceCompletion": true,
             "totalManualSteps": 6,
             "restartCount": 3,
             "success": true,
             "mttrData": [
-              27168,
-              16960,
-              12946
+              10,
+              8,
+              7
             ],
             "transferIds": [
-              "transfer_1757200082190_ry8xpmddw",
-              "transfer_1757200104614_y3cjitf4h",
-              "transfer_1757200123581_g8z8c6uco"
+              "atomic_swap_1757297864377_kbpkwzqng",
+              "atomic_swap_1757297878673_1p3ct5ivm",
+              "atomic_swap_1757297901790_kluish6g3"
             ],
             "manualStepsData": [
               2,
@@ -776,20 +513,20 @@
             "limitationDetails": "All 3 restarts completed successfully"
           },
           "midTransferRecovery": {
-            "avgMttr": 13213,
+            "avgMttr": 7,
             "exactlyOnceCompletion": true,
             "totalManualSteps": 6,
             "restartCount": 3,
             "success": true,
             "mttrData": [
-              11833,
-              11763,
-              16043
+              7,
+              7,
+              7
             ],
             "transferIds": [
-              "transfer_1757200135517_olmslewxk",
-              "transfer_1757200149364_c2pxbu9ap",
-              "transfer_1757200163143_6oe6rtq5p"
+              "atomic_swap_1757297913677_ap1vltnbc",
+              "atomic_swap_1757297922991_hkjwchzmy",
+              "atomic_swap_1757297940620_lc11s3sq0"
             ],
             "manualStepsData": [
               2,
@@ -799,13 +536,13 @@
             "layerZeroLimitation": false,
             "limitationDetails": "All 3 mid-transfer restarts completed successfully"
           },
-          "avgMttr": 16118.833333333334,
+          "avgMttr": 7.666666666666667,
           "exactlyOnceCompletion": true,
           "totalManualSteps": 12,
           "totalRestarts": 6
         }
       },
-      "status": "partial"
+      "status": "passed"
     },
     {
       "domain": "Operational Reliability",
@@ -813,11 +550,11 @@
       "unit": "compatibility_issues",
       "value": 0,
       "method": "Test configuration changes, connection state management, and system resilience during operational changes",
-      "timestamp": "2025-09-06T23:10:29.335Z",
+      "timestamp": "2025-09-08T02:19:55.855Z",
       "details": {
         "configurationChangeSuccess": true,
         "connectionResilience": true,
-        "stateTransitionTime": 7867,
+        "stateTransitionTime": 0.008,
         "operationalCompatibilityIssues": 0,
         "configChangeIssues": 0,
         "connectionIssues": 0,
@@ -827,7 +564,7 @@
         "lifecycleData": {
           "configurationChangeSuccess": true,
           "connectionResilience": true,
-          "stateTransitionTime": 7867,
+          "stateTransitionTime": 0.008,
           "operationalCompatibilityIssues": 0,
           "preChangeSuccess": true,
           "postChangeSuccess": true,
@@ -840,8 +577,8 @@
   ],
   "summary": {
     "totalTests": 3,
-    "passed": 2,
-    "partial": 1,
+    "passed": 3,
+    "partial": 0,
     "failed": 0,
     "notApplicable": 0
   },
@@ -858,38 +595,26 @@
   },
   "detailedMetrics": {
     "observability": {
-      "totalLogs": 5,
+      "totalLogs": 4,
       "totalMetrics": 6,
-      "totalTraces": 5,
+      "totalTraces": 4,
       "successfulTransfers": 1,
       "failedTransfers": 1,
       "correlationIds": [
-        "obs_1757200064324_pi8xkt5hp"
+        "obs_1757297772315_2su38bqmm"
       ],
       "transferIds": [
-        "transfer_1757200064325_288g2yof4",
-        "lz_1757200064942_5ahwza9x8",
-        "transfer_1757200074429_ek92dhlun",
-        "transfer_1757200075444_rbe428gea",
-        "transfer_1757200082190_ry8xpmddw",
-        "lz_1757200082430_evbpvupwo",
-        "transfer_1757200104614_y3cjitf4h",
-        "lz_1757200105013_sj0wam2yp",
-        "transfer_1757200123581_g8z8c6uco",
-        "lz_1757200123815_xpk0yh117",
-        "transfer_1757200135517_olmslewxk",
-        "lz_1757200135884_kyuscxje8",
-        "transfer_1757200149364_c2pxbu9ap",
-        "lz_1757200149936_kre4cl48r",
-        "transfer_1757200163143_6oe6rtq5p",
-        "lz_1757200163528_5ezdxku6t",
-        "transfer_1757200179187_9zuya1h4i",
-        "lz_1757200179390_ch8oww2vw",
-        "transfer_1757200194572_ux0mokuxh",
-        "lz_1757200194760_rxvzl97zq",
-        "transfer_1757200206294_u8k0bx3a3",
-        "lz_1757200206477_6u2f3xq9o",
-        "transfer_1757200221582_54axyea25"
+        "atomic_swap_1757297772316_9k6kt6ek8",
+        "atomic_swap_1757297863358_38f68cmyb",
+        "atomic_swap_1757297864377_kbpkwzqng",
+        "atomic_swap_1757297878673_1p3ct5ivm",
+        "atomic_swap_1757297901790_kluish6g3",
+        "atomic_swap_1757297913677_ap1vltnbc",
+        "atomic_swap_1757297922991_hkjwchzmy",
+        "atomic_swap_1757297940620_lc11s3sq0",
+        "atomic_swap_1757297957094_ew82wzy58",
+        "atomic_swap_1757297969032_r63jkao5z",
+        "atomic_swap_1757297980624_cj9bt29r7"
       ],
       "fieldCompleteness": {
         "timestamp": 1,
@@ -904,15 +629,15 @@
       "idleRestarts": 3,
       "midTransferRestarts": 3,
       "totalManualSteps": 12,
-      "averageMttr": 16118.833333333334,
+      "averageMttr": 7.666666666666667,
       "exactlyOnceCompletionRate": 100,
       "mttrData": [
-        27168,
-        16960,
-        12946,
-        11833,
-        11763,
-        16043
+        10,
+        8,
+        7,
+        7,
+        7,
+        7
       ],
       "manualStepsData": [
         2,
@@ -923,12 +648,12 @@
         2
       ],
       "transferIds": [
-        "transfer_1757200082190_ry8xpmddw",
-        "transfer_1757200104614_y3cjitf4h",
-        "transfer_1757200123581_g8z8c6uco",
-        "transfer_1757200135517_olmslewxk",
-        "transfer_1757200149364_c2pxbu9ap",
-        "transfer_1757200163143_6oe6rtq5p"
+        "atomic_swap_1757297864377_kbpkwzqng",
+        "atomic_swap_1757297878673_1p3ct5ivm",
+        "atomic_swap_1757297901790_kluish6g3",
+        "atomic_swap_1757297913677_ap1vltnbc",
+        "atomic_swap_1757297922991_hkjwchzmy",
+        "atomic_swap_1757297940620_lc11s3sq0"
       ]
     },
     "lifecycle": {
@@ -936,7 +661,7 @@
       "connectionStateChanges": 2,
       "stateTransitions": 1,
       "compatibilityIssues": 0,
-      "averageStateTransitionTime": 7867,
+      "averageStateTransitionTime": 0.008,
       "successRates": {
         "configurationChange": 100,
         "connectionResilience": 100,
@@ -944,10 +669,10 @@
       }
     },
     "performance": {
-      "totalTransfers": 36,
+      "totalTransfers": 22,
       "successfulTransfers": 10,
       "failedTransfers": 1,
-      "averageTransferTime": 540,
+      "averageTransferTime": 330,
       "totalGasUsed": 0,
       "totalFeesPaid": 0,
       "transferTimes": []
