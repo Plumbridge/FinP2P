@@ -1,46 +1,51 @@
-# FinP2P Core - Fusion OpenAPI Compliant Blockchain Adapters
+# FinP2P Core - Cross-Chain Atomic Swap Platform
 
-> **Production-Ready Multi-Blockchain Integration System**
+> **Production-Ready Multi-Blockchain Atomic Swap System**
 
-A comprehensive blockchain adapter system implementing the **Fusion OpenAPI Specification** for seamless multi-chain interactions. This project provides production-ready adapters for Ethereum/EVM, Hedera Hashgraph, and SUI blockchain networks.
+A comprehensive cross-chain atomic swap platform providing secure, efficient, and reliable transaction routing between different blockchain networks. This project implements multiple cross-chain protocols including Axelar, LayerZero, and FinP2P for seamless multi-chain atomic swaps.
 
 ## 🎯 Key Features
 
-### **✅ Complete Fusion OpenAPI Compliance**
-- **All 9 required endpoints** implemented across all blockchains
-- **External signing model** for enterprise security
-- **Real network connectivity** with production-grade error handling
-- **OpenAPI specification validation** with 100% test coverage
+### **🔄 Cross-Chain Atomic Swaps**
+- **Multiple cross-chain protocols** - Axelar, LayerZero, and FinP2P integration
+- **Secure atomic swap coordination** with HTLC (Hash Time Locked Contracts)
+- **Real-time transaction routing** between different blockchain networks
+- **Production-grade reliability** with comprehensive error handling
 
 ### **🌐 Multi-Blockchain Support**
 - **Ethereum/EVM**: Sepolia testnet with ethers.js integration
 - **Hedera Hashgraph**: Testnet with official Hedera SDK
 - **SUI Blockchain**: Testnet with Move smart contract support
+- **Cosmos**: IBC-enabled chains via Axelar
+- **LayerZero**: Omnichain protocol support
 
 ### **🔒 Enterprise Security**
 - **External transaction signing** (no private key management)
+- **HTLC-based security** for atomic swap guarantees
 - **Production-grade validation** and error handling
 - **Real smart contract interactions** without mocked functionality
 
 ## 🏗️ Architecture
 
-### **Fusion Adapter Pattern**
+### **Cross-Chain Atomic Swap Architecture**
 ```
-Client Application → Fusion Adapter → Blockchain Network
+Client Application → FinP2P Router → Cross-Chain Adapters → Blockchain Networks
                   ↓
-            OpenAPI Compliant REST Endpoints
+            Atomic Swap Coordination Layer
 ```
 
-**Two Adapter Types:**
-1. **Pure Adapters** (`adapters/pure/`) - Native SDK wrappers
-2. **Fusion Adapters** (`adapters/fusion/`) - OpenAPI compliant REST handlers
+**Adapter Types:**
+1. **Cross-Chain Adapters** (`adapters/axelar/`, `adapters/layerzero/`) - Cross-chain protocol implementations
+2. **FinP2P Adapters** (`adapters/finp2p/`) - FinP2P protocol integration
+3. **Fusion Adapters** (`adapters/fusion/`) - Fusion OpenAPI compliant REST handlers
+4. **Pure Adapters** (`adapters/pure/`) - Native SDK wrappers
 
 ## 📚 Quick Start
 
 ### **Installation**
 ```bash
 git clone <repository>
-cd Project-Files
+cd FinP2P
 npm install
 ```
 
@@ -60,210 +65,289 @@ SUI_ADDRESS=0xYOUR_SUI_ADDRESS
 # Build the project
 npm run build
 
-# Run comprehensive Fusion compliance demo
-npm run demo:fusion-spec
+# Run atomic swap demos
+npm run demo:atomic-swap
+npm run demo:axelar
+npm run demo:layerzero
 
-# Expected output: 27/27 (100%) tests passing
+# Run comprehensive tests
+npm run test:all
 ```
 
-## 🔌 Fusion Adapters
+## 🔌 Cross-Chain Adapters
 
-### **FusionEVMAdapter**
-- **Networks**: Ethereum, Polygon, BSC, Arbitrum (EVM-compatible)
-- **Features**: Native transfers, ERC-20 tokens, smart contracts
-- **SDK**: ethers.js v6
-- **Endpoints**: All 9 Fusion OpenAPI endpoints
+### **Axelar Adapter**
+- **Networks**: Ethereum, Cosmos, Avalanche, Polygon, BSC
+- **Features**: Cross-chain token transfers, atomic swaps, IBC integration
+- **SDK**: @axelar-network/axelarjs-sdk
+- **Protocol**: Axelar General Message Passing (GMP)
 
-### **FusionHederaAdapter** 
-- **Network**: Hedera Hashgraph Testnet
-- **Features**: HBAR transfers, HCS smart contracts
-- **SDK**: @hashgraph/sdk
-- **Endpoints**: All 9 Fusion OpenAPI endpoints
+### **LayerZero Adapter**
+- **Networks**: 30+ EVM and non-EVM chains
+- **Features**: Omnichain fungible tokens, cross-chain messaging
+- **SDK**: @layerzerolabs/lz-sdk
+- **Protocol**: LayerZero Omnichain Protocol
 
-### **FusionSuiAdapter**
-- **Network**: SUI Testnet
-- **Features**: SUI transfers, Move smart contracts  
-- **SDK**: @mysten/sui
-- **Endpoints**: All 9 Fusion OpenAPI endpoints
+### **FinP2P Adapters**
+- **Networks**: Hedera, SUI, Ethereum
+- **Features**: FinP2P protocol integration, atomic swap coordination
+- **SDK**: @owneraio/finp2p-sdk-js
+- **Protocol**: FinP2P atomic swap protocol
 
-## 📋 Fusion OpenAPI Endpoints
+### **Fusion Adapters**
+- **Networks**: Ethereum, Hedera, SUI
+- **Features**: OpenAPI compliant REST endpoints
+- **SDK**: Native blockchain SDKs
+- **Protocol**: Fusion OpenAPI specification
 
-All adapters implement these standardized endpoints:
+## 📋 Available Demos
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/transfer-proposal` | Create native/token transfer proposals |
-| POST | `/smartContractWrite-proposal` | Create smart contract write proposals |
-| POST | `/smartContractDeploy-proposal` | Create smart contract deploy proposals |
-| POST | `/execute` | Execute pre-signed transactions |
-| POST | `/smartContract-read` | Read smart contract data |
-| GET | `/balance` | Query account balances |
-| GET | `/nonce` | Query account nonces/sequences |
-| GET | `/transaction` | Retrieve transaction details |
-| GET | `/block` | Retrieve block information |
+### **Atomic Swap Demos**
+```bash
+# FinP2P atomic swap coordination
+npm run demo:atomic-swap
+
+# Axelar cross-chain atomic swap
+npm run demo:axelar:true-atomic-swap
+
+# LayerZero omnichain demo
+npm run demo:layerzero
+
+# Fusion multi-chain demo
+npm run demo:fusion
+```
+
+### **Adapter Demos**
+```bash
+# Hedera and SUI adapters
+npm run demo:adapters
+
+# Pure adapter demos
+npm run demo:fusion-pure
+
+# LayerZero router demo
+npm run demo:layerzero-router
+```
 
 ## 🚀 Usage Examples
 
-### **Basic Balance Query**
+### **Axelar Cross-Chain Atomic Swap**
 ```typescript
-import { FusionEVMAdapter } from './adapters/fusion';
+import { AxelarAdapter } from './adapters/axelar';
 
-const adapter = new FusionEVMAdapter(config, logger);
+const axelarAdapter = new AxelarAdapter(config, logger);
 
-const balance = await adapter.balance({
-  technology: 'ethereum',
-  network: 'ethereum sepolia testnet',
-  accountId: '0x742d35cc6641c72323cab7c8f71c8c3c1ea7cb0a'
+// Create atomic swap proposal
+const swapProposal = await axelarAdapter.createAtomicSwapProposal({
+  sourceChain: 'ethereum',
+  destinationChain: 'avalanche',
+  tokenAddress: '0x...',
+  amount: '1000000000000000000', // 1 token
+  recipient: '0x...',
+  secretHash: '0x...'
 });
 ```
 
-### **Transfer Proposal**
+### **LayerZero Omnichain Transfer**
 ```typescript
-const proposal = await adapter.transferProposal({
-  location: { technology: 'ethereum', network: 'ethereum sepolia testnet' },
-  proposalDetails: {
-    transferType: 'nativeTokenTransfer',
-    origins: [{ originId: '0x...' }],
-    destinations: [{ 
-      destinationId: '0x...', 
-      totalPaymentAmount: { unit: 'ETH', amount: '0.1' }
-    }],
-    feePayers: ['0x...']
-  }
+import { LayerZeroAdapter } from './adapters/layerzero';
+
+const layerZeroAdapter = new LayerZeroAdapter(config, logger);
+
+// Send tokens across chains
+const transfer = await layerZeroAdapter.sendTokens({
+  sourceChain: 'ethereum',
+  destinationChain: 'polygon',
+  tokenAddress: '0x...',
+  amount: '1000000000000000000',
+  recipient: '0x...'
 });
 ```
 
-### **Smart Contract Read**
+### **FinP2P Atomic Swap Coordination**
 ```typescript
-const result = await adapter.smartContractRead({
-  location: { technology: 'ethereum', network: 'ethereum sepolia testnet' },
-  contractDetails: {
-    smartContractId: '0x...',
-    functionName: 'balanceOf',
-    inputParameters: [{ name: 'account', type: 'address', value: '0x...' }],
-    outputParameters: [{ name: 'balance', type: 'uint256' }]
-  }
+import { FinP2PIntegratedFusionAdapter } from './adapters/finp2p';
+
+const finp2pAdapter = new FinP2PIntegratedFusionAdapter(config, logger);
+
+// Coordinate atomic swap
+const swap = await finp2pAdapter.coordinateAtomicSwap({
+  participant1: { chain: 'hedera', address: '0.0.123' },
+  participant2: { chain: 'sui', address: '0x...' },
+  asset1: { type: 'HBAR', amount: '100' },
+  asset2: { type: 'SUI', amount: '50' }
 });
 ```
 
 ## 🧪 Testing & Validation
 
-### **Comprehensive Demo Suite**
+### **Comprehensive Test Suite**
 ```bash
-# Run complete Fusion specification validation
-npm run demo:fusion-spec
+# Run all tests
+npm run test:all
 
-# Output shows 100% compliance across all adapters:
-# EVM: 9/9 (100%) ✅
-# Hedera: 9/9 (100%) ✅  
-# SUI: 9/9 (100%) ✅
-# Total: 27/27 (100%) ✅
+# Run specific test suites
+npm run test:adapters
+npm run test:security
+npm run test:performance
+npm run test:compliance
+npm run test:reliability
+
+# Run cross-chain specific tests
+npm run test:axelar
+npm run test:layerzero
+```
+
+### **Benchmark Suite**
+```bash
+# Run comprehensive benchmarks
+npm run benchmark:empirical
+
+# Run specific protocol benchmarks
+npm run benchmark:axelar
+npm run benchmark:layerzero
+
+# Run performance tests
+npm run benchmark:test-performance
 ```
 
 ### **Test Coverage**
-- ✅ **Real network connectivity** testing
-- ✅ **All 9 Fusion endpoints** validated
+- ✅ **Cross-chain atomic swap** testing
+- ✅ **HTLC contract validation** across protocols
 - ✅ **External signing model** verification
 - ✅ **Error handling** and edge cases
-- ✅ **Smart contract interactions** with real contracts
+- ✅ **Real blockchain interactions** with testnets
 
 ## 📖 Documentation
 
-- [Fusion Adapter Documentation](./docs/fusion-adapters.md) - Detailed API reference
-- [Configuration Guide](./docs/configuration.md) - Setup and network configuration
-- [Development Guide](./docs/development.md) - Contributing and extending adapters
-- [Fusion OpenAPI Specification](./FusionSpec%20(1).yaml) - Complete API specification
+- [Adapter Documentation](./docs/adapters/) - Detailed API reference for all adapters
+- [Core Router Documentation](./docs/core/finp2p-sdk-router.md) - FinP2P SDK router guide
+- [Demo Documentation](./docs/demos/) - Comprehensive demo guides
+- [Benchmark Results](./results/) - Performance and reliability benchmarks
 
 ## 🔧 Configuration
 
-### **Network Configuration**
-Each adapter requires network-specific configuration:
+### **Environment Variables**
+```bash
+# Ethereum/EVM Networks
+ETHEREUM_SEPOLIA_URL=https://sepolia.infura.io/v3/YOUR_API_KEY
+POLYGON_RPC_URL=https://polygon-rpc.com
+BSC_RPC_URL=https://bsc-dataseed.binance.org
 
-```typescript
-// EVM Configuration
-const evmConfig = {
-  networks: {
-    'ethereum_ethereum sepolia testnet': {
-      chainId: 11155111,
-      rpcUrl: process.env.ETHEREUM_SEPOLIA_URL,
-      name: 'Ethereum Sepolia Testnet'
-    }
-  }
-};
+# Hedera Network
+HEDERA_ACCOUNT_ID=0.0.YOUR_ACCOUNT
+HEDERA_PRIVATE_KEY=YOUR_PRIVATE_KEY
+HEDERA_NETWORK=testnet
 
-// Hedera Configuration  
-const hederaConfig = {
-  network: 'testnet',
-  mirrorNodeUrl: 'https://testnet.mirrornode.hedera.com'
-};
+# SUI Network
+SUI_RPC_URL=https://fullnode.testnet.sui.io:443
+SUI_ADDRESS=0xYOUR_SUI_ADDRESS
 
-// SUI Configuration
-const suiConfig = {
-  network: 'testnet',
-  rpcUrl: process.env.SUI_RPC_URL
-};
+# Axelar Network
+AXELAR_RPC_URL=https://axelar-testnet-rpc.chainode.tech
+AXELAR_CHAIN_ID=axelar-testnet-lisbon-3
+
+# LayerZero Network
+LAYERZERO_RPC_URL=https://rpc.ankr.com/eth_sepolia
+LAYERZERO_CHAIN_ID=40161
 ```
 
 ## 🎯 Production Readiness
 
 ### **Enterprise Features**
 - ✅ **External signing only** - No private key management
+- ✅ **HTLC-based security** for atomic swap guarantees
 - ✅ **Production error handling** with detailed logging
 - ✅ **Rate limiting support** and connection pooling
 - ✅ **Real blockchain validation** with proper gas estimation
-- ✅ **OpenAPI specification compliance** for standardization
+- ✅ **Multi-protocol support** for maximum flexibility
 
 ### **Performance**
-- ⚡ **4.6 second demo execution** across all networks
+- ⚡ **Sub-second response times** for atomic swap coordination
 - 🔄 **Connection pooling** for optimal performance
-- 📊 **Comprehensive benchmarking** available
+- 📊 **Comprehensive benchmarking** across all protocols
+- 🚀 **Scalable architecture** for high-volume transactions
 
 ## 🛠️ Development
 
 ### **Project Structure**
 ```
 adapters/
-├── pure/           # Native SDK adapters
-│   ├── HederaAdapter.ts
-│   └── SuiAdapter.ts
+├── axelar/         # Axelar cross-chain protocol
+│   ├── AxelarAdapter.ts
+│   ├── AtomicSwapCoordinator.ts
+│   └── HTLCContract.ts
+├── layerzero/      # LayerZero omnichain protocol
+│   ├── LayerZeroAdapter.ts
+│   └── HTLCContract.ts
+├── finp2p/         # FinP2P protocol integration
+│   ├── FinP2PIntegratedFusionAdapter.ts
+│   ├── FinP2PIntegratedHederaAdapter.ts
+│   └── FinP2PIntegratedSuiAdapter.ts
 ├── fusion/         # Fusion OpenAPI compliant adapters
 │   ├── FusionEVMAdapter.ts
 │   ├── FusionHederaAdapter.ts
 │   └── FusionSuiAdapter.ts
-└── index.ts
+└── pure/           # Native SDK adapters
+    ├── HederaAdapter.ts
+    └── SuiAdapter.ts
 
-demos/
-├── fusion/         # Fusion specification demos
-│   └── fusion-adapters-demo.js
+core/               # Core routing and utilities
+├── router/         # FinP2P SDK router
+├── types/          # TypeScript definitions
+└── utils/          # Utility functions
+
+demos/              # Comprehensive demo suite
+├── axelar/         # Axelar demos
+├── layerzero/      # LayerZero demos
+├── finp2p/         # FinP2P demos
+├── fusion/         # Fusion demos
 └── pure/           # Pure adapter demos
 
-docs/               # Comprehensive documentation
+results/            # Benchmark results
+├── axelar/         # Axelar benchmarks
+├── layerzero/      # LayerZero benchmarks
+└── finp2p/         # FinP2P benchmarks
 ```
 
 ### **Contributing**
-1. Follow the Fusion OpenAPI specification exactly
-2. Maintain 100% test coverage for new features
+1. Follow atomic swap security best practices
+2. Maintain comprehensive test coverage for new features
 3. Use real blockchain SDKs (no mocking)
 4. Implement external signing model
 5. Add comprehensive error handling
+6. Include benchmark tests for performance validation
 
 ## 📊 Benchmarks & Performance
 
-Latest benchmark results show excellent performance across all adapters:
-- **EVM Adapter**: Sub-second response times
-- **Hedera Adapter**: Efficient consensus integration  
-- **SUI Adapter**: Optimized Move contract interactions
+Comprehensive benchmark results available across all protocols:
 
-See [benchmark results](./benchmark-results/) for detailed metrics.
+### **Performance Characteristics**
+- **Axelar**: Cross-chain transfer latency and throughput
+- **LayerZero**: Omnichain message delivery times
+- **FinP2P**: Atomic swap coordination efficiency
+
+### **Security & Reliability**
+- **HTLC Contract Security**: Vulnerability assessments
+- **Operational Reliability**: Uptime and error rates
+- **Regulatory Compliance**: Audit and compliance metrics
+
+### **Benchmark Results**
+- [Axelar Benchmarks](./results/axelar/) - Performance, security, reliability, compliance
+- [LayerZero Benchmarks](./results/layerzero/) - Performance, security, reliability, compliance  
+- [FinP2P Benchmarks](./results/finp2p/) - Performance, security, reliability, compliance
+
+Run benchmarks: `npm run benchmark:empirical`
 
 ## 🤝 Enterprise Support
 
-This system is designed for enterprise blockchain integration:
-- **Fusion OpenAPI compliance** for standardization
-- **Multi-chain support** in a unified interface
+This system is designed for enterprise cross-chain atomic swap integration:
+- **Multi-protocol support** for maximum flexibility
+- **HTLC-based security** for atomic swap guarantees
 - **Production-grade security** with external signing
 - **Comprehensive documentation** and examples
-- **100% test coverage** with real network validation
+- **Extensive test coverage** with real network validation
+- **Comprehensive benchmarking** for performance validation
 
 ## 📄 License
 
@@ -271,4 +355,4 @@ MIT License - See [LICENSE](./LICENSE) for details.
 
 ---
 
-**Ready for production deployment with complete Fusion OpenAPI specification compliance.**
+**Ready for production deployment with comprehensive cross-chain atomic swap capabilities.**
