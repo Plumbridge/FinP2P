@@ -1,8 +1,8 @@
 # Axelar Operational Reliability Benchmark Results
 
-**Test Date:** 2025-09-08T01:54:00.164Z
-**Duration:** 40.5 seconds
-**Overall Score:** 100% (3/3 criteria passed)
+**Test Date:** 2025-09-08T03:36:25.725Z
+**Duration:** 90.5 seconds
+**Overall Score:** 83% (2/3 criteria passed)
 **Domain:** Operational Reliability
 **Network:** Axelar Testnet
 **Status:** ✅ **COMPLETED** - Real operational reliability testing confirmed
@@ -35,21 +35,21 @@ This benchmark successfully tested Axelar's Operational Reliability using **real
 - **Logs Count:** 29
 - **Metrics Count:** 3
 - **Traces Count:** 1
-- **Successful Transfer:** observability_success_1757296380431
+- **Successful Transfer:** observability_success_1757302475868
 - **Failed Transfer:** none
 
-### Fault Recovery Capabilities ✅ **PASSED**
+### Fault Recovery Capabilities ⚠️ **PARTIAL**
 
 **Method:** Kill local relayer/client mid-transfer and during idle; restart
-**Status:** ✅ **PASSED**
-**Score:** 100%
+**Status:** ⚠️ **PARTIAL**
+**Score:** 75%
 
 #### **Performance Metrics:**
-- **MTTR (Mean Time To Recovery):** 2013ms (2.013s)
+- **MTTR (Mean Time To Recovery):** 23148.333333333332ms (23.148s)
 - **Exactly-Once Completion:** Yes
-- **Manual Steps:** 0
-- **Kill Time:** 2025-09-08T01:53:20.000Z
-- **Restart Time:** 2025-09-08T01:53:22.013Z
+- **Manual Steps:** 3
+- **Kill Time:** 2025-09-08T03:34:55.240Z
+- **Restart Time:** 2025-09-08T03:36:10.222Z
 - **Axelar Limitation:** No
 
 ### Lifecycle Management Process ✅ **PASSED**
@@ -63,16 +63,16 @@ This benchmark successfully tested Axelar's Operational Reliability using **real
 - **Connection State Success:** Yes
 - **System Resilience Success:** Yes
 - **State Transition Success:** Yes
-- **Total Downtime:** 12.662s
+- **Total Downtime:** 12.095s
 - **Compatibility Issues:** 0
-- **Configuration Change Time:** 3.842s
-- **Connection State Time:** 0.109s
-- **Resilience Time:** 3.673s
-- **State Transition Time:** 5.038s
+- **Configuration Change Time:** 3.849s
+- **Connection State Time:** 0.111s
+- **Resilience Time:** 4.667s
+- **State Transition Time:** 3.468s
 
 ## 📈 **Evidence Summary**
 
-- **Logs Collected:** 127
+- **Logs Collected:** 175
 - **Metrics Collected:** 3
 - **Traces Collected:** 1
 
