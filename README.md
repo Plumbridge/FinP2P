@@ -54,10 +54,23 @@ npm install
 # Copy environment template
 cp .env.example .env
 
-# Add your API keys and network configurations
-ETHEREUM_SEPOLIA_URL=https://sepolia.infura.io/v3/YOUR_API_KEY
-HEDERA_ACCOUNT_ID=0.0.YOUR_ACCOUNT
-SUI_ADDRESS=0xYOUR_SUI_ADDRESS
+# Edit .env file with your API keys and network configurations
+# See .env.example for all required environment variables
+```
+
+### **Docker Deployment (Recommended)**
+```bash
+# Build and run with Docker Compose
+docker-compose up -d
+
+# Or build and run individual services
+docker-compose up redis finp2p-core
+
+# View logs
+docker-compose logs -f finp2p-core
+
+# Stop services
+docker-compose down
 ```
 
 ### **Build & Test**
@@ -338,6 +351,68 @@ Comprehensive benchmark results available across all protocols:
 - [FinP2P Benchmarks](./results/finp2p/) - Performance, security, reliability, compliance
 
 Run benchmarks: `npm run benchmark:empirical`
+
+## 🐳 Docker Deployment
+
+### **Quick Start with Docker**
+```bash
+# Clone and setup
+git clone <repository>
+cd FinP2P
+
+# Copy environment template
+cp .env.example .env
+# Edit .env with your configuration
+
+# Start all services
+docker-compose up -d
+
+# Check status
+docker-compose ps
+
+# View logs
+docker-compose logs -f finp2p-core
+```
+
+### **Available Services**
+- **finp2p-core**: Main application (port 3000)
+- **redis**: Caching and session storage (port 6379)
+- **finp2p-frontend**: Web interface (port 3001) - Optional
+- **prometheus**: Metrics collection (port 9090) - Optional
+- **grafana**: Monitoring dashboard (port 3002) - Optional
+
+### **Docker Commands**
+```bash
+# Build and run
+docker-compose up --build
+
+# Run in background
+docker-compose up -d
+
+# Stop services
+docker-compose down
+
+# Stop and remove volumes
+docker-compose down -v
+
+# View logs
+docker-compose logs -f [service-name]
+
+# Execute commands in container
+docker-compose exec finp2p-core npm run test
+```
+
+### **Production Deployment**
+```bash
+# Set production environment
+export NODE_ENV=production
+
+# Build production image
+docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+
+# Scale services
+docker-compose up -d --scale finp2p-core=3
+```
 
 ## 🤝 Enterprise Support
 

@@ -1,0 +1,141 @@
+# FinP2P Core - Docker Compose Configuration
+# Multi-service setup for development and production
+
+version: '3.8'
+
+services:
+  # =============================================================================
+  # REDIS SERVICE
+  # =============================================================================
+  redis:
+    image: redis:7-alpine
+    container_name: finp2p-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - finp2p-network
+
+  # =============================================================================
+  # FINP2P CORE APPLICATION
+  # =============================================================================
+  finp2p-core:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+    container_name: finp2p-core
+    restart: unless-stopped
+    ports:
+      - "${PORT:-3000}:3000"
+    environment:
+      - NODE_ENV=${NODE_ENV:-production}
+      - PORT=${PORT:-3000}
+      - REDIS_URL=redis://redis:6379
+      - LOG_LEVEL=${LOG_LEVEL:-info}
+    env_file:
+      - .env
+    volumes:
+      - ./logs:/app/logs
+      - ./results:/app/results
+    depends_on:
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3000/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - finp2p-network
+
+  # =============================================================================
+  # FRONTEND SERVICE (Optional)
+  # =============================================================================
+  finp2p-frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: finp2p-frontend
+    restart: unless-stopped
+    ports:
+      - "3001:3000"
+    environment:
+      - REACT_APP_API_URL=http://finp2p-core:3000
+      - REACT_APP_WS_URL=ws://finp2p-core:3000
+    depends_on:
+      - finp2p-core
+    networks:
+      - finp2p-network
+
+  # =============================================================================
+  # MONITORING SERVICE (Optional)
+  # =============================================================================
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: finp2p-prometheus
+    restart: unless-stopped
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--storage.tsdb.retention.time=200h'
+      - '--web.enable-lifecycle'
+    networks:
+      - finp2p-network
+
+  # =============================================================================
+  # GRAFANA DASHBOARD (Optional)
+  # =============================================================================
+  grafana:
+    image: grafana/grafana:latest
+    container_name: finp2p-grafana
+    restart: unless-stopped
+    ports:
+      - "3002:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD:-admin}
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./monitoring/grafana/dashboards:/etc/grafana/provisioning/dashboards
+      - ./monitoring/grafana/datasources:/etc/grafana/provisioning/datasources
+    depends_on:
+      - prometheus
+    networks:
+      - finp2p-network
+
+# =============================================================================
+# VOLUMES
+# =============================================================================
+volumes:
+  redis_data:
+    driver: local
+  prometheus_data:
+    driver: local
+  grafana_data:
+    driver: local
+
+# =============================================================================
+# NETWORKS
+# =============================================================================
+networks:
+  finp2p-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16

@@ -1,9 +1,9 @@
 import { EventEmitter } from 'events';
-import { FinP2PSDKRouter } from '../../../dist/core/router/FinP2PSDKRouter';
-import { FinP2PIntegratedSuiAdapter } from '../../../dist/adapters/finp2p/FinP2PIntegratedSuiAdapter';
-import { FinP2PIntegratedHederaAdapter } from '../../../dist/adapters/finp2p/FinP2PIntegratedHederaAdapter';
-import { createLogger } from '../../../dist/core/utils/logger';
-import { findAvailablePort } from '../../../dist/core/utils/port-scanner';
+import { FinP2PSDKRouter } from '../../../core/router/FinP2PSDKRouter';
+import { FinP2PIntegratedSuiAdapter } from '../../../adapters/finp2p/FinP2PIntegratedSuiAdapter';
+import { FinP2PIntegratedHederaAdapter } from '../../../adapters/finp2p/FinP2PIntegratedHederaAdapter';
+import { createLogger } from '../../../core/utils/logger';
+import { findAvailablePort } from '../../../core/utils/port-scanner';
 import * as fs from 'fs';
 import * as path from 'path';
 import { exec } from 'child_process';
