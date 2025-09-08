@@ -325,14 +325,14 @@ class LayerZeroSecurityRobustnessBenchmark {
         const transferId = `sender_auth_test_${Date.now()}`;
         const result = await this.executeCrossChainAtomicSwap(transferId, '0.00001', '0.00001');
         
-        if (result.success && result.txHash) {
+        if (result.success && result.sepoliaTxHash) {
           // Verify that we can recover the sender from the transaction signature
-          const senderVerification = await this.verifySenderFromTransaction(result.txHash, this.sepoliaWallet1.address);
+          const senderVerification = await this.verifySenderFromTransaction(result.sepoliaTxHash, this.sepoliaWallet1.address);
           
           evidence.proofs.push({
             test: 'sender_authenticity',
             passed: senderVerification,
-            txHash: result.txHash,
+            sepoliaTxHash: result.sepoliaTxHash,
             expectedSender: this.sepoliaWallet1.address,
             verified: senderVerification,
             note: 'Sender authenticity verified through cryptographic signature recovery'
@@ -372,7 +372,7 @@ class LayerZeroSecurityRobustnessBenchmark {
         // Perform transfer on Sepolia
         const sepoliaResult = await this.executeCrossChainAtomicSwap(sepoliaTransferId, '0.00001', '0.00001');
         
-        if (sepoliaResult.success && sepoliaResult.txHash) {
+        if (sepoliaResult.success && sepoliaResult.sepoliaTxHash) {
           // Try to replay the same transaction parameters on Polygon (should fail or be different)
           const polygonResult = await this.executeCrossChainAtomicSwap(polygonTransferId, '0.00001', '0.00001');
           
@@ -380,14 +380,14 @@ class LayerZeroSecurityRobustnessBenchmark {
           // 1. Both transactions succeed but have different hashes (proper nonce handling)
           // 2. Or if one fails due to proper domain isolation
           const domainSeparationWorking = (sepoliaResult.success && polygonResult.success && 
-                                         sepoliaResult.txHash !== polygonResult.txHash) ||
+                                         sepoliaResult.sepoliaTxHash !== polygonResult.polygonTxHash) ||
                                         (sepoliaResult.success && !polygonResult.success);
           
           evidence.proofs.push({
             test: 'domain_separation',
             passed: domainSeparationWorking,
-            sepoliaTxHash: sepoliaResult.txHash,
-            polygonTxHash: polygonResult.txHash,
+            sepoliaTxHash: sepoliaResult.sepoliaTxHash,
+            polygonTxHash: polygonResult.polygonTxHash,
             sepoliaSuccess: sepoliaResult.success,
             polygonSuccess: polygonResult.success,
             note: 'Cross-chain domain separation prevents replay attacks'
@@ -429,7 +429,7 @@ class LayerZeroSecurityRobustnessBenchmark {
         // 1. Transaction fails due to validation (good - tamper rejection working)
         // 2. Or if it succeeds but with proper validation (also acceptable)
         const tamperRejectionWorking = !tamperResult.success || 
-          (tamperResult.success && tamperResult.txHash); // If it succeeds, it should have a valid hash
+          (tamperResult.success && tamperResult.sepoliaTxHash); // If it succeeds, it should have a valid hash
         
         evidence.proofs.push({
           test: 'tamper_rejection',
@@ -493,7 +493,7 @@ class LayerZeroSecurityRobustnessBenchmark {
   private async verifySenderFromTransaction(txHash: string, expectedSender: string): Promise<boolean> {
     try {
       // Get transaction details from Sepolia
-      const tx = await this.sepoliaWallet1.provider.getTransaction(txHash);
+      const tx = await this.sepoliaWallet1.provider?.getTransaction(txHash);
       
       if (tx && tx.from) {
         // Compare the recovered sender with expected sender
