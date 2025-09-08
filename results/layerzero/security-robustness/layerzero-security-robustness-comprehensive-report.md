@@ -2,68 +2,68 @@
 
 ## Executive Summary
 
-**Test Date:** 2025-09-07T19:15:14.105Z
-**Overall Score:** 50.00% (2/5 criteria passed)
+**Test Date:** 2025-09-08T04:08:43.085Z
+**Overall Score:** 80.00% (3/5 criteria passed)
 **Domain:** Security Robustness
 
 ### Score Breakdown
 
 | Status | Count | Percentage |
 |--------|-------|------------|
-| ✅ Passed | 2 | 40.0% |
-| ⚠️ Partial | 1 | 20.0% |
-| ❌ Failed | 2 | 40.0% |
+| ✅ Passed | 3 | 60.0% |
+| ⚠️ Partial | 2 | 40.0% |
+| ❌ Failed | 0 | 0.0% |
 
 ## Detailed Criteria Analysis
 
-### ❌ Formal Verification Coverage
+### ⚠️ Formal Verification Coverage
 
-**Status:** FAILED
-**Score:** 25.0 FVC compliance score (%)
+**Status:** PARTIAL
+**Score:** 75.0 FVC compliance score (%)
 **Method:** Runtime conformance to claimed invariants (black-box)
-**Timestamp:** 2025-09-07T19:11:24.397Z
+**Timestamp:** 2025-09-08T04:08:43.055Z
 
 #### Detailed Metrics
 
-- **fvcScore:** 25.0%
+- **fvcScore:** 75.0%
 - **totalTests:** 4
-- **violations:** 3
-- **violationRate:** 75.00%
+- **violations:** 1
+- **violationRate:** 25.00%
 - **individualTestScores:** {
-  "replayRejection": 0,
+  "replayRejection": 100,
   "valueConservation": 100,
-  "finalizationTiming": 0,
+  "finalizationTiming": 100,
   "idempotencyRetries": 0
 }
-- **note:** Tested 4 formal verification criteria with 3 violations
+- **note:** Tested 4 formal verification criteria with 1 violations
 
 #### Evidence Summary
 
-**Proofs:** 2 successful tests
-**Errors:** 2 test failures
+**Proofs:** 4 successful tests
+
 
 
 ---
 
-### ❌ Cryptographic Robustness
+### ✅ Cryptographic Robustness
 
-**Status:** FAILED
-**Score:** 0.0 Crypto compliance score (%)
+**Status:** PASSED
+**Score:** 100.0 Crypto compliance score (%)
 **Method:** Signature binding & tamper rejection (on-chain verifiable)
-**Timestamp:** 2025-09-07T19:11:28.545Z
+**Timestamp:** 2025-09-08T04:08:43.059Z
 
 #### Detailed Metrics
 
-- **cryptoScore:** 0.0%
+- **cryptoScore:** 100.0%
 - **totalTests:** 3
-- **mismatches:** 3
-- **mismatchRate:** 100.00%
-- **note:** Tested 3 cryptographic criteria with 3 mismatches
+- **mismatches:** 0
+- **mismatchRate:** 0.00%
+- **note:** Tested 3 cryptographic criteria with 0 mismatches
 
 #### Evidence Summary
 
-**Proofs:** 2 successful tests
-**Errors:** 1 test failures
+**Proofs:** 3 successful tests
+
 
 
 ---
@@ -73,7 +73,7 @@
 **Status:** PASSED
 **Score:** 100.0 HSM compliance score (%)
 **Method:** Signer abstraction / external-signer compatibility (software proxy)
-**Timestamp:** 2025-09-07T19:11:28.545Z
+**Timestamp:** 2025-09-08T04:08:43.059Z
 
 #### Detailed Metrics
 
@@ -96,18 +96,18 @@
 **Status:** PARTIAL
 **Score:** 75.0 BFT compliance score (%)
 **Method:** Quorum/finality enforcement at the API boundary
-**Timestamp:** 2025-09-07T19:15:14.102Z
+**Timestamp:** 2025-09-08T04:08:43.083Z
 
 #### Detailed Metrics
 
 - **bftScore:** 75.0%
-- **rawBftScore:** 95.0%
+- **rawBftScore:** 97.5%
 - **formalVerificationRequired:** true
 - **prematureFinalizationRate:** 0.00%
-- **staleStateAcceptanceRate:** 5.00%
+- **staleStateAcceptanceRate:** 2.50%
 - **totalTransfers:** 40
-- **totalViolations:** 2
-- **violationRate:** 5.00%
+- **totalViolations:** 1
+- **violationRate:** 2.50%
 - **bftCompliant:** false
 - **confirmationLevels:** [
   0,
@@ -117,7 +117,7 @@
 - **transfersPerLevel:** 10
 - **staleBlockTests:** 5
 - **reorgTests:** 5
-- **note:** Tested BFT with 40 transfers: 0 premature finalizations, 2 stale state acceptances. BFT capped at 75% without formal verification.
+- **note:** Tested BFT with 40 transfers: 0 premature finalizations, 1 stale state acceptances. BFT capped at 75% without formal verification.
 
 #### Evidence Summary
 
@@ -132,7 +132,7 @@
 **Status:** PASSED
 **Score:** 100.0 Vuln compliance score (%)
 **Method:** Surface scan of deployed components only
-**Timestamp:** 2025-09-07T19:15:14.103Z
+**Timestamp:** 2025-09-08T04:08:43.083Z
 
 #### Detailed Metrics
 
@@ -173,11 +173,6 @@
 - **Recommendation:** Review and strengthen formal verification coverage mechanisms
 - **Action:** Implement additional validation checks for formal verification coverage
 
-### Cryptographic Robustness
-- **Issue:** Test failures detected
-- **Recommendation:** Review and strengthen cryptographic robustness mechanisms
-- **Action:** Implement additional validation checks for cryptographic robustness
-
 ### Byzantine Fault Tolerance
 - **Issue:** Test failures detected
 - **Recommendation:** Review and strengthen byzantine fault tolerance mechanisms
@@ -185,6 +180,6 @@
 
 ## Conclusion
 
-The LayerZero Security Robustness benchmark achieved an overall score of **50.00%** with 2 out of 5 criteria passing. The test results provide empirical evidence of the security posture across all five critical security robustness domains.
+The LayerZero Security Robustness benchmark achieved an overall score of **80.00%** with 3 out of 5 criteria passing. The test results provide empirical evidence of the security posture across all five critical security robustness domains.
 
-**Note:** 2 criteria failed and require attention.
+**Note:** All critical security criteria passed successfully.

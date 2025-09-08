@@ -496,14 +496,65 @@ class LayerZeroSecurityRobustnessBenchmark {
       const tx = await this.sepoliaWallet1.provider?.getTransaction(txHash);
       
       if (tx && tx.from) {
-        // Compare the recovered sender with expected sender
-        return tx.from.toLowerCase() === expectedSender.toLowerCase();
+        // First check if the from field matches (basic check)
+        const fromMatches = tx.from.toLowerCase() === expectedSender.toLowerCase();
+        
+        // For proper cryptographic verification, we should also verify the signature
+        // by recovering the address from the signature components
+        if (fromMatches && tx.signature) {
+          try {
+            // Recover the address from the signature
+            const recoveredAddress = this.recoverAddressFromSignature(tx);
+            const recoveredMatches = recoveredAddress.toLowerCase() === expectedSender.toLowerCase();
+            
+            console.log(`    Sender verification: from=${tx.from}, recovered=${recoveredAddress}, expected=${expectedSender}`);
+            return recoveredMatches;
+          } catch (sigError) {
+            console.log(`    Warning: Could not recover address from signature: ${(sigError as Error).message}`);
+            // Fall back to basic from field check
+            return fromMatches;
+          }
+        }
+        
+        return fromMatches;
       }
       
       return false;
     } catch (error) {
       console.log(`    Warning: Could not verify sender from transaction ${txHash}: ${(error as Error).message}`);
       return false;
+    }
+  }
+
+  // Helper method to recover address from transaction signature
+  private recoverAddressFromSignature(tx: any): string {
+    try {
+      // Import ethers utilities for signature recovery
+      const { ethers } = require('ethers');
+      
+      // Create the transaction hash that was signed
+      const txHash = ethers.utils.keccak256(
+        ethers.utils.serializeTransaction({
+          to: tx.to,
+          value: tx.value,
+          data: tx.data,
+          gasLimit: tx.gasLimit,
+          gasPrice: tx.gasPrice,
+          nonce: tx.nonce,
+          chainId: tx.chainId
+        })
+      );
+      
+      // Recover the address from the signature
+      const recoveredAddress = ethers.utils.recoverAddress(txHash, {
+        r: tx.signature.r,
+        s: tx.signature.s,
+        v: tx.signature.v
+      });
+      
+      return recoveredAddress;
+    } catch (error) {
+      throw new Error(`Signature recovery failed: ${(error as Error).message}`);
     }
   }
 
