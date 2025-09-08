@@ -1,6 +1,6 @@
 {
-  "testDate": "2025-09-06T18:09:14.997Z",
-  "duration": "338.427 seconds",
+  "testDate": "2025-09-08T01:17:30.954Z",
+  "duration": "440.216 seconds",
   "overallScore": "80.00%",
   "totalCriteria": 5,
   "passedCriteria": 4,
@@ -14,7 +14,7 @@
       "unit": "FVC compliance score (%)",
       "value": 100,
       "method": "Runtime conformance to claimed invariants (black-box)",
-      "timestamp": "2025-09-06T18:10:56.332Z",
+      "timestamp": "2025-09-08T01:20:22.568Z",
       "details": {
         "fvcScore": "100.0%",
         "totalTests": 4,
@@ -37,19 +37,19 @@
           {
             "test": "replay_rejection",
             "passed": true,
-            "sepoliaTx1": "0x8d08c1066629df0d1cfba64ff625de1fcf20ab2bd39bce8a23a625ce14d09805",
-            "moonbeamTx1": "0x333fb20cb61ed6c362f24e4072fd03c33f9e2c19d81d762f85e0df25be2407ea",
-            "sepoliaTx2": "0x5a02a634876b4216a7ce819944d22f9fe8486f9e59f310dd5d42fcc5940ccce0",
-            "moonbeamTx2": "0x68c05b919f5b80e88ef03d9ef6ce6d8ac58c187a17d6165a1ed3dabd8c4d465c"
+            "sepoliaTx1": "0x6ce8e23693f14bc71c6e7998a345b90bf939f80e41a8d2302def909dd2ad165d",
+            "moonbeamTx1": "0x4e85abd6aadead5a8c854e65e1c6483c0b8cd35b4651c3ddafc80738a1111de4",
+            "sepoliaTx2": "0x91702445c18dc106a4151f24bbac143ae86a37a7e334894480b41a48faf30912",
+            "moonbeamTx2": "0xd79c0747c0375d8de9f524c1153ad43eb568221da8277555bad46b8cc169c3e7"
           },
           {
             "test": "value_conservation",
             "passed": true,
-            "initialBalance": 5922000,
-            "finalBalance": 5916000,
+            "initialBalance": 5910000,
+            "finalBalance": 5904000,
             "totalTransferred": 1500000,
             "totalFees": 216000,
-            "expectedFinalBalance": 5706000,
+            "expectedFinalBalance": 5694000,
             "difference": 210000,
             "note": "Testing that total value is conserved: initial = final + transferred + fees"
           },
@@ -57,10 +57,10 @@
             "test": "finalization_timing",
             "passed": true,
             "confirmations": 2,
-            "settlementTime": 16138,
+            "settlementTime": 78456,
             "settled": true,
-            "sepoliaTxHash": "0x1c50bd9cbd3ca77f293f3bd54e108798aa8b009fb4ba06b55d74d0e508f9ffbb",
-            "moonbeamTxHash": "0xa2ede0fcd4f25d926e92957d28d6ed5cd9b1237f8ca2b8ea72e5c9dede3315a1",
+            "sepoliaTxHash": "0xa52eeeacf44ed4102d43c2e93e4602983ca8566d1a6c33c6524834484e9b636c",
+            "moonbeamTxHash": "0x36d40f989d0d92855bf8db02b7c3ce3bbe456384620962812995d13447b37274",
             "note": "May fail due to testnet fast finality - this is expected behavior"
           },
           {
@@ -69,21 +69,21 @@
             "attemptedTransfers": 3,
             "successfulTransfers": 1,
             "results": [
-              "could not coalesce error (error={ \"code\": -32000, \"message\": \"already known\" }, payload={ \"id\": 99, \"jsonrpc\": \"2.0\", \"method\": \"eth_sendRawTransaction\", \"params\": [ \"0x02f87483aa36a7820261830f4240834b8f7c825208947b52c77f01ae2cd0a59c0b24de48f21121e6c2bc8702aa1efb94e00080c001a098de965b0c729df13813bba19b8dfcb92d8d883ddbf9afc8063d193053b8d56aa0257d49e1bb1439b7fb78edc08cfb2ab10ac1b4276b80708c4615f7fd71d420b9\" ] }, code=UNKNOWN_ERROR, version=6.15.0)",
-              "Success: Sepolia=0x9f7aa54313fde09dbd08910fa3b8fc811715fbe32df5cc24b2142e641f9e0a06, Moonbeam=0xd199ffa909c5ea44bbf36b8e186f86ebaa304b82aa90fabaddb537b9e2c9ea5c",
-              "could not coalesce error (error={ \"code\": -32000, \"message\": \"already known\" }, payload={ \"id\": 102, \"jsonrpc\": \"2.0\", \"method\": \"eth_sendRawTransaction\", \"params\": [ \"0x02f87483aa36a7820261830f4240834b8f7c825208947b52c77f01ae2cd0a59c0b24de48f21121e6c2bc8702aa1efb94e00080c001a098de965b0c729df13813bba19b8dfcb92d8d883ddbf9afc8063d193053b8d56aa0257d49e1bb1439b7fb78edc08cfb2ab10ac1b4276b80708c4615f7fd71d420b9\" ] }, code=UNKNOWN_ERROR, version=6.15.0)"
+              "could not coalesce error (error={ \"code\": -32000, \"message\": \"already known\" }, payload={ \"id\": 151, \"jsonrpc\": \"2.0\", \"method\": \"eth_sendRawTransaction\", \"params\": [ \"0x02f87483aa36a78204ba830f424083a75cac825208947b52c77f01ae2cd0a59c0b24de48f21121e6c2bc8702aa1efb94e00080c001a09d6c408ec986ec8fc0e39f0510d53f3172c8d5efad0f97a23d6c302c99fa335aa06e1fd8b246c82e11c643acc99950a6f1849ec93cc054c0d4a703a4f6e1b57ce6\" ] }, code=UNKNOWN_ERROR, version=6.15.0)",
+              "Success: Sepolia=0x974fd74f1df013f98ad9cf09476f499736eab2084ff427940a36762553a01741, Moonbeam=0x608abdab01105de5dfa8c2b9ab184e000acf786c4694ca59c67f3dde28d63c5b",
+              "could not coalesce error (error={ \"code\": -32000, \"message\": \"already known\" }, payload={ \"id\": 154, \"jsonrpc\": \"2.0\", \"method\": \"eth_sendRawTransaction\", \"params\": [ \"0x02f87483aa36a78204ba830f424083a75cac825208947b52c77f01ae2cd0a59c0b24de48f21121e6c2bc8702aa1efb94e00080c001a09d6c408ec986ec8fc0e39f0510d53f3172c8d5efad0f97a23d6c302c99fa335aa06e1fd8b246c82e11c643acc99950a6f1849ec93cc054c0d4a703a4f6e1b57ce6\" ] }, code=UNKNOWN_ERROR, version=6.15.0)"
             ]
           }
         ],
         "errors": [],
         "txHashes": [
-          "0x8d08c1066629df0d1cfba64ff625de1fcf20ab2bd39bce8a23a625ce14d09805",
-          "0x333fb20cb61ed6c362f24e4072fd03c33f9e2c19d81d762f85e0df25be2407ea",
-          "0x5a02a634876b4216a7ce819944d22f9fe8486f9e59f310dd5d42fcc5940ccce0",
-          "0x68c05b919f5b80e88ef03d9ef6ce6d8ac58c187a17d6165a1ed3dabd8c4d465c",
-          "D6EC3EEBD90DC7684145042FFA985C67A12457A0A8F570A32949F7FC58A1EB47",
-          "39C00500900B5BFCC574483326B690AB21D80C68704471D8F8DA1C8A1F729D7F",
-          "68BEBBA9436B503BBC3496238BE8756B22BEA23F56D9BFB8E1F50812D2E7E6E9"
+          "0x6ce8e23693f14bc71c6e7998a345b90bf939f80e41a8d2302def909dd2ad165d",
+          "0x4e85abd6aadead5a8c854e65e1c6483c0b8cd35b4651c3ddafc80738a1111de4",
+          "0x91702445c18dc106a4151f24bbac143ae86a37a7e334894480b41a48faf30912",
+          "0xd79c0747c0375d8de9f524c1153ad43eb568221da8277555bad46b8cc169c3e7",
+          "E838506D978A6850A38CD38B875C394A0F5FCEB62DBF14FA8E7D4BE52E84A20B",
+          "3E0A01F2056CE4334B2E078EF67952231677E4566B0B3FAD001EEBA5BA6E1A5F",
+          "0724DB7E73361B723F1B57CBD1FE5E55E48BE96C960A655B082F97DFB247C9CB"
         ],
         "balances": {}
       },
@@ -95,7 +95,7 @@
       "unit": "Crypto compliance score (%)",
       "value": 100,
       "method": "Signature binding & tamper rejection (on-chain verifiable)",
-      "timestamp": "2025-09-06T18:11:15.292Z",
+      "timestamp": "2025-09-08T01:20:38.388Z",
       "details": {
         "cryptoScore": "100.0%",
         "totalTests": 3,
@@ -118,7 +118,7 @@
             "passed": true,
             "expected": "axelar14lgyh9gcvxcs4g3qwrfhraxgrha8gnk7pqnapr",
             "actual": "axelar14lgyh9gcvxcs4g3qwrfhraxgrha8gnk7pqnapr",
-            "txHash": "DEA71CB1F5A36AE50BFFA8E9D8D79146FF10194786A7613F76923CE7DAB6B2B5",
+            "txHash": "2E19791FC063A1F28232AB7126CC862DE0E7D3A98D8D3AE158926399E7E1DDD4",
             "note": "Testing that transaction was properly signed by the expected Cosmos wallet"
           },
           {
@@ -130,7 +130,7 @@
           {
             "test": "tamper_rejection",
             "passed": true,
-            "validTxHash": "DF30990BADB69B73BD22AF4C4CCF1FCF918159D660F5DA82CCA238C1E847F1DD",
+            "validTxHash": "68F40B3D7E2447CD40FF38808D92F1D2215D1DC9E6D652AF6ECB02EFABBA0351",
             "tamperAttempted": true,
             "note": "Testing that properly signed transactions are accepted and malformed ones are rejected"
           }
@@ -145,11 +145,11 @@
       "unit": "HSM compliance score (%)",
       "value": 100,
       "method": "Signer abstraction / external-signer compatibility (software proxy)",
-      "timestamp": "2025-09-06T18:11:15.412Z",
+      "timestamp": "2025-09-08T01:20:38.499Z",
       "details": {
         "hsmScore": "100.0%",
         "externalSignerWorks": true,
-        "rotationTimeSeconds": 0.003,
+        "rotationTimeSeconds": 0.005,
         "postRevocationAcceptanceRate": "0%",
         "individualTestScores": {
           "externalSignerCompatibility": 100,
@@ -173,7 +173,7 @@
             "passed": true,
             "oldAddress": "axelar14lgyh9gcvxcs4g3qwrfhraxgrha8gnk7pqnapr",
             "newAddress": "axelar14lgyh9gcvxcs4g3qwrfhraxgrha8gnk7pqnapr",
-            "rotationTimeMs": 3,
+            "rotationTimeMs": 5,
             "revocationWorks": true
           }
         ],
@@ -185,17 +185,17 @@
       "domain": "Security Robustness",
       "criterion": "Byzantine Fault Tolerance",
       "unit": "BFT compliance score (%)",
-      "value": 66.66666666666667,
+      "value": 75,
       "method": "Quorum/finality enforcement at the API boundary",
-      "timestamp": "2025-09-06T18:14:31.451Z",
+      "timestamp": "2025-09-08T01:24:27.768Z",
       "details": {
-        "bftScore": "66.7%",
-        "prematureFinalizationRate": "11.11%",
+        "bftScore": "75.0%",
+        "prematureFinalizationRate": "0.00%",
         "staleStateAcceptanceRate": "100.00%",
         "totalTests": 12,
-        "totalViolations": 4,
-        "violationRate": "33.3%",
-        "prematureCount": 1,
+        "totalViolations": 3,
+        "violationRate": "25.0%",
+        "prematureCount": 0,
         "staleAccepted": 3,
         "finalityThresholdTests": 9,
         "staleStateTests": 3,
@@ -207,63 +207,63 @@
           {
             "test": "finality_0_conf",
             "confirmations": 0,
-            "settlementTime": 19237,
+            "settlementTime": 19220,
             "expectedMinTime": 0,
             "premature": false
           },
           {
             "test": "finality_0_conf",
             "confirmations": 0,
-            "settlementTime": 35272,
+            "settlementTime": 10572,
             "expectedMinTime": 0,
             "premature": false
           },
           {
             "test": "finality_0_conf",
             "confirmations": 0,
-            "settlementTime": 22867,
+            "settlementTime": 10830,
             "expectedMinTime": 0,
             "premature": false
           },
           {
             "test": "finality_1_conf",
             "confirmations": 1,
-            "settlementTime": 10460,
+            "settlementTime": 14389,
             "expectedMinTime": 6000,
             "premature": false
           },
           {
             "test": "finality_1_conf",
             "confirmations": 1,
-            "settlementTime": 14640,
+            "settlementTime": 10494,
             "expectedMinTime": 6000,
             "premature": false
           },
           {
             "test": "finality_1_conf",
             "confirmations": 1,
-            "settlementTime": 10461,
+            "settlementTime": 14600,
             "expectedMinTime": 6000,
             "premature": false
           },
           {
             "test": "finality_2_conf",
             "confirmations": 2,
-            "settlementTime": 10348,
-            "expectedMinTime": 12000,
-            "premature": true
-          },
-          {
-            "test": "finality_2_conf",
-            "confirmations": 2,
-            "settlementTime": 14840,
+            "settlementTime": 35453,
             "expectedMinTime": 12000,
             "premature": false
           },
           {
             "test": "finality_2_conf",
             "confirmations": 2,
-            "settlementTime": 22829,
+            "settlementTime": 43238,
+            "expectedMinTime": 12000,
+            "premature": false
+          },
+          {
+            "test": "finality_2_conf",
+            "confirmations": 2,
+            "settlementTime": 14625,
             "expectedMinTime": 12000,
             "premature": false
           },
@@ -285,7 +285,7 @@
       "unit": "Vuln compliance score (%)",
       "value": 100,
       "method": "Surface scan of deployed components only",
-      "timestamp": "2025-09-06T18:14:53.424Z",
+      "timestamp": "2025-09-08T01:24:51.170Z",
       "details": {
         "vulnScore": "100.0%",
         "highCriticalFindings": 0,

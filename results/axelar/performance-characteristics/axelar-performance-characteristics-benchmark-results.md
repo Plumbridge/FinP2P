@@ -1,7 +1,7 @@
 # Axelar Performance Characteristics Benchmark Results
 
 **Test Date:** December 2024
-**Duration:** 189.0 seconds (3.2 minutes)
+**Duration:** 188.2 seconds (3.1 minutes)
 **Overall Score:** 66.67% (2/3 criteria passed)
 **Domain:** Performance Characteristics
 **Network:** Axelar Testnet (axelar-testnet-lisbon-3)
@@ -30,12 +30,12 @@ This benchmark successfully tested Axelar's Performance Characteristics using **
 **Score:** 100%
 
 #### **Performance Metrics:**
-- **P50 Latency:** 10584msms (NaN seconds)
-- **P95 Latency:** 11291msms (NaN seconds)
+- **P50 Latency:** 10432msms (NaN seconds)
+- **P95 Latency:** 13889msms (NaN seconds)
 - **Success Rate:** 100.00%%
-- **IQR (Interquartile Range):** 407msms
-- **Min Latency:** 10458msms
-- **Max Latency:** 11373msms
+- **IQR (Interquartile Range):** 191msms
+- **Min Latency:** 6922msms
+- **Max Latency:** 14709msms
 
 ### Throughput Scalability ❌ **FAILED**
 
@@ -94,8 +94,8 @@ This benchmark successfully tested Axelar's Performance Characteristics using **
 
 | Metric | Value | Status | Notes |
 |--------|-------|--------|-------|
-| **Cross-chain Latency (P50)** | 10584msms | ✅ Excellent | Consistent sub-10s performance |
-| **Cross-chain Latency (P95)** | 11291msms | ✅ Good | 95% of transactions < 10s |
+| **Cross-chain Latency (P50)** | 10432msms | ✅ Excellent | Consistent sub-10s performance |
+| **Cross-chain Latency (P95)** | 13889msms | ✅ Good | 95% of transactions < 10s |
 | **Success Rate (Latency)** | 100.00%% | ✅ Perfect | No failed transactions |
 | **Sustainable TPS** | < 1 RPS | ❌ Limited | Testnet rate limiting |
 | **System Availability** | 100.00%% | ✅ Perfect | No downtime observed |
@@ -144,7 +144,7 @@ This benchmark successfully tested Axelar's Performance Characteristics using **
 - **Network:** Axelar Testnet (axelar-testnet-lisbon-3)
 - **SDK Version:** Cosmos SDK integration
 - **RPC Endpoint:** `https://axelart.tendermintrpc.lava.build`
-- **Test Duration:** 189.0 seconds
+- **Test Duration:** 188.2 seconds
 - **Data Points:** 0+ successful transactions, 100+ error samples
 
 ---

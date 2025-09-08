@@ -1,6 +1,6 @@
 {
-  "testDate": "2025-09-06T17:52:03.772Z",
-  "duration": "189.0 seconds",
+  "testDate": "2025-09-08T01:47:53.608Z",
+  "duration": "188.2 seconds",
   "overallScore": "66.67%",
   "totalCriteria": 3,
   "passedCriteria": 2,
@@ -14,16 +14,16 @@
       "domain": "Performance Characteristics",
       "criterion": "Cross-chain Transaction Latency",
       "unit": "P50/P95 latency (ms)",
-      "value": "10584/11291",
+      "value": "10432/13889",
       "method": "5 cross-chain atomic swaps (Sepolia ETH ↔ Moonbeam DEV); timestamp client send & observe completion; record both chain heights",
-      "timestamp": "2025-09-06T17:53:03.790Z",
+      "timestamp": "2025-09-08T01:48:52.751Z",
       "details": {
-        "p50Latency": "10584ms",
-        "p95Latency": "11291ms",
-        "avgLatency": "10788ms",
-        "minLatency": "10458ms",
-        "maxLatency": "11373ms",
-        "iqr": "407ms",
+        "p50Latency": "10432ms",
+        "p95Latency": "13889ms",
+        "avgLatency": "10618ms",
+        "minLatency": "6922ms",
+        "maxLatency": "14709ms",
+        "iqr": "191ms",
         "totalTransfers": 5,
         "successfulTransfers": 5,
         "successRate": "100.00%",
@@ -42,77 +42,77 @@
         "latencyData": [
           {
             "transferId": "latency_test_0",
-            "startTime": 1757181124456,
-            "endTime": 1757181135829,
-            "latency": 11373,
+            "startTime": 1757296074269,
+            "endTime": 1757296081191,
+            "latency": 6922,
             "sourceChain": "Sepolia",
             "destChain": "Moonbeam",
-            "sourceHeight": 9147463,
-            "destHeight": 13702611,
+            "sourceHeight": 9156916,
+            "destHeight": 13720567,
             "rpcUsed": "https://sepolia.infura.io/v3/3d3b8fca04b44645b436ad6d60069060, https://rpc.api.moonbase.moonbeam.network/",
             "success": true
           },
           {
             "transferId": "latency_test_1",
-            "startTime": 1757181136911,
-            "endTime": 1757181147495,
-            "latency": 10584,
+            "startTime": 1757296082257,
+            "endTime": 1757296096966,
+            "latency": 14709,
             "sourceChain": "Sepolia",
             "destChain": "Moonbeam",
-            "sourceHeight": 9147464,
-            "destHeight": 13702613,
+            "sourceHeight": 9156917,
+            "destHeight": 13720569,
             "rpcUsed": "https://sepolia.infura.io/v3/3d3b8fca04b44645b436ad6d60069060, https://rpc.api.moonbase.moonbeam.network/",
             "success": true
           },
           {
             "transferId": "latency_test_2",
-            "startTime": 1757181148567,
-            "endTime": 1757181159025,
-            "latency": 10458,
+            "startTime": 1757296098098,
+            "endTime": 1757296108706,
+            "latency": 10608,
             "sourceChain": "Sepolia",
             "destChain": "Moonbeam",
-            "sourceHeight": 9147465,
-            "destHeight": 13702615,
+            "sourceHeight": 9156918,
+            "destHeight": 13720571,
             "rpcUsed": "https://sepolia.infura.io/v3/3d3b8fca04b44645b436ad6d60069060, https://rpc.api.moonbase.moonbeam.network/",
             "success": true
           },
           {
             "transferId": "latency_test_3",
-            "startTime": 1757181160128,
-            "endTime": 1757181171093,
-            "latency": 10965,
+            "startTime": 1757296109785,
+            "endTime": 1757296120202,
+            "latency": 10417,
             "sourceChain": "Sepolia",
             "destChain": "Moonbeam",
-            "sourceHeight": 9147466,
-            "destHeight": 13702617,
+            "sourceHeight": 9156919,
+            "destHeight": 13720573,
             "rpcUsed": "https://sepolia.infura.io/v3/3d3b8fca04b44645b436ad6d60069060, https://rpc.api.moonbase.moonbeam.network/",
             "success": true
           },
           {
             "transferId": "latency_test_4",
-            "startTime": 1757181172160,
-            "endTime": 1757181182718,
-            "latency": 10558,
+            "startTime": 1757296121257,
+            "endTime": 1757296131689,
+            "latency": 10432,
             "sourceChain": "Sepolia",
             "destChain": "Moonbeam",
-            "sourceHeight": 9147467,
-            "destHeight": 13702619,
+            "sourceHeight": 9156920,
+            "destHeight": 13720575,
             "rpcUsed": "https://sepolia.infura.io/v3/3d3b8fca04b44645b436ad6d60069060, https://rpc.api.moonbase.moonbeam.network/",
             "success": true
           }
         ],
         "errors": [],
         "txHashes": [
-          "0x005ab838bd6c23224f2109ebfd0e76be6e748df8420fb0dcf44923b7aa39d15e",
-          "0x0d4915c27ac4404081723e231163af162fbc3b142e2593cf37c3bfb69b920306",
-          "0x8adb68608e3faa7a19b850ac731842495fd9c46c8a083cf8c2227243dde262da",
-          "0x03e7a3aef22bdd1ad7ba8c879acaf5393c1278374d6cd18f43ccda832d74b0fa",
-          "0xb84deea051ea46fbce3ff3eef40dd0a5a4ef8834cfdd8b16b08ee97c1f0e404c",
-          "0x251e210ee799614b814b2ecfc6bf0a502187865680dde824876cdac01e895922",
-          "0x8b8f08ab8e22084fc9f9b1485f9534d518207d07387c8f32d1e3f416fdfb182a",
-          "0xc8096cf1412013a3c261d4987aee71705c33783f6f62074270d74e4e5da42062",
-          "0xd4d9e26c12160dd0ee352d1258492de448c809adcd03b40a8b833d6e007eed3e",
-          "0xa391f56fc529201e9de4876fc4fab3121d7b262fda9a556551da361ce6e80f14"
+          "0x1de4096f20334dc4fa987fb14808a8814c82ea4ad38a57757f2688d01ec9ae3e",
+          "0xf407252d2100eb77877d06506c9ce6899001af6604a0dad81e80c6af37b09fff",
+          "0x7380477644907d53f571cb8986297a4b25c2d7d21943a9811b5cff55a14d8ac3",
+          "0xe3f0d77e17639e803445d78b69d95f25797954348afe31e37097cd857b74ee88",
+          "0x8c9e3f4c17924cff736bf1abbe607c6eadaada3471a9fe9a97846276aaba0f73",
+          "0xde85689eb578c788afb75ccc83897844071a3931aac8d9ea920f4f42af355534",
+          "0x324606dbdc33d8e76e8aa0d29d60fb7bb7a4726e7c78acc8b63d05785181618a",
+          "0x53d773b24314561dfe1d9b1747933e43d521e4d8085274c5f154d8e53a648bcf",
+          "0x17e523d7f5cdc646c38334ea9e2e541de028e58ea56a4dc0fc9b3eeb2a30eb23",
+          "0x44547729dfa11f42d1bfd2260629e33b54ddc92e461e83d9487700be581cf200"
         ],
         "timestamps": []
       },
@@ -124,7 +124,7 @@
       "unit": "Sustainable TPS",
       "value": 1,
       "method": "Step load 1 RPS cross-chain atomic swaps (Sepolia ETH ↔ Moonbeam DEV) for 30 seconds",
-      "timestamp": "2025-09-06T17:53:35.796Z",
+      "timestamp": "2025-09-08T01:49:24.758Z",
       "details": {
         "sustainableTPS": 1,
         "kneePoint": "Not reached",
@@ -132,14 +132,14 @@
         "totalRequests": 29,
         "totalSuccessful": 17,
         "totalFailed": 0,
-        "avgLatencyAcrossSteps": "9979ms",
+        "avgLatencyAcrossSteps": "10537ms",
         "errorBreakdown": {},
         "stepResults": [
           {
             "rps": 1,
             "successRate": "58.62%",
-            "avgLatency": "9979ms",
-            "p95Latency": "15104ms"
+            "avgLatency": "10537ms",
+            "p95Latency": "16289ms"
           }
         ],
         "rpcInfo": {
@@ -162,13 +162,13 @@
             "successfulRequests": 29,
             "failedRequests": 0,
             "errorRate": 0,
-            "avgLatency": 9978.70588235294,
-            "p50Latency": 9501,
-            "p95Latency": 15104.4,
-            "maxLatency": 15910,
-            "minLatency": 5470,
+            "avgLatency": 10536.64705882353,
+            "p50Latency": 10044,
+            "p95Latency": 16288.8,
+            "maxLatency": 17100,
+            "minLatency": 6022,
             "errors": [],
-            "timestamp": "2025-09-06T17:53:03.791Z"
+            "timestamp": "2025-09-08T01:48:52.752Z"
           }
         ],
         "errors": []
@@ -181,7 +181,7 @@
       "unit": "Success rate (%)",
       "value": 100,
       "method": "24-hour canary (1 op/5 min) with simple alert on failure",
-      "timestamp": "2025-09-06T17:55:12.813Z",
+      "timestamp": "2025-09-08T01:51:01.783Z",
       "details": {
         "successRate": "100.00%",
         "mtbf": "1.50 minutes",
@@ -194,39 +194,39 @@
         "failureTypes": {},
         "canaryLogs": [
           {
-            "timestamp": "2025-09-06T17:53:35.797Z",
+            "timestamp": "2025-09-08T01:49:24.759Z",
             "success": true,
-            "responseTime": 119,
+            "responseTime": 90,
             "statusCode": 200
           },
           {
-            "timestamp": "2025-09-06T17:53:50.807Z",
+            "timestamp": "2025-09-08T01:49:39.777Z",
             "success": true,
-            "responseTime": 220,
+            "responseTime": 107,
             "statusCode": 200
           },
           {
-            "timestamp": "2025-09-06T17:54:05.820Z",
+            "timestamp": "2025-09-08T01:49:54.783Z",
             "success": true,
-            "responseTime": 91,
+            "responseTime": 118,
             "statusCode": 200
           },
           {
-            "timestamp": "2025-09-06T17:54:20.827Z",
+            "timestamp": "2025-09-08T01:50:09.784Z",
             "success": true,
-            "responseTime": 321,
+            "responseTime": 153,
             "statusCode": 200
           },
           {
-            "timestamp": "2025-09-06T17:54:35.842Z",
+            "timestamp": "2025-09-08T01:50:24.794Z",
             "success": true,
-            "responseTime": 182,
+            "responseTime": 113,
             "statusCode": 200
           },
           {
-            "timestamp": "2025-09-06T17:54:50.856Z",
+            "timestamp": "2025-09-08T01:50:39.797Z",
             "success": true,
-            "responseTime": 119,
+            "responseTime": 154,
             "statusCode": 200
           }
         ],
@@ -235,77 +235,77 @@
       "evidence": {
         "availabilityData": [
           {
-            "timestamp": "2025-09-06T17:53:35.797Z",
+            "timestamp": "2025-09-08T01:49:24.759Z",
             "success": true,
-            "responseTime": 119,
+            "responseTime": 90,
             "statusCode": 200
           },
           {
-            "timestamp": "2025-09-06T17:53:50.807Z",
+            "timestamp": "2025-09-08T01:49:39.777Z",
             "success": true,
-            "responseTime": 220,
+            "responseTime": 107,
             "statusCode": 200
           },
           {
-            "timestamp": "2025-09-06T17:54:05.820Z",
+            "timestamp": "2025-09-08T01:49:54.783Z",
             "success": true,
-            "responseTime": 91,
+            "responseTime": 118,
             "statusCode": 200
           },
           {
-            "timestamp": "2025-09-06T17:54:20.827Z",
+            "timestamp": "2025-09-08T01:50:09.784Z",
             "success": true,
-            "responseTime": 321,
+            "responseTime": 153,
             "statusCode": 200
           },
           {
-            "timestamp": "2025-09-06T17:54:35.842Z",
+            "timestamp": "2025-09-08T01:50:24.794Z",
             "success": true,
-            "responseTime": 182,
+            "responseTime": 113,
             "statusCode": 200
           },
           {
-            "timestamp": "2025-09-06T17:54:50.856Z",
+            "timestamp": "2025-09-08T01:50:39.797Z",
             "success": true,
-            "responseTime": 119,
+            "responseTime": 154,
             "statusCode": 200
           }
         ],
         "canaryLogs": [
           {
-            "timestamp": "2025-09-06T17:53:35.797Z",
+            "timestamp": "2025-09-08T01:49:24.759Z",
             "success": true,
-            "responseTime": 119,
+            "responseTime": 90,
             "statusCode": 200
           },
           {
-            "timestamp": "2025-09-06T17:53:50.807Z",
+            "timestamp": "2025-09-08T01:49:39.777Z",
             "success": true,
-            "responseTime": 220,
+            "responseTime": 107,
             "statusCode": 200
           },
           {
-            "timestamp": "2025-09-06T17:54:05.820Z",
+            "timestamp": "2025-09-08T01:49:54.783Z",
             "success": true,
-            "responseTime": 91,
+            "responseTime": 118,
             "statusCode": 200
           },
           {
-            "timestamp": "2025-09-06T17:54:20.827Z",
+            "timestamp": "2025-09-08T01:50:09.784Z",
             "success": true,
-            "responseTime": 321,
+            "responseTime": 153,
             "statusCode": 200
           },
           {
-            "timestamp": "2025-09-06T17:54:35.842Z",
+            "timestamp": "2025-09-08T01:50:24.794Z",
             "success": true,
-            "responseTime": 182,
+            "responseTime": 113,
             "statusCode": 200
           },
           {
-            "timestamp": "2025-09-06T17:54:50.856Z",
+            "timestamp": "2025-09-08T01:50:39.797Z",
             "success": true,
-            "responseTime": 119,
+            "responseTime": 154,
             "statusCode": 200
           }
         ],
@@ -337,8 +337,8 @@
     },
     "performanceCharacteristics": {
       "latency": {
-        "p50": "10584ms",
-        "p95": "11291ms",
+        "p50": "10432ms",
+        "p95": "13889ms",
         "successRate": "100.00%",
         "status": "passed"
       },

@@ -1,12 +1,10 @@
 {
-  "domain": "Regulatory Compliance",
-  "testDate": "2025-09-07T15:44:03.353Z",
-  "duration": 163.34,
-  "overallScore": 78.33333333333333,
-  "status": "COMPLETED",
+  "testName": "FinP2P Regulatory Compliance Benchmark",
+  "timestamp": "2025-09-08T00:31:17.219Z",
+  "duration": 164499,
   "criteria": [
     {
-      "name": "Atomicity Enforcement",
+      "criterion": "Atomicity Enforcement",
       "status": "PASSED",
       "score": 100,
       "details": {
@@ -15,252 +13,252 @@
         "rpcOutageHandling": true,
         "transactionHashes": [
           {
-            "swapId": "atomic_swap_1_1757259844059",
-            "suiTxHash": "2u4LNc9W1DkNTUCgneX7NYfcrVrqyS4ssKuuSSoefevV",
-            "hederaTxHash": "0.0.6427779@1757259837.748977977",
-            "timestamp": "2025-09-07T15:44:06.159Z"
+            "swapId": "atomic_swap_1_1757291478219",
+            "suiTxHash": "GmZoWURgin289WDjoYMUw636mt71fMtxGnCXdd1AnPYm",
+            "hederaTxHash": "0.0.6427779@1757291471.550379630",
+            "timestamp": "2025-09-08T00:31:20.365Z"
           },
           {
-            "swapId": "atomic_swap_2_1757259848168",
-            "suiTxHash": "7Lb7WdNpvQVJqCznrkQWCkuBEzj3KnoZPxuVY9MoPqw8",
-            "hederaTxHash": "0.0.6427779@1757259845.379204168",
-            "timestamp": "2025-09-07T15:44:10.869Z"
+            "swapId": "atomic_swap_2_1757291482371",
+            "suiTxHash": "GrLYFw3z939nZcf1xQL22yZxxR3V2UkE5Cs81Yg7MPAZ",
+            "hederaTxHash": "0.0.6427779@1757291479.412193613",
+            "timestamp": "2025-09-08T00:31:24.936Z"
           },
           {
-            "swapId": "atomic_swap_3_1757259852877",
-            "suiTxHash": "HyX98rHk1bdjERt3ft3AEuCpdDgEKxCceLhF2vo3YFzC",
-            "hederaTxHash": "0.0.6427779@1757259847.221083750",
-            "timestamp": "2025-09-07T15:44:15.474Z"
+            "swapId": "atomic_swap_3_1757291486948",
+            "suiTxHash": "3PGKhz2m1qDv3eUSusppqDSUrM2UZ6J3UQQT5E5XYbk3",
+            "hederaTxHash": "0.0.6427779@1757291481.572623361",
+            "timestamp": "2025-09-08T00:31:30.178Z"
           },
           {
-            "swapId": "atomic_swap_4_1757259857483",
-            "suiTxHash": "DwX4H5R1961kWkrSRYbuTRXt3SFvhGJndPEma6JSxRpQ",
-            "hederaTxHash": "0.0.6427779@1757259853.068528123",
-            "timestamp": "2025-09-07T15:44:20.774Z"
+            "swapId": "atomic_swap_4_1757291492189",
+            "suiTxHash": "DyVHmvch6w62vZgegSNmxzXMGWENbp5hKsk8xUhKLMQm",
+            "hederaTxHash": "0.0.6427779@1757291487.561770817",
+            "timestamp": "2025-09-08T00:31:36.031Z"
           },
           {
-            "swapId": "atomic_swap_5_1757259862787",
-            "suiTxHash": "BCz9km3uqsmUNVTJyPTQmVMS74eq65fp3yiZebRqtMQy",
-            "hederaTxHash": "0.0.6427779@1757259856.050643496",
-            "timestamp": "2025-09-07T15:44:26.119Z"
+            "swapId": "atomic_swap_5_1757291498031",
+            "suiTxHash": "Fi7E6EUUdkqwzcVFZWjVKzPE1YvD8KgmRLBakTqzdBNQ",
+            "hederaTxHash": "0.0.6427779@1757291494.534943229",
+            "timestamp": "2025-09-08T00:31:41.275Z"
           },
           {
-            "swapId": "atomic_swap_6_1757259868134",
-            "suiTxHash": "7A2AKoyYF2UqtjvBG2WcRarpuTtDo1HGkk6s35bMwNpT",
-            "hederaTxHash": "0.0.6427779@1757259864.123917647",
-            "timestamp": "2025-09-07T15:44:30.980Z"
+            "swapId": "atomic_swap_6_1757291503276",
+            "suiTxHash": "CLK9mM7nNjFhF5Mq2VwRUeCEhJ4EtoBvgsmNLbtAX6z2",
+            "hederaTxHash": "0.0.6427779@1757291496.362273062",
+            "timestamp": "2025-09-08T00:31:46.062Z"
           },
           {
-            "swapId": "atomic_swap_7_1757259872992",
-            "suiTxHash": "4p5HDk64QdY4WiXtoWUWq7N3qcZB7UgWY18Y8joP9g2a",
-            "hederaTxHash": "0.0.6427779@1757259869.774352229",
-            "timestamp": "2025-09-07T15:44:36.243Z"
+            "swapId": "atomic_swap_7_1757291508063",
+            "suiTxHash": "7kS2JWzwT7qUYcnkmiPYFnpEZS2qTp3a6HLde22mw7R2",
+            "hederaTxHash": "0.0.6427779@1757291505.220393579",
+            "timestamp": "2025-09-08T00:31:50.710Z"
           },
           {
-            "swapId": "atomic_swap_8_1757259878245",
-            "suiTxHash": "DdA2TwjRhgFDynRs5qKS47zJm8LF9rs7whTRpL46Cyfq",
-            "hederaTxHash": "0.0.6427779@1757259874.353868112",
-            "timestamp": "2025-09-07T15:44:40.310Z"
+            "swapId": "atomic_swap_8_1757291512722",
+            "suiTxHash": "59ecGvvKLNcMpAbM7JesKYrnZnPY7xMqYgYkcnY37QSp",
+            "hederaTxHash": "0.0.6427779@1757291509.407631039",
+            "timestamp": "2025-09-08T00:31:55.924Z"
           },
           {
-            "swapId": "atomic_swap_9_1757259882320",
-            "suiTxHash": "TuUz3aEDjpL9NcpEjC7gqv3VEhkzsf1MRWM1yPrxBaV",
-            "hederaTxHash": "0.0.6427779@1757259876.406955435",
-            "timestamp": "2025-09-07T15:44:45.630Z"
+            "swapId": "atomic_swap_9_1757291517927",
+            "suiTxHash": "Ci3B3sbB3MqUQvZn1uowpGhwatHoJFTRvJXFtBeqTVCm",
+            "hederaTxHash": "0.0.6427779@1757291511.733213055",
+            "timestamp": "2025-09-08T00:32:01.207Z"
           },
           {
-            "swapId": "atomic_swap_10_1757259887640",
-            "suiTxHash": "BycRtj2abLpoLowK2EbkDyh2smgU3LaDTA4bCeCPZM8c",
-            "hederaTxHash": "0.0.6427779@1757259882.917058992",
-            "timestamp": "2025-09-07T15:44:50.931Z"
+            "swapId": "atomic_swap_10_1757291523222",
+            "suiTxHash": "5fWerXqankKrNKnuYzbqf9NdYXjaNbKLJ9toDA2h7y4F",
+            "hederaTxHash": "0.0.6427779@1757291515.873015924",
+            "timestamp": "2025-09-08T00:32:05.613Z"
           },
           {
-            "swapId": "atomic_swap_11_1757259892942",
-            "suiTxHash": "AtKpsFary4C8nYD5QsMHNHSdCWTjdY4nJo7LoJ3fxUg",
-            "hederaTxHash": "0.0.6427779@1757259886.005427673",
-            "timestamp": "2025-09-07T15:44:55.757Z"
+            "swapId": "atomic_swap_11_1757291527617",
+            "suiTxHash": "654WQyD3XYHezcZebUkFEQPm9rQRgD3JxdQymABRmJRv",
+            "hederaTxHash": "0.0.6427779@1757291523.096441730",
+            "timestamp": "2025-09-08T00:32:10.304Z"
           },
           {
-            "swapId": "atomic_swap_12_1757259897770",
-            "suiTxHash": "CixdEjtHzk7dbBhAyZAVwg18rbsFSpZaTHmUucW6WyJt",
-            "hederaTxHash": "0.0.6427779@1757259893.558840103",
-            "timestamp": "2025-09-07T15:45:01.010Z"
+            "swapId": "atomic_swap_12_1757291532304",
+            "suiTxHash": "6Ttcuy99p2FV94PAeZS6xaSFZfeqa9bSATY5oaiVzbCX",
+            "hederaTxHash": "0.0.6427779@1757291527.545118421",
+            "timestamp": "2025-09-08T00:32:15.393Z"
           },
           {
-            "swapId": "atomic_swap_13_1757259903025",
-            "suiTxHash": "DH3gqYCXsNvqFvgwwK3DMBU3gYtiBemzRygMjfQpC1Bn",
-            "hederaTxHash": "0.0.6427779@1757259897.630072548",
-            "timestamp": "2025-09-07T15:45:05.043Z"
+            "swapId": "atomic_swap_13_1757291537397",
+            "suiTxHash": "7tHtC9d67KDbJSRUVnmW5HesTg9NTkszrKyZHXiURnLc",
+            "hederaTxHash": "0.0.6427779@1757291531.586614484",
+            "timestamp": "2025-09-08T00:32:20.691Z"
           },
           {
-            "swapId": "atomic_swap_14_1757259907058",
-            "suiTxHash": "4kU14vNHpSJFzw7kFEThM3P4HBxi99WVVAUwS33LfADZ",
-            "hederaTxHash": "0.0.6427779@1757259902.915373302",
-            "timestamp": "2025-09-07T15:45:08.969Z"
+            "swapId": "atomic_swap_14_1757291542705",
+            "suiTxHash": "5n7TeT1gN9QkLv56kSaJYhrVQpnEv61aXMyNgBxGBZEF",
+            "hederaTxHash": "0.0.6427779@1757291539.289007152",
+            "timestamp": "2025-09-08T00:32:25.621Z"
           },
           {
-            "swapId": "atomic_swap_15_1757259910978",
-            "suiTxHash": "62pcvSWQTz8ytNyN91BWicLSBk3aJSErzd1BXysm4uMq",
-            "hederaTxHash": "0.0.6427779@1757259905.172081017",
-            "timestamp": "2025-09-07T15:45:13.890Z"
+            "swapId": "atomic_swap_15_1757291547631",
+            "suiTxHash": "GUNMS1tsjBXcXiNsd5wTtvXRJYxUWQy3SMqbnzSnDUv6",
+            "hederaTxHash": "0.0.6427779@1757291541.855240502",
+            "timestamp": "2025-09-08T00:32:29.754Z"
           },
           {
-            "swapId": "atomic_swap_16_1757259915892",
-            "suiTxHash": "7EaZF6g6VwFfrKiDRWdPwLmcXxjJGQqZ1ahjWixdTyrw",
-            "hederaTxHash": "0.0.6427779@1757259925.228018545",
-            "timestamp": "2025-09-07T15:45:33.030Z"
+            "swapId": "atomic_swap_16_1757291551754",
+            "suiTxHash": "APxyGmkS2pMPxZxGGQAGKYUhcQbdVVD9gxqyv3Dqp3fT",
+            "hederaTxHash": "0.0.6427779@1757291562.635911573",
+            "timestamp": "2025-09-08T00:32:48.700Z"
           },
           {
-            "swapId": "atomic_swap_17_1757259935041",
-            "suiTxHash": "8DttL599mUdG5dhBRE21HUxgDJBdrzBGw8e9DEoLbFUj",
-            "hederaTxHash": "0.0.6427779@1757259930.963073742",
-            "timestamp": "2025-09-07T15:45:37.966Z"
+            "swapId": "atomic_swap_17_1757291570702",
+            "suiTxHash": "BoiHEwV5XQULRuHV6MHaSgRLkimL5x5LxCtoLBfT9tbW",
+            "hederaTxHash": "0.0.6427779@1757291566.562466426",
+            "timestamp": "2025-09-08T00:32:53.853Z"
           },
           {
-            "swapId": "atomic_swap_18_1757259939974",
-            "suiTxHash": "6Ph2VP1tfFx521cVE1HGZQRqqXr3td8MLVxLBTFc8orW",
-            "hederaTxHash": "0.0.6427779@1757259936.640504297",
-            "timestamp": "2025-09-07T15:45:42.570Z"
+            "swapId": "atomic_swap_18_1757291575864",
+            "suiTxHash": "D55KCLcTyZnTrVSGDvJegYKbCSs81avJNWSf5RDgM6PP",
+            "hederaTxHash": "0.0.6427779@1757291571.523938488",
+            "timestamp": "2025-09-08T00:32:57.902Z"
           },
           {
-            "swapId": "atomic_swap_19_1757259944578",
-            "suiTxHash": "56dKddwCrWr2xJSar2gjXC7AnT9F2d5BdJArvDtVnwFK",
-            "hederaTxHash": "0.0.6427779@1757259940.180626912",
-            "timestamp": "2025-09-07T15:45:47.577Z"
+            "swapId": "atomic_swap_19_1757291579905",
+            "suiTxHash": "GhuPjBGg4KAvc4bfkGQne4tHapp9WdWSMHAJrnCg8CV5",
+            "hederaTxHash": "0.0.6427779@1757291574.707049924",
+            "timestamp": "2025-09-08T00:33:02.777Z"
           },
           {
-            "swapId": "atomic_swap_20_1757259949580",
-            "suiTxHash": "9buBRthtzdBBwwv1jmLGikRZ3YmaFbLy49PzXhsRMLs1",
-            "hederaTxHash": "0.0.6427779@1757259947.087901234",
-            "timestamp": "2025-09-07T15:45:51.402Z"
+            "swapId": "atomic_swap_20_1757291584783",
+            "suiTxHash": "Hkdm7fSSYQ1iEJ3tmKhnzymtBGHGntFyStST8ojGNuG8",
+            "hederaTxHash": "0.0.6427779@1757291579.538703533",
+            "timestamp": "2025-09-08T00:33:07.855Z"
           },
           {
-            "swapId": "atomic_swap_21_1757259953404",
-            "suiTxHash": "9ooCfv4DdzxKYUZotrkrjZUpSMdeuEoiRFGvwtyWTB1a",
-            "hederaTxHash": "0.0.6427779@1757259949.025521793",
-            "timestamp": "2025-09-07T15:45:55.361Z"
+            "swapId": "atomic_swap_21_1757291589856",
+            "suiTxHash": "8VibuZULGYCPrVEKiok6P5mN1WTpv9xqzU9VUoXxSagS",
+            "hederaTxHash": "0.0.6427779@1757291583.455177813",
+            "timestamp": "2025-09-08T00:33:13.078Z"
           },
           {
-            "swapId": "atomic_swap_22_1757259957365",
-            "suiTxHash": "LiRqZPLvrieimPhkkTEU8Ud3RBMGG72tsZdPdy76Sc1",
-            "hederaTxHash": "0.0.6427779@1757259950.052144006",
-            "timestamp": "2025-09-07T15:46:00.538Z"
+            "swapId": "atomic_swap_22_1757291595081",
+            "suiTxHash": "GJwSGDuziLUpaLFycnSkXEEDXx98z98AQC4HKg4rsMjA",
+            "hederaTxHash": "0.0.6427779@1757291590.666591259",
+            "timestamp": "2025-09-08T00:33:18.247Z"
           },
           {
-            "swapId": "atomic_swap_23_1757259962549",
-            "suiTxHash": "2s34Bm19SQuALAasRkdbxHwjeuNtpMXf6Rk19QtTayUg",
-            "hederaTxHash": "0.0.6427779@1757259959.892062030",
-            "timestamp": "2025-09-07T15:46:05.430Z"
+            "swapId": "atomic_swap_23_1757291600254",
+            "suiTxHash": "2k3iVWSKJHRY2abSkQqj8D1A9pLCEiCn1pwvcDhiRyUZ",
+            "hederaTxHash": "0.0.6427779@1757291593.903192785",
+            "timestamp": "2025-09-08T00:33:23.009Z"
           },
           {
-            "swapId": "atomic_swap_24_1757259967434",
-            "suiTxHash": "7o3ezZrQY2cay9TCLMFqsVMTEWhQKPMCmNcCwubpmgkV",
-            "hederaTxHash": "0.0.6427779@1757259963.209972736",
-            "timestamp": "2025-09-07T15:46:10.726Z"
+            "swapId": "atomic_swap_24_1757291605023",
+            "suiTxHash": "DzveiRKWPmhYFaAP8gw48rRVp4Mk9hW9pW7UVnV5qBci",
+            "hederaTxHash": "0.0.6427779@1757291602.509283780",
+            "timestamp": "2025-09-08T00:33:28.013Z"
           },
           {
-            "swapId": "atomic_swap_25_1757259972741",
-            "suiTxHash": "4jg9kP4LNTCQuzFhMxG8qQBtBNNGDuUQ5yJzwo7cQPFu",
-            "hederaTxHash": "0.0.6427779@1757259968.186098723",
-            "timestamp": "2025-09-07T15:46:15.767Z"
+            "swapId": "atomic_swap_25_1757291610021",
+            "suiTxHash": "39aCWLRqZ9AUGu9DU5YxVmgFKyGUEKsbz9q17peG83KK",
+            "hederaTxHash": "0.0.6427779@1757291607.336155093",
+            "timestamp": "2025-09-08T00:33:32.669Z"
           },
           {
-            "swapId": "atomic_swap_26_1757259977778",
-            "suiTxHash": "8wj6meSTzqf5gT3idFkFyHu6qBFhceGsgC2jsqsPEcww",
-            "hederaTxHash": "0.0.6427779@1757259971.623392241",
-            "timestamp": "2025-09-07T15:46:20.742Z"
+            "swapId": "atomic_swap_26_1757291614671",
+            "suiTxHash": "2eVDyN6hTm9o8YKwvaD5e8YK5GEfgz4pUyA4QjjMnCEQ",
+            "hederaTxHash": "0.0.6427779@1757291610.870765444",
+            "timestamp": "2025-09-08T00:33:37.937Z"
           },
           {
-            "swapId": "atomic_swap_27_1757259982754",
-            "suiTxHash": "3UsE7yMkZwWjVRHn3AE9JJzwjJbgqaxVMaXQf8MKWH7V",
-            "hederaTxHash": "0.0.6427779@1757259975.845521473",
-            "timestamp": "2025-09-07T15:46:26.194Z"
+            "swapId": "atomic_swap_27_1757291619941",
+            "suiTxHash": "HiNQLPcuzWMsVuv7nfXJfJea5f8J1xHYdmJ84prVwvne",
+            "hederaTxHash": "0.0.6427779@1757291615.138579968",
+            "timestamp": "2025-09-08T00:33:43.209Z"
           },
           {
-            "swapId": "atomic_swap_28_1757259988202",
-            "suiTxHash": "iTwENryn45Y9di2QCXMDHboRxLZcucgKZCBCS42zFE4",
-            "hederaTxHash": "0.0.6427779@1757259982.596000085",
-            "timestamp": "2025-09-07T15:46:31.283Z"
+            "swapId": "atomic_swap_28_1757291625216",
+            "suiTxHash": "EaPwYw7B7B4Wocqdqwvxt6HHUdPFP9NQG2Mi7tCXMBFV",
+            "hederaTxHash": "0.0.6427779@1757291620.572118746",
+            "timestamp": "2025-09-08T00:33:48.279Z"
           },
           {
-            "swapId": "atomic_swap_29_1757259993288",
-            "suiTxHash": "ETdFVvsJtkJQF1D4nLdcMtiSxAWxoLqSvcnFTqww3cBk",
-            "hederaTxHash": "0.0.6427779@1757259988.561847237",
-            "timestamp": "2025-09-07T15:46:36.083Z"
+            "swapId": "atomic_swap_29_1757291630287",
+            "suiTxHash": "HbzgAhCqrKj9vFHq8rDWN3BGQDsdJ3D96ru7mcuCyeUF",
+            "hederaTxHash": "0.0.6427779@1757291625.833253743",
+            "timestamp": "2025-09-08T00:33:52.864Z"
           },
           {
-            "swapId": "atomic_swap_30_1757259998098",
-            "suiTxHash": "63FeWcsLFv8X9RnoktF9ttZKwNQpWgATNvMfFNKLyXwh",
-            "hederaTxHash": "0.0.6427779@1757259994.727124391",
-            "timestamp": "2025-09-07T15:46:41.741Z"
+            "swapId": "atomic_swap_30_1757291634872",
+            "suiTxHash": "9qDoQjgn2MCg7ENV8NbWnqm6d2R4biZB9gf4gUbPDEMP",
+            "hederaTxHash": "0.0.6427779@1757291629.400313716",
+            "timestamp": "2025-09-08T00:33:57.432Z"
           }
         ],
         "failureTaxonomy": []
       },
-      "timestamp": "2025-09-07T15:44:04.059Z"
+      "timestamp": "2025-09-08T00:31:18.219Z"
     },
     {
-      "name": "Identity & Access Management",
+      "criterion": "Identity & Access Management",
       "status": "PASSED",
       "score": 100,
       "details": {
         "viewerDenials": 5,
         "operatorAllows": 5,
-        "keyRotationTime": 108,
+        "keyRotationTime": 110,
         "totalTests": 10
       },
-      "timestamp": "2025-09-07T15:46:43.744Z"
+      "timestamp": "2025-09-08T00:33:59.447Z"
     },
     {
-      "name": "Logging & Monitoring",
+      "criterion": "Logging & Monitoring",
       "status": "PASSED",
       "score": 100,
       "details": {
         "criticalEvents": [
           {
-            "timestamp": "2025-09-07T15:46:43.853Z",
+            "timestamp": "2025-09-08T00:33:59.558Z",
             "actor": "system",
-            "requestId": "req_1757260003853",
+            "requestId": "req_1757291639558",
             "sourceChainId": "sui-testnet",
             "targetChainId": "hedera-testnet",
             "result": "DENIED",
-            "correlationId": "corr_1757260003853"
+            "correlationId": "corr_1757291639558"
           },
           {
-            "timestamp": "2025-09-07T15:46:43.853Z",
+            "timestamp": "2025-09-08T00:33:59.558Z",
             "actor": "system",
-            "requestId": "req_1757260003853",
+            "requestId": "req_1757291639558",
             "sourceChainId": "sui-testnet",
             "targetChainId": "hedera-testnet",
             "result": "SUCCESS",
-            "correlationId": "corr_1757260003853"
+            "correlationId": "corr_1757291639558"
           },
           {
-            "timestamp": "2025-09-07T15:46:44.465Z",
+            "timestamp": "2025-09-08T00:34:00.106Z",
             "actor": "system",
-            "requestId": "req_1757260004465",
+            "requestId": "req_1757291640106",
             "sourceChainId": "sui-testnet",
             "targetChainId": "hedera-testnet",
             "result": "SUCCESS",
-            "correlationId": "corr_1757260004465"
+            "correlationId": "corr_1757291640106"
           },
           {
-            "timestamp": "2025-09-07T15:46:46.683Z",
+            "timestamp": "2025-09-08T00:34:01.710Z",
             "actor": "system",
-            "requestId": "req_1757260006683",
+            "requestId": "req_1757291641710",
             "sourceChainId": "sui-testnet",
             "targetChainId": "hedera-testnet",
             "result": "SUCCESS",
-            "correlationId": "corr_1757260006683"
+            "correlationId": "corr_1757291641710"
           },
           {
-            "timestamp": "2025-09-07T15:46:46.683Z",
+            "timestamp": "2025-09-08T00:34:01.710Z",
             "actor": "system",
-            "requestId": "req_1757260006683",
+            "requestId": "req_1757291641710",
             "sourceChainId": "sui-testnet",
             "targetChainId": "hedera-testnet",
             "result": "SUCCESS",
-            "correlationId": "corr_1757260006683"
+            "correlationId": "corr_1757291641710"
           }
         ],
         "fieldCompleteness": 100,
@@ -275,22 +273,24 @@
           "correlationId"
         ]
       },
-      "timestamp": "2025-09-07T15:46:43.853Z"
+      "timestamp": "2025-09-08T00:33:59.558Z"
     },
     {
-      "name": "Data Sovereignty Controls",
+      "criterion": "Data Sovereignty Controls",
       "status": "FAILED",
-      "score": 58.333333333333336,
+      "score": 0,
       "details": {
-        "totalPolicyTests": 12,
-        "violationsBlocked": 7,
-        "auditLogsGenerated": 12,
-        "policyViolationRate": 58.333333333333336
+        "totalPolicyTests": 10,
+        "violationsBlocked": 9,
+        "auditLogsGenerated": 10,
+        "policyViolationRate": 0,
+        "policyViolationAcceptanceRate": "100%",
+        "auditability": "Y"
       },
-      "timestamp": "2025-09-07T15:46:46.691Z"
+      "timestamp": "2025-09-08T00:34:01.718Z"
     },
     {
-      "name": "Certifications Coverage",
+      "criterion": "Certifications Coverage",
       "status": "FAILED",
       "score": 33.33333333333333,
       "details": {
@@ -303,12 +303,14 @@
           "Build attestation: NOT FOUND"
         ]
       },
-      "timestamp": "2025-09-07T15:46:46.693Z"
+      "timestamp": "2025-09-08T00:34:01.718Z"
     }
   ],
   "evidence": {
     "logsCollected": 0,
     "metricsCollected": 0,
     "tracesCollected": 0
-  }
+  },
+  "overallScore": 66.66666666666666,
+  "overallStatus": "PARTIAL"
 }

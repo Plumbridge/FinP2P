@@ -1,7 +1,7 @@
 # Axelar Operational Reliability Benchmark Results
 
-**Test Date:** 2025-09-06T18:01:46.730Z
-**Duration:** 39.0 seconds
+**Test Date:** 2025-09-08T01:54:00.164Z
+**Duration:** 40.5 seconds
 **Overall Score:** 100% (3/3 criteria passed)
 **Domain:** Operational Reliability
 **Network:** Axelar Testnet
@@ -35,7 +35,7 @@ This benchmark successfully tested Axelar's Operational Reliability using **real
 - **Logs Count:** 29
 - **Metrics Count:** 3
 - **Traces Count:** 1
-- **Successful Transfer:** observability_success_1757181652554
+- **Successful Transfer:** observability_success_1757296380431
 - **Failed Transfer:** none
 
 ### Fault Recovery Capabilities ✅ **PASSED**
@@ -45,11 +45,11 @@ This benchmark successfully tested Axelar's Operational Reliability using **real
 **Score:** 100%
 
 #### **Performance Metrics:**
-- **MTTR (Mean Time To Recovery):** 2000ms (2.000s)
+- **MTTR (Mean Time To Recovery):** 2013ms (2.013s)
 - **Exactly-Once Completion:** Yes
 - **Manual Steps:** 0
-- **Kill Time:** 2025-09-06T18:01:08.069Z
-- **Restart Time:** 2025-09-06T18:01:10.069Z
+- **Kill Time:** 2025-09-08T01:53:20.000Z
+- **Restart Time:** 2025-09-08T01:53:22.013Z
 - **Axelar Limitation:** No
 
 ### Lifecycle Management Process ✅ **PASSED**
@@ -63,12 +63,12 @@ This benchmark successfully tested Axelar's Operational Reliability using **real
 - **Connection State Success:** Yes
 - **System Resilience Success:** Yes
 - **State Transition Success:** Yes
-- **Total Downtime:** 10.972s
+- **Total Downtime:** 12.662s
 - **Compatibility Issues:** 0
-- **Configuration Change Time:** 3.841s
-- **Connection State Time:** 0.11s
-- **Resilience Time:** 3.543s
-- **State Transition Time:** 3.478s
+- **Configuration Change Time:** 3.842s
+- **Connection State Time:** 0.109s
+- **Resilience Time:** 3.673s
+- **State Transition Time:** 5.038s
 
 ## 📈 **Evidence Summary**
 

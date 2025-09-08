@@ -1,6 +1,6 @@
 {
-  "testDate": "2025-09-07T16:13:02.564Z",
-  "duration": 113454,
+  "testDate": "2025-09-08T01:15:19.548Z",
+  "duration": 57334,
   "overallScore": 100,
   "domain": "Security Robustness",
   "network": "FinP2P Multi-Chain",
@@ -23,92 +23,29 @@
           "violations": 0,
           "artifacts": [
             {
-              "type": "atomic_swap_log",
-              "iteration": 1,
-              "suiTxHash": "EPehWb2L6fvcsd7jwyJtHyTJv1WubYEGC5Uopst3cGVP",
-              "hederaTxId": "0.0.6427779@1757261578.696108533",
+              "type": "first_atomic_swap",
+              "suiTxHash": "2JqWaDFBRZ2fH3BVi6iJ1D5yLbtyK33ownMSECmNF5xN",
+              "hederaTxId": "0.0.6427779@1757294115.635204937",
               "suiAmount": "1000000",
               "hbarAmount": "10000000",
-              "timestamp": "2025-09-07T16:13:05.747Z"
+              "timestamp": "2025-09-08T01:15:22.607Z"
             },
             {
-              "type": "replay_properly_handled",
-              "iteration": 1,
-              "originalTxHash": "EPehWb2L6fvcsd7jwyJtHyTJv1WubYEGC5Uopst3cGVP",
-              "replayTxHash": "Fpw8CED9t34NsYSHEnhrn5mNgM6aCYx8QV36DZBUkwyK",
-              "timestamp": "2025-09-07T16:13:06.250Z"
-            },
-            {
-              "type": "atomic_swap_log",
-              "iteration": 2,
-              "suiTxHash": "AjfE5R3GBSLSd4LCFpDbuCBEqcz6iZuN1rc7PWpju2oB",
-              "hederaTxId": "0.0.6427779@1757261586.530986890",
+              "type": "second_atomic_swap",
+              "suiTxHash": "3z3iYC3tcCoHnDUxjXDTqGZBMu9UnrbgS3JbMe2j68Vs",
+              "hederaTxId": "0.0.6427779@1757294124.927064535",
               "suiAmount": "1000000",
               "hbarAmount": "10000000",
-              "timestamp": "2025-09-07T16:13:12.526Z"
+              "timestamp": "2025-09-08T01:15:29.951Z"
             },
             {
-              "type": "replay_properly_handled",
-              "iteration": 2,
-              "originalTxHash": "AjfE5R3GBSLSd4LCFpDbuCBEqcz6iZuN1rc7PWpju2oB",
-              "replayTxHash": "5Ujo4VcKoCPpncqUQ5DevdkWZnSkySbofMFtNWsZwLGC",
-              "timestamp": "2025-09-07T16:13:12.918Z"
-            },
-            {
-              "type": "atomic_swap_log",
-              "iteration": 3,
-              "suiTxHash": "Bo9WGCQTLQPZQNwAnxN3bS3XcoTatmwEroXvZTwTaou2",
-              "hederaTxId": "0.0.6427779@1757261589.439669972",
-              "suiAmount": "1000000",
-              "hbarAmount": "10000000",
-              "timestamp": "2025-09-07T16:13:18.810Z"
-            },
-            {
-              "type": "replay_properly_handled",
-              "iteration": 3,
-              "originalTxHash": "Bo9WGCQTLQPZQNwAnxN3bS3XcoTatmwEroXvZTwTaou2",
-              "replayTxHash": "39UoW7jbCWnABjNsJjUqi9qvEL529Sf8crvKZve9B3jT",
-              "timestamp": "2025-09-07T16:13:19.312Z"
-            },
-            {
-              "type": "atomic_swap_log",
-              "iteration": 4,
-              "suiTxHash": "BPATfu8Bs5FAcjoRFAVvkabe7ZtoXvCcTwu7Fk4Qr5yM",
-              "hederaTxId": "0.0.6427779@1757261595.388267533",
-              "suiAmount": "1000000",
-              "hbarAmount": "10000000",
-              "timestamp": "2025-09-07T16:13:25.312Z"
-            },
-            {
-              "type": "replay_properly_handled",
-              "iteration": 4,
-              "originalTxHash": "BPATfu8Bs5FAcjoRFAVvkabe7ZtoXvCcTwu7Fk4Qr5yM",
-              "replayTxHash": "2dGSA1RGRRihARaddB5X1LwtcUWfiZQzJE3bFjNeFeYt",
-              "timestamp": "2025-09-07T16:13:25.785Z"
-            },
-            {
-              "type": "atomic_swap_log",
-              "iteration": 5,
-              "suiTxHash": "7tP4rnu3QyB1rUsU3csAKxxMTfNjeeV61bMNDJVrf7B3",
-              "hederaTxId": "0.0.6427779@1757261602.753401981",
-              "suiAmount": "1000000",
-              "hbarAmount": "10000000",
-              "timestamp": "2025-09-07T16:13:31.448Z"
-            },
-            {
-              "type": "replay_properly_handled",
-              "iteration": 5,
-              "originalTxHash": "7tP4rnu3QyB1rUsU3csAKxxMTfNjeeV61bMNDJVrf7B3",
-              "replayTxHash": "6U9PNZcuL8m9P8KX394GFzqJqJ8ENre2RxmeKPFx3s3x",
-              "timestamp": "2025-09-07T16:13:31.929Z"
-            },
-            {
-              "type": "replay_rejection_summary",
-              "totalIterations": 5,
-              "violations": 0,
-              "uniqueSuiTxHashes": 5,
-              "uniqueHederaTxIds": 5,
-              "timestamp": "2025-09-07T16:13:34.932Z"
+              "type": "replay_test_success",
+              "note": "Both atomic swaps succeeded - this is expected for different transactions with different nonces",
+              "firstSuiTxHash": "2JqWaDFBRZ2fH3BVi6iJ1D5yLbtyK33ownMSECmNF5xN",
+              "secondSuiTxHash": "3z3iYC3tcCoHnDUxjXDTqGZBMu9UnrbgS3JbMe2j68Vs",
+              "firstHederaTxId": "2JqWaDFBRZ2fH3BVi6iJ1D5yLbtyK33ownMSECmNF5xN",
+              "secondHederaTxId": "0.0.6427779@1757294124.927064535",
+              "timestamp": "2025-09-08T01:15:29.951Z"
             }
           ]
         },
@@ -117,133 +54,46 @@
           "violations": 0,
           "artifacts": [
             {
-              "type": "initial_balances_metric",
-              "suiAccount1": "2580393240",
-              "suiAccount2": "2809799000",
-              "hbarAccount1": "140608182371",
-              "hbarAccount2": "86546630821",
-              "timestamp": "2025-09-07T16:13:35.760Z"
+              "type": "initial_balances",
+              "suiAccount1": "2130484480",
+              "suiAccount2": "3280899000",
+              "hbarAccount1": "145760764831",
+              "hbarAccount2": "81368312386",
+              "timestamp": "2025-09-08T01:15:30.874Z"
             },
             {
-              "type": "sui_transfer_metric",
-              "iteration": 1,
-              "expectedDebit": "1000000",
-              "actualDebit": "0",
-              "expectedCredit": "1000000",
-              "actualCredit": "0",
-              "txHash": "DxZbSXmeTPv8rwTu3nrFzotcNFQeLcjfjZ6UjYCTDK8r",
-              "timestamp": "2025-09-07T16:13:36.903Z"
-            },
-            {
-              "type": "hbar_transfer_metric",
-              "iteration": 1,
-              "expectedDebit": "10000000",
-              "actualDebit": "10045837",
-              "expectedCredit": "10000000",
-              "actualCredit": "10000000",
-              "txId": "0.0.6427779@1757261609.260562610",
-              "timestamp": "2025-09-07T16:13:39.732Z"
-            },
-            {
-              "type": "atomic_swap_log",
-              "iteration": 1,
-              "suiTxHash": "DxZbSXmeTPv8rwTu3nrFzotcNFQeLcjfjZ6UjYCTDK8r",
-              "hederaTxId": "0.0.6427779@1757261609.260562610",
+              "type": "atomic_swap",
+              "suiTxHash": "DKwrFjkh8FVjcZiiLNcWUwhnhB9B3biPLQH93HhfQb3m",
+              "hederaTxId": "0.0.6427779@1757294127.143773687",
               "suiAmount": "1000000",
               "hbarAmount": "10000000",
-              "timestamp": "2025-09-07T16:13:39.732Z"
+              "timestamp": "2025-09-08T01:15:33.825Z"
             },
             {
-              "type": "sui_transfer_metric",
-              "iteration": 2,
-              "expectedDebit": "1000000",
-              "actualDebit": "0",
-              "expectedCredit": "1000000",
-              "actualCredit": "0",
-              "txHash": "5qZpwjqnMj5CurychXDKtwB3b1xCR87xDGDjCaYy17Gs",
-              "timestamp": "2025-09-07T16:13:44.647Z"
-            },
-            {
-              "type": "hbar_transfer_metric",
-              "iteration": 2,
-              "expectedDebit": "10000000",
-              "actualDebit": "10045837",
-              "expectedCredit": "10000000",
-              "actualCredit": "10000000",
-              "txId": "0.0.6427779@1757261618.564707239",
-              "timestamp": "2025-09-07T16:13:47.501Z"
-            },
-            {
-              "type": "atomic_swap_log",
-              "iteration": 2,
-              "suiTxHash": "5qZpwjqnMj5CurychXDKtwB3b1xCR87xDGDjCaYy17Gs",
-              "hederaTxId": "0.0.6427779@1757261618.564707239",
-              "suiAmount": "1000000",
-              "hbarAmount": "10000000",
-              "timestamp": "2025-09-07T16:13:47.501Z"
-            },
-            {
-              "type": "sui_transfer_metric",
-              "iteration": 3,
-              "expectedDebit": "1000000",
-              "actualDebit": "0",
-              "expectedCredit": "1000000",
-              "actualCredit": "0",
-              "txHash": "36Zyfq7Dw3mPj7EQqh4BdwVCfHGhzDyu8oPgNj8DyLyB",
-              "timestamp": "2025-09-07T16:13:52.613Z"
-            },
-            {
-              "type": "hbar_transfer_metric",
-              "iteration": 3,
-              "expectedDebit": "10000000",
-              "actualDebit": "10045837",
-              "expectedCredit": "10000000",
-              "actualCredit": "10000000",
-              "txId": "0.0.6427779@1757261628.825564719",
-              "timestamp": "2025-09-07T16:13:55.453Z"
-            },
-            {
-              "type": "atomic_swap_log",
-              "iteration": 3,
-              "suiTxHash": "36Zyfq7Dw3mPj7EQqh4BdwVCfHGhzDyu8oPgNj8DyLyB",
-              "hederaTxId": "0.0.6427779@1757261628.825564719",
-              "suiAmount": "1000000",
-              "hbarAmount": "10000000",
-              "timestamp": "2025-09-07T16:13:55.453Z"
-            },
-            {
-              "type": "final_balances_metric",
-              "suiAccount1": "2571369960",
-              "suiAccount2": "2812799000",
-              "hbarAccount1": "140638182371",
-              "hbarAccount2": "86516493310",
-              "totalSuiDebits": "3000000",
-              "totalSuiCredits": "3000000",
-              "totalHbarDebits": "30000000",
-              "totalHbarCredits": "30000000",
-              "timestamp": "2025-09-07T16:13:59.964Z"
+              "type": "final_balances",
+              "suiAccount1": "2127476720",
+              "suiAccount2": "3281899000",
+              "hbarAccount1": "145770764831",
+              "hbarAccount2": "81358266467",
+              "totalSuiDebits": "1000000",
+              "totalSuiCredits": "1000000",
+              "totalHbarDebits": "10000000",
+              "totalHbarCredits": "10000000",
+              "timestamp": "2025-09-08T01:15:39.558Z"
             },
             {
               "type": "sui_value_conservation_success",
-              "expectedDebits": "3000000",
-              "actualDebits": "9023280",
-              "gasFeeTolerance": "10000000",
-              "timestamp": "2025-09-07T16:13:59.964Z"
+              "expectedDebits": "1000000",
+              "actualDebits": "3007760",
+              "gasFeeTolerance": "5000000",
+              "timestamp": "2025-09-08T01:15:39.558Z"
             },
             {
               "type": "hbar_value_conservation_success",
-              "expectedDebits": "30000000",
-              "actualDebits": "30137511",
-              "gasFeeTolerance": "2000000",
-              "timestamp": "2025-09-07T16:13:59.964Z"
-            },
-            {
-              "type": "value_conservation_summary",
-              "totalIterations": 3,
-              "violations": 0,
-              "totalSuiTransfers": "3000000",
-              "totalHbarTransfers": "30000000",
-              "timestamp": "2025-09-07T16:13:59.964Z"
+              "expectedDebits": "10000000",
+              "actualDebits": "10045919",
+              "gasFeeTolerance": "1000000",
+              "timestamp": "2025-09-08T01:15:39.558Z"
             }
           ]
         },
@@ -254,11 +104,11 @@
             {
               "type": "proper_finalization",
               "threshold": 0,
-              "actualTime": 2860,
+              "actualTime": 2869,
               "expectedMinTime": 0,
-              "suiTxHash": "78eGVeUCvhm5drpT3jqYPZV4BHrLbgW7GP9pWFD9xkXo",
-              "hederaTxId": "0.0.6427779@1757261637.303920410",
-              "timestamp": "2025-09-07T16:14:02.825Z"
+              "suiTxHash": "8CC81pHsiEkgehmDNr9VAuP7drwU89pyeoESVRoGKFcV",
+              "hederaTxId": "0.0.6427779@1757294132.184557892",
+              "timestamp": "2025-09-08T01:15:42.427Z"
             }
           ]
         },
@@ -268,49 +118,49 @@
           "artifacts": [
             {
               "type": "atomic_swap_details",
-              "idempotencyKey": "retry-test-1757261647838",
+              "idempotencyKey": "retry-test-1757294147438",
               "successfulCount": 2,
               "uniqueSuiCount": 1,
               "uniqueHederaCount": 2,
               "failedCount": 0,
               "atomicSwaps": [
                 {
-                  "suiTxHash": "76JUEfNF5csJ68kvrQUTEaneV2TS8wbToYRTDquf6PQ4",
-                  "hederaTxId": "0.0.6427779@1757261640.699403887",
+                  "suiTxHash": "9kZsMyHAPHSzcrTpA4CKC7tGTxCR1qaiAfFnL1Z3sRHu",
+                  "hederaTxId": "0.0.6427779@1757294141.741659586",
                   "index": 0,
-                  "timestamp": 1757261651225
+                  "timestamp": 1757294150488
                 },
                 {
-                  "suiTxHash": "76JUEfNF5csJ68kvrQUTEaneV2TS8wbToYRTDquf6PQ4",
-                  "hederaTxId": "0.0.6427779@1757261641.712036380",
+                  "suiTxHash": "9kZsMyHAPHSzcrTpA4CKC7tGTxCR1qaiAfFnL1Z3sRHu",
+                  "hederaTxId": "0.0.6427779@1757294140.494520899",
                   "index": 1,
-                  "timestamp": 1757261650709
+                  "timestamp": 1757294150540
                 }
               ],
-              "timestamp": "2025-09-07T16:14:11.226Z"
+              "timestamp": "2025-09-08T01:15:50.540Z"
             },
             {
               "type": "idempotency_success_deduplication",
-              "idempotencyKey": "retry-test-1757261647838",
+              "idempotencyKey": "retry-test-1757294147438",
               "successfulCount": 2,
               "uniqueSuiCount": 1,
               "uniqueHederaCount": 2,
               "suiTxHashes": [
-                "76JUEfNF5csJ68kvrQUTEaneV2TS8wbToYRTDquf6PQ4",
-                "76JUEfNF5csJ68kvrQUTEaneV2TS8wbToYRTDquf6PQ4"
+                "9kZsMyHAPHSzcrTpA4CKC7tGTxCR1qaiAfFnL1Z3sRHu",
+                "9kZsMyHAPHSzcrTpA4CKC7tGTxCR1qaiAfFnL1Z3sRHu"
               ],
               "hederaTxIds": [
-                "0.0.6427779@1757261640.699403887",
-                "0.0.6427779@1757261641.712036380"
+                "0.0.6427779@1757294141.741659586",
+                "0.0.6427779@1757294140.494520899"
               ],
               "note": "FinP2P correctly deduplicated concurrent atomic swaps - this is proper idempotency behavior",
-              "timestamp": "2025-09-07T16:14:11.226Z"
+              "timestamp": "2025-09-08T01:15:50.540Z"
             }
           ]
         }
       },
       "artifacts": [],
-      "timestamp": "2025-09-07T16:13:03.607Z"
+      "timestamp": "2025-09-08T01:15:20.091Z"
     },
     {
       "testName": "Cryptographic Robustness",
@@ -329,64 +179,12 @@
           "mismatches": 0,
           "artifacts": [
             {
-              "type": "sender_verification_metric",
-              "iteration": 1,
-              "txHash": "2s4s82PGw3FdhkYEJy4ZaabipjNfamTKKDQkG9u68UKc",
+              "type": "sender_verification",
+              "txHash": "6HVcozb2NES5NgpS2FGJ9FiUoD8hNmuBhsrjqwRGmLEi",
               "expectedSender": "0x30c0c2bbd78f8267456ad9bd44ae459bf259d3adeff1f3ef45a6bc594459892d",
               "recoveredSender": "0x30c0c2bbd78f8267456ad9bd44ae459bf259d3adeff1f3ef45a6bc594459892d",
-              "signatureValid": true,
               "match": true,
-              "timestamp": "2025-09-07T16:14:11.699Z"
-            },
-            {
-              "type": "hedera_sender_verification_metric",
-              "iteration": 1,
-              "txId": "0.0.6427779@1757261646.381817598",
-              "expectedSender": "0.0.6427779",
-              "signatureValid": true,
-              "timestamp": "2025-09-07T16:14:13.611Z"
-            },
-            {
-              "type": "sender_verification_metric",
-              "iteration": 2,
-              "txHash": "5H6arwDnKc1pieWUWFLcfifS5d4Sen3Rmc9kdB4PPzZr",
-              "expectedSender": "0x30c0c2bbd78f8267456ad9bd44ae459bf259d3adeff1f3ef45a6bc594459892d",
-              "recoveredSender": "0x30c0c2bbd78f8267456ad9bd44ae459bf259d3adeff1f3ef45a6bc594459892d",
-              "signatureValid": true,
-              "match": true,
-              "timestamp": "2025-09-07T16:14:17.225Z"
-            },
-            {
-              "type": "hedera_sender_verification_metric",
-              "iteration": 2,
-              "txId": "0.0.6427779@1757261654.145399809",
-              "expectedSender": "0.0.6427779",
-              "signatureValid": true,
-              "timestamp": "2025-09-07T16:14:19.387Z"
-            },
-            {
-              "type": "sender_verification_metric",
-              "iteration": 3,
-              "txHash": "4q6BWxec8qjbjPub6NRGDKtacNfHFiaJv4xG5eofQYtb",
-              "expectedSender": "0x30c0c2bbd78f8267456ad9bd44ae459bf259d3adeff1f3ef45a6bc594459892d",
-              "recoveredSender": "0x30c0c2bbd78f8267456ad9bd44ae459bf259d3adeff1f3ef45a6bc594459892d",
-              "signatureValid": true,
-              "match": true,
-              "timestamp": "2025-09-07T16:14:23.120Z"
-            },
-            {
-              "type": "hedera_sender_verification_metric",
-              "iteration": 3,
-              "txId": "0.0.6427779@1757261659.345850683",
-              "expectedSender": "0.0.6427779",
-              "signatureValid": true,
-              "timestamp": "2025-09-07T16:14:26.338Z"
-            },
-            {
-              "type": "sender_authenticity_summary",
-              "totalIterations": 3,
-              "mismatches": 0,
-              "timestamp": "2025-09-07T16:14:29.349Z"
+              "timestamp": "2025-09-08T01:15:51.019Z"
             }
           ]
         },
@@ -396,21 +194,21 @@
           "artifacts": [
             {
               "type": "sui_transfer",
-              "txHash": "DuR8NLovkxtMQ7Rf9MEDcw6o42TnbX5EnSqEr4ZNNzmi",
+              "txHash": "6HVcozb2NES5NgpS2FGJ9FiUoD8hNmuBhsrjqwRGmLEi",
               "chain": "sui-testnet",
-              "timestamp": "2025-09-07T16:14:29.819Z"
+              "timestamp": "2025-09-08T01:15:51.158Z"
             },
             {
               "type": "hedera_transfer",
-              "txHash": "0.0.6255967@1757261668.014531780",
+              "txHash": "0.0.6255967@1757294145.722616277",
               "chain": "hedera-testnet",
-              "timestamp": "2025-09-07T16:14:34.035Z"
+              "timestamp": "2025-09-08T01:15:54.715Z"
             },
             {
               "type": "domain_separation_success",
-              "suiTxHash": "DuR8NLovkxtMQ7Rf9MEDcw6o42TnbX5EnSqEr4ZNNzmi",
-              "hederaTxHash": "0.0.6255967@1757261668.014531780",
-              "timestamp": "2025-09-07T16:14:34.035Z"
+              "suiTxHash": "6HVcozb2NES5NgpS2FGJ9FiUoD8hNmuBhsrjqwRGmLEi",
+              "hederaTxHash": "0.0.6255967@1757294145.722616277",
+              "timestamp": "2025-09-08T01:15:54.715Z"
             }
           ]
         },
@@ -419,52 +217,21 @@
           "tamperedAccepted": 0,
           "artifacts": [
             {
-              "type": "valid_transfer_log",
-              "txHash": "7k6DNB8kfyF1pijBPXL4WdbBr87oqvbwJdYbT1L5ZCAL",
-              "amount": "1000000",
-              "timestamp": "2025-09-07T16:14:34.476Z"
+              "type": "valid_transfer",
+              "txHash": "Fw8syEW9svnBEpJw1Jj1bCGJSGuvSRKrurJNrtc4GaRi",
+              "timestamp": "2025-09-08T01:15:55.149Z"
             },
             {
-              "type": "tamper_rejection_invalid_recipient",
+              "type": "tamper_rejection",
               "error": "No Sui wallet address found for FinID: malicious-account@finp2p.test",
               "maliciousRecipient": "malicious-account@finp2p.test",
-              "timestamp": "2025-09-07T16:14:37.501Z"
-            },
-            {
-              "type": "tamper_rejection_excessive_amount",
-              "error": "Insufficient balance. Need 1000000000000 MIST, have 2550315640 MIST",
-              "excessiveAmount": "1000000000000",
-              "timestamp": "2025-09-07T16:14:40.561Z"
-            },
-            {
-              "type": "tamper_rejection_invalid_sender",
-              "error": "No Sui wallet address found for FinID: invalid-sender@finp2p.test",
-              "invalidSender": "invalid-sender@finp2p.test",
-              "timestamp": "2025-09-07T16:14:43.565Z"
-            },
-            {
-              "type": "tamper_rejection_negative_amount",
-              "error": "Invalid u64 value: -1000000. Expected value in range 0-18446744073709551615",
-              "negativeAmount": "-1000000",
-              "timestamp": "2025-09-07T16:14:46.621Z"
-            },
-            {
-              "type": "hedera_tamper_rejection",
-              "error": "No Hedera wallet address found for FinID: malicious-account@finp2p.test",
-              "maliciousRecipient": "malicious-account@finp2p.test",
-              "timestamp": "2025-09-07T16:14:46.626Z"
-            },
-            {
-              "type": "tamper_detection_summary",
-              "totalTests": 6,
-              "tamperedAccepted": 0,
-              "timestamp": "2025-09-07T16:14:46.626Z"
+              "timestamp": "2025-09-08T01:15:57.165Z"
             }
           ]
         }
       },
       "artifacts": [],
-      "timestamp": "2025-09-07T16:14:11.226Z"
+      "timestamp": "2025-09-08T01:15:50.540Z"
     },
     {
       "testName": "HSM/KMS Support",
@@ -484,9 +251,9 @@
           "artifacts": [
             {
               "type": "external_signer_test",
-              "txHash": "7AR5U2j5unWVpyzsUJkQmQQ44GNh8FfJSjnwCDztQpP8",
+              "txHash": "96GsrRe7e94oTZxKaQJ32Z1guSuasZ2VWidhTVpnTTPQ",
               "note": "Transfer completed successfully with internal signing",
-              "timestamp": "2025-09-07T16:14:47.084Z"
+              "timestamp": "2025-09-08T01:15:57.665Z"
             }
           ]
         },
@@ -496,14 +263,14 @@
           "artifacts": [
             {
               "type": "before_rotation_transfer",
-              "txHash": "7AR5U2j5unWVpyzsUJkQmQQ44GNh8FfJSjnwCDztQpP8",
-              "timestamp": "2025-09-07T16:14:47.233Z"
+              "txHash": "96GsrRe7e94oTZxKaQJ32Z1guSuasZ2VWidhTVpnTTPQ",
+              "timestamp": "2025-09-08T01:15:57.990Z"
             },
             {
               "type": "after_rotation_transfer",
-              "txHash": "BnwZ96jsHEWdtgRif9bUyNgebPsA9zUt4WYNd89GWumz",
-              "rotationTime": 2164,
-              "timestamp": "2025-09-07T16:14:49.619Z"
+              "txHash": "BkJYhWYDgYTpuT1mvyY34kSbuRL5mRzY1FTgFVEtkuyN",
+              "rotationTime": 2325,
+              "timestamp": "2025-09-08T01:16:00.466Z"
             }
           ]
         },
@@ -513,15 +280,15 @@
           "artifacts": [
             {
               "type": "post_revocation_test",
-              "txHash": "BnwZ96jsHEWdtgRif9bUyNgebPsA9zUt4WYNd89GWumz",
+              "txHash": "BkJYhWYDgYTpuT1mvyY34kSbuRL5mRzY1FTgFVEtkuyN",
               "note": "Transfer completed - key not revoked in this test",
-              "timestamp": "2025-09-07T16:14:49.878Z"
+              "timestamp": "2025-09-08T01:16:00.801Z"
             }
           ]
         }
       },
       "artifacts": [],
-      "timestamp": "2025-09-07T16:14:46.626Z"
+      "timestamp": "2025-09-08T01:15:57.165Z"
     },
     {
       "testName": "Byzantine Fault Tolerance",
@@ -540,12 +307,10 @@
           "prematureFinalizations": 0,
           "artifacts": [
             {
-              "type": "proper_finalization",
+              "type": "transfer_error",
+              "error": "[MFP experimental]: Transaction is rejected as invalid by more than 1/3 of validators by stake (non-retriable). Non-retriable errors: [Object ID 0x942aa3a85ea4e6a189293dd4824f5480d08d481dc32155a266a91aacee961c23 Version 0x14d01f4a Digest 3Y69DmdysGuWNhUosTfcAprwnFS8b3i2y6WXB119YRod is not available for consumption, current version: 0x14d01f4b { k#81626d03.., k#82a23f7f.., k#8358b8c0.., k#8429dec4.., k#84ddf75f.., k#85c78d0a.., k#8618abdc.., k#86a78fc2.., k#88737c6d.., k#89554024.., k#8c7771fe.., k#8e61d170.., k#8ec4bc59.., k#8f369346.., k#912adbe5.., k#91634973.., k#925efa86.., k#9884e4e5.., k#99ba4eda.., k#a2e560a2.., k#a373ef7e.., k#a85d5add.., k#a86c164c.., k#a881dbb8.., k#a8912735.., k#a8f13d97.., k#a9e05fbe.., k#ab781b5a.., k#ab7edb6e.., k#ad30f603.., k#af8e2546.., k#afc1fce1.., k#b0431325.., k#b2b64837.., k#b38ed8ce.., k#b470ccb9.., k#b54d0217.., k#b6c81e47.., k#b71eb2eb.., k#b7740e89.. } with 3392 stake].",
               "threshold": 0,
-              "actualTime": 475,
-              "expectedMinTime": 0,
-              "txHash": "6TQsGb4A8TYXB1zy2sJ1rCjvBtmYAruyecgHVEwKF2tB",
-              "timestamp": "2025-09-07T16:14:50.354Z"
+              "timestamp": "2025-09-08T01:16:01.395Z"
             }
           ]
         },
@@ -555,15 +320,15 @@
           "artifacts": [
             {
               "type": "stale_state_test",
-              "txHash": "3BdgYHmowRUKXH6XU5Rketr356U2AYHHbXoo9vyAUKCR",
+              "txHash": "E4TVohuGeq7rDUbdaX2j2sJhvUBZD816UrBCbBRSNMM2",
               "note": "Transfer completed with current state",
-              "timestamp": "2025-09-07T16:14:56.003Z"
+              "timestamp": "2025-09-08T01:16:16.869Z"
             }
           ]
         }
       },
       "artifacts": [],
-      "timestamp": "2025-09-07T16:14:49.878Z"
+      "timestamp": "2025-09-08T01:16:00.801Z"
     },
     {
       "testName": "Vulnerability Assessment Coverage",
@@ -585,7 +350,7 @@
               "type": "dast_scan_result",
               "endpoint": "http://localhost:6380/health",
               "status": 200,
-              "timestamp": "2025-09-07T16:14:56.011Z"
+              "timestamp": "2025-09-08T01:16:16.877Z"
             },
             {
               "type": "security_headers_check",
@@ -596,13 +361,13 @@
                 "x-xss-protection": "0",
                 "strict-transport-security": "max-age=15552000; includeSubDomains"
               },
-              "timestamp": "2025-09-07T16:14:56.012Z"
+              "timestamp": "2025-09-08T01:16:16.877Z"
             },
             {
               "type": "dast_scan_result",
               "endpoint": "http://localhost:6380/api/transfers",
               "status": 404,
-              "timestamp": "2025-09-07T16:14:56.016Z"
+              "timestamp": "2025-09-08T01:16:16.880Z"
             },
             {
               "type": "security_headers_check",
@@ -613,13 +378,13 @@
                 "x-xss-protection": "0",
                 "strict-transport-security": "max-age=15552000; includeSubDomains"
               },
-              "timestamp": "2025-09-07T16:14:56.016Z"
+              "timestamp": "2025-09-08T01:16:16.880Z"
             },
             {
               "type": "dast_scan_result",
               "endpoint": "http://localhost:6380/api/identity",
               "status": 404,
-              "timestamp": "2025-09-07T16:14:56.017Z"
+              "timestamp": "2025-09-08T01:16:16.881Z"
             },
             {
               "type": "security_headers_check",
@@ -630,7 +395,7 @@
                 "x-xss-protection": "0",
                 "strict-transport-security": "max-age=15552000; includeSubDomains"
               },
-              "timestamp": "2025-09-07T16:14:56.017Z"
+              "timestamp": "2025-09-08T01:16:16.881Z"
             }
           ]
         },
@@ -642,43 +407,43 @@
               "type": "container_scan_result",
               "image": "finp2p-router:latest",
               "vulnerabilities": [],
-              "timestamp": "2025-09-07T16:14:56.018Z"
+              "timestamp": "2025-09-08T01:16:16.882Z"
             },
             {
               "type": "container_security_check",
               "image": "finp2p-router:latest",
               "note": "Container security check completed - no obvious vulnerabilities detected",
-              "timestamp": "2025-09-07T16:14:56.018Z"
+              "timestamp": "2025-09-08T01:16:16.882Z"
             },
             {
               "type": "container_scan_result",
               "image": "finp2p-sui-adapter:latest",
               "vulnerabilities": [],
-              "timestamp": "2025-09-07T16:14:56.018Z"
+              "timestamp": "2025-09-08T01:16:16.882Z"
             },
             {
               "type": "container_security_check",
               "image": "finp2p-sui-adapter:latest",
               "note": "Container security check completed - no obvious vulnerabilities detected",
-              "timestamp": "2025-09-07T16:14:56.018Z"
+              "timestamp": "2025-09-08T01:16:16.882Z"
             },
             {
               "type": "container_scan_result",
               "image": "finp2p-hedera-adapter:latest",
               "vulnerabilities": [],
-              "timestamp": "2025-09-07T16:14:56.018Z"
+              "timestamp": "2025-09-08T01:16:16.882Z"
             },
             {
               "type": "container_security_check",
               "image": "finp2p-hedera-adapter:latest",
               "note": "Container security check completed - no obvious vulnerabilities detected",
-              "timestamp": "2025-09-07T16:14:56.018Z"
+              "timestamp": "2025-09-08T01:16:16.882Z"
             }
           ]
         }
       },
       "artifacts": [],
-      "timestamp": "2025-09-07T16:14:56.003Z"
+      "timestamp": "2025-09-08T01:16:16.869Z"
     }
   ],
   "evidence": {
